@@ -2,20 +2,31 @@
 
 import type { ReportStatus } from "@/app/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
+import { getCurrentOrganization } from "./org-actions";
 
 export type ReportFilters = {
   status?: ReportStatus;
   search?: string;
 };
 
+/**
+ * Get reports for the current user's organization
+ */
 export async function getReports(
-  authorId: string,
   filters?: ReportFilters,
   page = 1,
   limit = 20,
 ) {
+  const orgData = await getCurrentOrganization();
+  if (!orgData) {
+    return {
+      reports: [],
+      pagination: { page, limit, total: 0, totalPages: 0 },
+    };
+  }
+
   const where: {
-    authorId: string;
+    organizationId: string;
     status?: ReportStatus;
     OR?: Array<{
       customerName?: { contains: string; mode: "insensitive" };
@@ -23,7 +34,7 @@ export async function getReports(
       serialNumber?: { contains: string; mode: "insensitive" };
     }>;
   } = {
-    authorId,
+    organizationId: orgData.organization.id,
   };
 
   if (filters?.status) {
@@ -55,6 +66,9 @@ export async function getReports(
         serviceDate: true,
         createdAt: true,
         updatedAt: true,
+        author: {
+          select: { id: true, name: true },
+        },
         _count: {
           select: { checklists: true },
         },
@@ -74,10 +88,18 @@ export async function getReports(
   };
 }
 
-export async function deleteReport(reportId: string, authorId: string) {
-  // Verify ownership
+/**
+ * Delete a report (must be in user's org)
+ */
+export async function deleteReport(reportId: string) {
+  const orgData = await getCurrentOrganization();
+  if (!orgData) {
+    return { success: false, error: "Ikke autentisert" };
+  }
+
+  // Verify report belongs to org
   const report = await prisma.report.findFirst({
-    where: { id: reportId, authorId },
+    where: { id: reportId, organizationId: orgData.organization.id },
   });
 
   if (!report) {
@@ -91,9 +113,17 @@ export async function deleteReport(reportId: string, authorId: string) {
   return { success: true };
 }
 
-export async function duplicateReport(reportId: string, authorId: string) {
+/**
+ * Duplicate a report within the same organization
+ */
+export async function duplicateReport(reportId: string) {
+  const orgData = await getCurrentOrganization();
+  if (!orgData) {
+    return { success: false, error: "Ikke autentisert" };
+  }
+
   const original = await prisma.report.findFirst({
-    where: { id: reportId, authorId },
+    where: { id: reportId, organizationId: orgData.organization.id },
     include: { checklists: true },
   });
 
@@ -101,9 +131,17 @@ export async function duplicateReport(reportId: string, authorId: string) {
     return { success: false, error: "Rapport ikke funnet" };
   }
 
+  // Get current session for authorId
+  const { getSession } = await import("@/lib/server");
+  const session = await getSession();
+  if (!session?.user) {
+    return { success: false, error: "Ikke autentisert" };
+  }
+
   const duplicate = await prisma.report.create({
     data: {
-      authorId,
+      authorId: session.user.id,
+      organizationId: orgData.organization.id,
       customerName: original.customerName,
       customerAddress: original.customerAddress,
       contactPerson: original.contactPerson,

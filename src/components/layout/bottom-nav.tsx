@@ -1,6 +1,6 @@
 "use client";
 
-import { Database, FileText, Home, PlusCircle, User } from "lucide-react";
+import { Database, FileText, Home, PlusCircle, Settings } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
@@ -10,7 +10,7 @@ const navItems = [
   { href: "/reports", label: "Rapporter", icon: FileText },
   { href: "/reports/new", label: "Ny", icon: PlusCircle, primary: true },
   { href: "/data-editor", label: "Data", icon: Database },
-  { href: "/profile", label: "Profil", icon: User },
+  { href: "/settings", label: "Mer", icon: Settings },
 ];
 
 export function BottomNav() {

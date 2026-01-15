@@ -17,10 +17,9 @@ export default async function DashboardPage() {
     return null; // Layout handles redirect
   }
 
-  const userId = session.user.id;
   const [stats, recentReports] = await Promise.all([
-    getDashboardStats(userId),
-    getRecentReports(userId),
+    getDashboardStats(),
+    getRecentReports(),
   ]);
 
   return (

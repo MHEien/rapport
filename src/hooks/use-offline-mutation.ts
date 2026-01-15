@@ -49,7 +49,7 @@ export function useOfflineMutation<TData, TPayload>(
   const [syncStatus, setSyncStatus] = useState<SyncStatus>("synced");
   const [isOnline, setIsOnline] = useState(true);
 
-    // Process queued mutations
+  // Process queued mutations
   const processQueue = useCallback(async () => {
     const currentQueue = loadQueue();
     const pendingMutations = currentQueue.filter(
@@ -113,8 +113,6 @@ export function useOfflineMutation<TData, TPayload>(
       setSyncStatus("synced");
     }
   }, [queue, isOnline]);
-
-
 
   // Main mutation
   const mutation = useMutation({

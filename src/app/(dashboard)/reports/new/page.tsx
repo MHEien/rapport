@@ -1,7 +1,7 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { getProductTypes } from "@/lib/actions/service-points-actions";
 import { auth } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
 import { NewReportClient } from "./client";
 
 export default async function NewReportPage() {
@@ -13,16 +13,8 @@ export default async function NewReportPage() {
     redirect("/auth/signin");
   }
 
-  // Get distinct product types from service points
-  const productTypes = await prisma.servicePoint.findMany({
-    distinct: ["productType"],
-    select: { productType: true },
-  });
+  // Get distinct product types from org's service points
+  const productTypes = await getProductTypes();
 
-  return (
-    <NewReportClient
-      userId={session.user.id}
-      productTypes={productTypes.map((p) => p.productType)}
-    />
-  );
+  return <NewReportClient productTypes={productTypes} />;
 }

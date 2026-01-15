@@ -31,6 +31,7 @@ export type ServicePointMinAggregateOutputType = {
   text: string | null;
   isForService: boolean | null;
   isForCommissioning: boolean | null;
+  organizationId: string | null;
 };
 
 export type ServicePointMaxAggregateOutputType = {
@@ -40,6 +41,7 @@ export type ServicePointMaxAggregateOutputType = {
   text: string | null;
   isForService: boolean | null;
   isForCommissioning: boolean | null;
+  organizationId: string | null;
 };
 
 export type ServicePointCountAggregateOutputType = {
@@ -49,6 +51,7 @@ export type ServicePointCountAggregateOutputType = {
   text: number;
   isForService: number;
   isForCommissioning: number;
+  organizationId: number;
   _all: number;
 };
 
@@ -59,6 +62,7 @@ export type ServicePointMinAggregateInputType = {
   text?: true;
   isForService?: true;
   isForCommissioning?: true;
+  organizationId?: true;
 };
 
 export type ServicePointMaxAggregateInputType = {
@@ -68,6 +72,7 @@ export type ServicePointMaxAggregateInputType = {
   text?: true;
   isForService?: true;
   isForCommissioning?: true;
+  organizationId?: true;
 };
 
 export type ServicePointCountAggregateInputType = {
@@ -77,6 +82,7 @@ export type ServicePointCountAggregateInputType = {
   text?: true;
   isForService?: true;
   isForCommissioning?: true;
+  organizationId?: true;
   _all?: true;
 };
 
@@ -167,6 +173,7 @@ export type ServicePointGroupByOutputType = {
   text: string;
   isForService: boolean;
   isForCommissioning: boolean;
+  organizationId: string;
   _count: ServicePointCountAggregateOutputType | null;
   _min: ServicePointMinAggregateOutputType | null;
   _max: ServicePointMaxAggregateOutputType | null;
@@ -195,6 +202,11 @@ export type ServicePointWhereInput = {
   text?: Prisma.StringFilter<"ServicePoint"> | string;
   isForService?: Prisma.BoolFilter<"ServicePoint"> | boolean;
   isForCommissioning?: Prisma.BoolFilter<"ServicePoint"> | boolean;
+  organizationId?: Prisma.StringFilter<"ServicePoint"> | string;
+  organization?: Prisma.XOR<
+    Prisma.OrganizationScalarRelationFilter,
+    Prisma.OrganizationWhereInput
+  >;
 };
 
 export type ServicePointOrderByWithRelationInput = {
@@ -204,12 +216,14 @@ export type ServicePointOrderByWithRelationInput = {
   text?: Prisma.SortOrder;
   isForService?: Prisma.SortOrder;
   isForCommissioning?: Prisma.SortOrder;
+  organizationId?: Prisma.SortOrder;
+  organization?: Prisma.OrganizationOrderByWithRelationInput;
 };
 
 export type ServicePointWhereUniqueInput = Prisma.AtLeast<
   {
     id?: string;
-    productType_category_text?: Prisma.ServicePointProductTypeCategoryTextCompoundUniqueInput;
+    organizationId_productType_category_text?: Prisma.ServicePointOrganizationIdProductTypeCategoryTextCompoundUniqueInput;
     AND?: Prisma.ServicePointWhereInput | Prisma.ServicePointWhereInput[];
     OR?: Prisma.ServicePointWhereInput[];
     NOT?: Prisma.ServicePointWhereInput | Prisma.ServicePointWhereInput[];
@@ -218,8 +232,13 @@ export type ServicePointWhereUniqueInput = Prisma.AtLeast<
     text?: Prisma.StringFilter<"ServicePoint"> | string;
     isForService?: Prisma.BoolFilter<"ServicePoint"> | boolean;
     isForCommissioning?: Prisma.BoolFilter<"ServicePoint"> | boolean;
+    organizationId?: Prisma.StringFilter<"ServicePoint"> | string;
+    organization?: Prisma.XOR<
+      Prisma.OrganizationScalarRelationFilter,
+      Prisma.OrganizationWhereInput
+    >;
   },
-  "id" | "productType_category_text"
+  "id" | "organizationId_productType_category_text"
 >;
 
 export type ServicePointOrderByWithAggregationInput = {
@@ -229,6 +248,7 @@ export type ServicePointOrderByWithAggregationInput = {
   text?: Prisma.SortOrder;
   isForService?: Prisma.SortOrder;
   isForCommissioning?: Prisma.SortOrder;
+  organizationId?: Prisma.SortOrder;
   _count?: Prisma.ServicePointCountOrderByAggregateInput;
   _max?: Prisma.ServicePointMaxOrderByAggregateInput;
   _min?: Prisma.ServicePointMinOrderByAggregateInput;
@@ -250,6 +270,7 @@ export type ServicePointScalarWhereWithAggregatesInput = {
   isForCommissioning?:
     | Prisma.BoolWithAggregatesFilter<"ServicePoint">
     | boolean;
+  organizationId?: Prisma.StringWithAggregatesFilter<"ServicePoint"> | string;
 };
 
 export type ServicePointCreateInput = {
@@ -259,6 +280,7 @@ export type ServicePointCreateInput = {
   text: string;
   isForService?: boolean;
   isForCommissioning?: boolean;
+  organization: Prisma.OrganizationCreateNestedOneWithoutServicePointsInput;
 };
 
 export type ServicePointUncheckedCreateInput = {
@@ -268,6 +290,7 @@ export type ServicePointUncheckedCreateInput = {
   text: string;
   isForService?: boolean;
   isForCommissioning?: boolean;
+  organizationId: string;
 };
 
 export type ServicePointUpdateInput = {
@@ -277,6 +300,7 @@ export type ServicePointUpdateInput = {
   text?: Prisma.StringFieldUpdateOperationsInput | string;
   isForService?: Prisma.BoolFieldUpdateOperationsInput | boolean;
   isForCommissioning?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+  organization?: Prisma.OrganizationUpdateOneRequiredWithoutServicePointsNestedInput;
 };
 
 export type ServicePointUncheckedUpdateInput = {
@@ -286,6 +310,7 @@ export type ServicePointUncheckedUpdateInput = {
   text?: Prisma.StringFieldUpdateOperationsInput | string;
   isForService?: Prisma.BoolFieldUpdateOperationsInput | boolean;
   isForCommissioning?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+  organizationId?: Prisma.StringFieldUpdateOperationsInput | string;
 };
 
 export type ServicePointCreateManyInput = {
@@ -295,6 +320,7 @@ export type ServicePointCreateManyInput = {
   text: string;
   isForService?: boolean;
   isForCommissioning?: boolean;
+  organizationId: string;
 };
 
 export type ServicePointUpdateManyMutationInput = {
@@ -313,13 +339,16 @@ export type ServicePointUncheckedUpdateManyInput = {
   text?: Prisma.StringFieldUpdateOperationsInput | string;
   isForService?: Prisma.BoolFieldUpdateOperationsInput | boolean;
   isForCommissioning?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+  organizationId?: Prisma.StringFieldUpdateOperationsInput | string;
 };
 
-export type ServicePointProductTypeCategoryTextCompoundUniqueInput = {
-  productType: string;
-  category: string;
-  text: string;
-};
+export type ServicePointOrganizationIdProductTypeCategoryTextCompoundUniqueInput =
+  {
+    organizationId: string;
+    productType: string;
+    category: string;
+    text: string;
+  };
 
 export type ServicePointCountOrderByAggregateInput = {
   id?: Prisma.SortOrder;
@@ -328,6 +357,7 @@ export type ServicePointCountOrderByAggregateInput = {
   text?: Prisma.SortOrder;
   isForService?: Prisma.SortOrder;
   isForCommissioning?: Prisma.SortOrder;
+  organizationId?: Prisma.SortOrder;
 };
 
 export type ServicePointMaxOrderByAggregateInput = {
@@ -337,6 +367,7 @@ export type ServicePointMaxOrderByAggregateInput = {
   text?: Prisma.SortOrder;
   isForService?: Prisma.SortOrder;
   isForCommissioning?: Prisma.SortOrder;
+  organizationId?: Prisma.SortOrder;
 };
 
 export type ServicePointMinOrderByAggregateInput = {
@@ -346,6 +377,241 @@ export type ServicePointMinOrderByAggregateInput = {
   text?: Prisma.SortOrder;
   isForService?: Prisma.SortOrder;
   isForCommissioning?: Prisma.SortOrder;
+  organizationId?: Prisma.SortOrder;
+};
+
+export type ServicePointListRelationFilter = {
+  every?: Prisma.ServicePointWhereInput;
+  some?: Prisma.ServicePointWhereInput;
+  none?: Prisma.ServicePointWhereInput;
+};
+
+export type ServicePointOrderByRelationAggregateInput = {
+  _count?: Prisma.SortOrder;
+};
+
+export type ServicePointCreateNestedManyWithoutOrganizationInput = {
+  create?:
+    | Prisma.XOR<
+        Prisma.ServicePointCreateWithoutOrganizationInput,
+        Prisma.ServicePointUncheckedCreateWithoutOrganizationInput
+      >
+    | Prisma.ServicePointCreateWithoutOrganizationInput[]
+    | Prisma.ServicePointUncheckedCreateWithoutOrganizationInput[];
+  connectOrCreate?:
+    | Prisma.ServicePointCreateOrConnectWithoutOrganizationInput
+    | Prisma.ServicePointCreateOrConnectWithoutOrganizationInput[];
+  createMany?: Prisma.ServicePointCreateManyOrganizationInputEnvelope;
+  connect?:
+    | Prisma.ServicePointWhereUniqueInput
+    | Prisma.ServicePointWhereUniqueInput[];
+};
+
+export type ServicePointUncheckedCreateNestedManyWithoutOrganizationInput = {
+  create?:
+    | Prisma.XOR<
+        Prisma.ServicePointCreateWithoutOrganizationInput,
+        Prisma.ServicePointUncheckedCreateWithoutOrganizationInput
+      >
+    | Prisma.ServicePointCreateWithoutOrganizationInput[]
+    | Prisma.ServicePointUncheckedCreateWithoutOrganizationInput[];
+  connectOrCreate?:
+    | Prisma.ServicePointCreateOrConnectWithoutOrganizationInput
+    | Prisma.ServicePointCreateOrConnectWithoutOrganizationInput[];
+  createMany?: Prisma.ServicePointCreateManyOrganizationInputEnvelope;
+  connect?:
+    | Prisma.ServicePointWhereUniqueInput
+    | Prisma.ServicePointWhereUniqueInput[];
+};
+
+export type ServicePointUpdateManyWithoutOrganizationNestedInput = {
+  create?:
+    | Prisma.XOR<
+        Prisma.ServicePointCreateWithoutOrganizationInput,
+        Prisma.ServicePointUncheckedCreateWithoutOrganizationInput
+      >
+    | Prisma.ServicePointCreateWithoutOrganizationInput[]
+    | Prisma.ServicePointUncheckedCreateWithoutOrganizationInput[];
+  connectOrCreate?:
+    | Prisma.ServicePointCreateOrConnectWithoutOrganizationInput
+    | Prisma.ServicePointCreateOrConnectWithoutOrganizationInput[];
+  upsert?:
+    | Prisma.ServicePointUpsertWithWhereUniqueWithoutOrganizationInput
+    | Prisma.ServicePointUpsertWithWhereUniqueWithoutOrganizationInput[];
+  createMany?: Prisma.ServicePointCreateManyOrganizationInputEnvelope;
+  set?:
+    | Prisma.ServicePointWhereUniqueInput
+    | Prisma.ServicePointWhereUniqueInput[];
+  disconnect?:
+    | Prisma.ServicePointWhereUniqueInput
+    | Prisma.ServicePointWhereUniqueInput[];
+  delete?:
+    | Prisma.ServicePointWhereUniqueInput
+    | Prisma.ServicePointWhereUniqueInput[];
+  connect?:
+    | Prisma.ServicePointWhereUniqueInput
+    | Prisma.ServicePointWhereUniqueInput[];
+  update?:
+    | Prisma.ServicePointUpdateWithWhereUniqueWithoutOrganizationInput
+    | Prisma.ServicePointUpdateWithWhereUniqueWithoutOrganizationInput[];
+  updateMany?:
+    | Prisma.ServicePointUpdateManyWithWhereWithoutOrganizationInput
+    | Prisma.ServicePointUpdateManyWithWhereWithoutOrganizationInput[];
+  deleteMany?:
+    | Prisma.ServicePointScalarWhereInput
+    | Prisma.ServicePointScalarWhereInput[];
+};
+
+export type ServicePointUncheckedUpdateManyWithoutOrganizationNestedInput = {
+  create?:
+    | Prisma.XOR<
+        Prisma.ServicePointCreateWithoutOrganizationInput,
+        Prisma.ServicePointUncheckedCreateWithoutOrganizationInput
+      >
+    | Prisma.ServicePointCreateWithoutOrganizationInput[]
+    | Prisma.ServicePointUncheckedCreateWithoutOrganizationInput[];
+  connectOrCreate?:
+    | Prisma.ServicePointCreateOrConnectWithoutOrganizationInput
+    | Prisma.ServicePointCreateOrConnectWithoutOrganizationInput[];
+  upsert?:
+    | Prisma.ServicePointUpsertWithWhereUniqueWithoutOrganizationInput
+    | Prisma.ServicePointUpsertWithWhereUniqueWithoutOrganizationInput[];
+  createMany?: Prisma.ServicePointCreateManyOrganizationInputEnvelope;
+  set?:
+    | Prisma.ServicePointWhereUniqueInput
+    | Prisma.ServicePointWhereUniqueInput[];
+  disconnect?:
+    | Prisma.ServicePointWhereUniqueInput
+    | Prisma.ServicePointWhereUniqueInput[];
+  delete?:
+    | Prisma.ServicePointWhereUniqueInput
+    | Prisma.ServicePointWhereUniqueInput[];
+  connect?:
+    | Prisma.ServicePointWhereUniqueInput
+    | Prisma.ServicePointWhereUniqueInput[];
+  update?:
+    | Prisma.ServicePointUpdateWithWhereUniqueWithoutOrganizationInput
+    | Prisma.ServicePointUpdateWithWhereUniqueWithoutOrganizationInput[];
+  updateMany?:
+    | Prisma.ServicePointUpdateManyWithWhereWithoutOrganizationInput
+    | Prisma.ServicePointUpdateManyWithWhereWithoutOrganizationInput[];
+  deleteMany?:
+    | Prisma.ServicePointScalarWhereInput
+    | Prisma.ServicePointScalarWhereInput[];
+};
+
+export type ServicePointCreateWithoutOrganizationInput = {
+  id?: string;
+  productType: string;
+  category: string;
+  text: string;
+  isForService?: boolean;
+  isForCommissioning?: boolean;
+};
+
+export type ServicePointUncheckedCreateWithoutOrganizationInput = {
+  id?: string;
+  productType: string;
+  category: string;
+  text: string;
+  isForService?: boolean;
+  isForCommissioning?: boolean;
+};
+
+export type ServicePointCreateOrConnectWithoutOrganizationInput = {
+  where: Prisma.ServicePointWhereUniqueInput;
+  create: Prisma.XOR<
+    Prisma.ServicePointCreateWithoutOrganizationInput,
+    Prisma.ServicePointUncheckedCreateWithoutOrganizationInput
+  >;
+};
+
+export type ServicePointCreateManyOrganizationInputEnvelope = {
+  data:
+    | Prisma.ServicePointCreateManyOrganizationInput
+    | Prisma.ServicePointCreateManyOrganizationInput[];
+  skipDuplicates?: boolean;
+};
+
+export type ServicePointUpsertWithWhereUniqueWithoutOrganizationInput = {
+  where: Prisma.ServicePointWhereUniqueInput;
+  update: Prisma.XOR<
+    Prisma.ServicePointUpdateWithoutOrganizationInput,
+    Prisma.ServicePointUncheckedUpdateWithoutOrganizationInput
+  >;
+  create: Prisma.XOR<
+    Prisma.ServicePointCreateWithoutOrganizationInput,
+    Prisma.ServicePointUncheckedCreateWithoutOrganizationInput
+  >;
+};
+
+export type ServicePointUpdateWithWhereUniqueWithoutOrganizationInput = {
+  where: Prisma.ServicePointWhereUniqueInput;
+  data: Prisma.XOR<
+    Prisma.ServicePointUpdateWithoutOrganizationInput,
+    Prisma.ServicePointUncheckedUpdateWithoutOrganizationInput
+  >;
+};
+
+export type ServicePointUpdateManyWithWhereWithoutOrganizationInput = {
+  where: Prisma.ServicePointScalarWhereInput;
+  data: Prisma.XOR<
+    Prisma.ServicePointUpdateManyMutationInput,
+    Prisma.ServicePointUncheckedUpdateManyWithoutOrganizationInput
+  >;
+};
+
+export type ServicePointScalarWhereInput = {
+  AND?:
+    | Prisma.ServicePointScalarWhereInput
+    | Prisma.ServicePointScalarWhereInput[];
+  OR?: Prisma.ServicePointScalarWhereInput[];
+  NOT?:
+    | Prisma.ServicePointScalarWhereInput
+    | Prisma.ServicePointScalarWhereInput[];
+  id?: Prisma.StringFilter<"ServicePoint"> | string;
+  productType?: Prisma.StringFilter<"ServicePoint"> | string;
+  category?: Prisma.StringFilter<"ServicePoint"> | string;
+  text?: Prisma.StringFilter<"ServicePoint"> | string;
+  isForService?: Prisma.BoolFilter<"ServicePoint"> | boolean;
+  isForCommissioning?: Prisma.BoolFilter<"ServicePoint"> | boolean;
+  organizationId?: Prisma.StringFilter<"ServicePoint"> | string;
+};
+
+export type ServicePointCreateManyOrganizationInput = {
+  id?: string;
+  productType: string;
+  category: string;
+  text: string;
+  isForService?: boolean;
+  isForCommissioning?: boolean;
+};
+
+export type ServicePointUpdateWithoutOrganizationInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string;
+  productType?: Prisma.StringFieldUpdateOperationsInput | string;
+  category?: Prisma.StringFieldUpdateOperationsInput | string;
+  text?: Prisma.StringFieldUpdateOperationsInput | string;
+  isForService?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+  isForCommissioning?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+};
+
+export type ServicePointUncheckedUpdateWithoutOrganizationInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string;
+  productType?: Prisma.StringFieldUpdateOperationsInput | string;
+  category?: Prisma.StringFieldUpdateOperationsInput | string;
+  text?: Prisma.StringFieldUpdateOperationsInput | string;
+  isForService?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+  isForCommissioning?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+};
+
+export type ServicePointUncheckedUpdateManyWithoutOrganizationInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string;
+  productType?: Prisma.StringFieldUpdateOperationsInput | string;
+  category?: Prisma.StringFieldUpdateOperationsInput | string;
+  text?: Prisma.StringFieldUpdateOperationsInput | string;
+  isForService?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+  isForCommissioning?: Prisma.BoolFieldUpdateOperationsInput | boolean;
 };
 
 export type ServicePointSelect<
@@ -359,6 +625,8 @@ export type ServicePointSelect<
     text?: boolean;
     isForService?: boolean;
     isForCommissioning?: boolean;
+    organizationId?: boolean;
+    organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>;
   },
   ExtArgs["result"]["servicePoint"]
 >;
@@ -374,6 +642,8 @@ export type ServicePointSelectCreateManyAndReturn<
     text?: boolean;
     isForService?: boolean;
     isForCommissioning?: boolean;
+    organizationId?: boolean;
+    organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>;
   },
   ExtArgs["result"]["servicePoint"]
 >;
@@ -389,6 +659,8 @@ export type ServicePointSelectUpdateManyAndReturn<
     text?: boolean;
     isForService?: boolean;
     isForCommissioning?: boolean;
+    organizationId?: boolean;
+    organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>;
   },
   ExtArgs["result"]["servicePoint"]
 >;
@@ -400,6 +672,7 @@ export type ServicePointSelectScalar = {
   text?: boolean;
   isForService?: boolean;
   isForCommissioning?: boolean;
+  organizationId?: boolean;
 };
 
 export type ServicePointOmit<
@@ -411,16 +684,37 @@ export type ServicePointOmit<
   | "category"
   | "text"
   | "isForService"
-  | "isForCommissioning",
+  | "isForCommissioning"
+  | "organizationId",
   ExtArgs["result"]["servicePoint"]
 >;
+export type ServicePointInclude<
+  ExtArgs extends
+    runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs,
+> = {
+  organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>;
+};
+export type ServicePointIncludeCreateManyAndReturn<
+  ExtArgs extends
+    runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs,
+> = {
+  organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>;
+};
+export type ServicePointIncludeUpdateManyAndReturn<
+  ExtArgs extends
+    runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs,
+> = {
+  organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>;
+};
 
 export type $ServicePointPayload<
   ExtArgs extends
     runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs,
 > = {
   name: "ServicePoint";
-  objects: {};
+  objects: {
+    organization: Prisma.$OrganizationPayload<ExtArgs>;
+  };
   scalars: runtime.Types.Extensions.GetPayloadResult<
     {
       id: string;
@@ -429,6 +723,7 @@ export type $ServicePointPayload<
       text: string;
       isForService: boolean;
       isForCommissioning: boolean;
+      organizationId: string;
     },
     ExtArgs["result"]["servicePoint"]
   >;
@@ -985,6 +1280,20 @@ export interface Prisma__ServicePointClient<
   GlobalOmitOptions = {},
 > extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise";
+  organization<T extends Prisma.OrganizationDefaultArgs<ExtArgs> = {}>(
+    args?: Prisma.Subset<T, Prisma.OrganizationDefaultArgs<ExtArgs>>,
+  ): Prisma.Prisma__OrganizationClient<
+    | runtime.Types.Result.GetResult<
+        Prisma.$OrganizationPayload<ExtArgs>,
+        T,
+        "findUniqueOrThrow",
+        GlobalOmitOptions
+      >
+    | Null,
+    Null,
+    ExtArgs,
+    GlobalOmitOptions
+  >;
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1033,6 +1342,7 @@ export interface ServicePointFieldRefs {
   readonly text: Prisma.FieldRef<"ServicePoint", "String">;
   readonly isForService: Prisma.FieldRef<"ServicePoint", "Boolean">;
   readonly isForCommissioning: Prisma.FieldRef<"ServicePoint", "Boolean">;
+  readonly organizationId: Prisma.FieldRef<"ServicePoint", "String">;
 }
 
 // Custom InputTypes
@@ -1051,6 +1361,10 @@ export type ServicePointFindUniqueArgs<
    * Omit specific fields from the ServicePoint
    */
   omit?: Prisma.ServicePointOmit<ExtArgs> | null;
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ServicePointInclude<ExtArgs> | null;
   /**
    * Filter, which ServicePoint to fetch.
    */
@@ -1073,6 +1387,10 @@ export type ServicePointFindUniqueOrThrowArgs<
    */
   omit?: Prisma.ServicePointOmit<ExtArgs> | null;
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ServicePointInclude<ExtArgs> | null;
+  /**
    * Filter, which ServicePoint to fetch.
    */
   where: Prisma.ServicePointWhereUniqueInput;
@@ -1093,6 +1411,10 @@ export type ServicePointFindFirstArgs<
    * Omit specific fields from the ServicePoint
    */
   omit?: Prisma.ServicePointOmit<ExtArgs> | null;
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ServicePointInclude<ExtArgs> | null;
   /**
    * Filter, which ServicePoint to fetch.
    */
@@ -1149,6 +1471,10 @@ export type ServicePointFindFirstOrThrowArgs<
    */
   omit?: Prisma.ServicePointOmit<ExtArgs> | null;
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ServicePointInclude<ExtArgs> | null;
+  /**
    * Filter, which ServicePoint to fetch.
    */
   where?: Prisma.ServicePointWhereInput;
@@ -1204,6 +1530,10 @@ export type ServicePointFindManyArgs<
    */
   omit?: Prisma.ServicePointOmit<ExtArgs> | null;
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ServicePointInclude<ExtArgs> | null;
+  /**
    * Filter, which ServicePoints to fetch.
    */
   where?: Prisma.ServicePointWhereInput;
@@ -1254,6 +1584,10 @@ export type ServicePointCreateArgs<
    */
   omit?: Prisma.ServicePointOmit<ExtArgs> | null;
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ServicePointInclude<ExtArgs> | null;
+  /**
    * The data needed to create a ServicePoint.
    */
   data: Prisma.XOR<
@@ -1300,6 +1634,10 @@ export type ServicePointCreateManyAndReturnArgs<
     | Prisma.ServicePointCreateManyInput
     | Prisma.ServicePointCreateManyInput[];
   skipDuplicates?: boolean;
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ServicePointIncludeCreateManyAndReturn<ExtArgs> | null;
 };
 
 /**
@@ -1317,6 +1655,10 @@ export type ServicePointUpdateArgs<
    * Omit specific fields from the ServicePoint
    */
   omit?: Prisma.ServicePointOmit<ExtArgs> | null;
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ServicePointInclude<ExtArgs> | null;
   /**
    * The data needed to update a ServicePoint.
    */
@@ -1384,6 +1726,10 @@ export type ServicePointUpdateManyAndReturnArgs<
    * Limit how many ServicePoints to update.
    */
   limit?: number;
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ServicePointIncludeUpdateManyAndReturn<ExtArgs> | null;
 };
 
 /**
@@ -1401,6 +1747,10 @@ export type ServicePointUpsertArgs<
    * Omit specific fields from the ServicePoint
    */
   omit?: Prisma.ServicePointOmit<ExtArgs> | null;
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ServicePointInclude<ExtArgs> | null;
   /**
    * The filter to search for the ServicePoint to update in case it exists.
    */
@@ -1436,6 +1786,10 @@ export type ServicePointDeleteArgs<
    * Omit specific fields from the ServicePoint
    */
   omit?: Prisma.ServicePointOmit<ExtArgs> | null;
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ServicePointInclude<ExtArgs> | null;
   /**
    * Filter which ServicePoint to delete.
    */
@@ -1474,4 +1828,8 @@ export type ServicePointDefaultArgs<
    * Omit specific fields from the ServicePoint
    */
   omit?: Prisma.ServicePointOmit<ExtArgs> | null;
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ServicePointInclude<ExtArgs> | null;
 };

@@ -25,8 +25,12 @@ model User {
   accounts      Account[]
   
   // App Relations
-  posts         Post[]    
-  reports       Report[]  // Technicians own their reports
+  posts            Post[]    
+  reports          Report[]  // Technicians own their reports
+  
+  // Organization Relations (Better Auth plugin)
+  members          Member[]
+  invitations      Invitation[]
 
   @@map("user")
 }
@@ -41,6 +45,9 @@ model Session {
   userAgent String?
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Organization plugin: active organization
+  activeOrganizationId String?
 
   @@unique([token])
   @@index([userId])
@@ -93,8 +100,10 @@ model Report {
   status        ReportStatus @default(DRAFT)
   
   // Relations
-  authorId      String
-  author        User         @relation(fields: [authorId], references: [id])
+  authorId       String
+  author         User         @relation(fields: [authorId], references: [id])
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   
   // Job Details
   serviceDate   DateTime     @default(now())
@@ -118,6 +127,7 @@ model Report {
   signatureUrl  String?      // Vercel Blob URL for signature
 
   @@index([authorId])
+  @@index([organizationId])
   @@index([customerName])
   @@index([serialNumber])
 }
@@ -167,7 +177,12 @@ model ServicePoint {
   isForService       Boolean @default(true)
   isForCommissioning Boolean @default(true)
 
-  @@unique([productType, category, text])
+  // Organization scoping
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, productType, category, text])
+  @@index([organizationId])
 }
 
 model Post {
@@ -200,4 +215,59 @@ enum ChecklistStatus {
   BOR_UTBEDRES  // Should be fixed
   MA_UTBEDRES   // Must be fixed
   IKKE_AKTUELT  // N/A
+}
+
+// ---------------------------------------------------------
+// 4. MULTI-TENANCY (Better Auth Organization Plugin)
+// ---------------------------------------------------------
+
+model Organization {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String?  @unique
+  logo        String?
+  metadata    String?  // JSON string for extra data
+  createdAt   DateTime @default(now())
+
+  members       Member[]
+  invitations   Invitation[]
+  
+  // App Relations
+  reports       Report[]
+  servicePoints ServicePoint[]
+
+  @@map("organization")
+}
+
+model Member {
+  id             String   @id @default(cuid())
+  role           String   @default("technician")
+  createdAt      DateTime @default(now())
+
+  userId         String
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, organizationId])
+  @@index([organizationId])
+  @@map("member")
+}
+
+model Invitation {
+  id               String   @id @default(cuid())
+  email            String
+  role             String   @default("technician")
+  status           String   @default("pending") // pending, accepted, rejected, canceled
+  expiresAt        DateTime
+  createdAt        DateTime @default(now())
+
+  organizationId   String
+  organization     Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  inviterId        String
+  inviter          User         @relation(fields: [inviterId], references: [id])
+
+  @@index([organizationId])
+  @@index([email])
+  @@map("invitation")
 }

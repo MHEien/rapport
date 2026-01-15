@@ -70,7 +70,6 @@ interface Pagination {
 interface ReportsClientProps {
   initialReports: Report[];
   initialPagination: Pagination;
-  userId: string;
 }
 
 // Status config
@@ -111,7 +110,6 @@ const statusFilters: { value: ReportStatus | "ALL"; label: string }[] = [
 export function ReportsClient({
   initialReports,
   initialPagination,
-  userId,
 }: ReportsClientProps) {
   const router = useRouter();
   const [_isPending, startTransition] = useTransition();
@@ -149,7 +147,7 @@ export function ReportsClient({
   const handleDelete = async () => {
     if (!reportToDelete) return;
 
-    const result = await deleteReport(reportToDelete, userId);
+    const result = await deleteReport(reportToDelete);
     if (result.success) {
       setReports(reports.filter((r) => r.id !== reportToDelete));
       setPagination((p) => ({ ...p, total: p.total - 1 }));
@@ -159,7 +157,7 @@ export function ReportsClient({
   };
 
   const handleDuplicate = async (reportId: string) => {
-    const result = await duplicateReport(reportId, userId);
+    const result = await duplicateReport(reportId);
     if (result.success && result.report) {
       router.push(`/reports/${result.report.id}/edit`);
     }

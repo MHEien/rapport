@@ -23,20 +23,15 @@ export default async function ReportsPage({ searchParams }: ReportsPageProps) {
   }
 
   const params = await searchParams;
-  const userId = session.user.id;
   const page = params.page ? parseInt(params.page, 10) : 1;
 
   const filters: ReportFilters = {};
   if (params.search) filters.search = params.search;
   if (params.status) filters.status = params.status;
 
-  const { reports, pagination } = await getReports(userId, filters, page);
+  const { reports, pagination } = await getReports(filters, page);
 
   return (
-    <ReportsClient
-      initialReports={reports}
-      initialPagination={pagination}
-      userId={userId}
-    />
+    <ReportsClient initialReports={reports} initialPagination={pagination} />
   );
 }

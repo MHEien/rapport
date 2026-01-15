@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -19,12 +20,16 @@ export default function Page() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    await signIn({ email, password });
+    const response = await signIn({ email, password });
+
+    if (response.user) {
+      redirect("/");
+    }
   };
 
   return (
-    <div>
-      <Card>
+    <div className="flex items-center justify-center h-screen">
+      <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle>Logg inn</CardTitle>
           <CardDescription>Logg inn for å komme til dashboard</CardDescription>

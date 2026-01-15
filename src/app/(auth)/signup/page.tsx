@@ -26,8 +26,8 @@ export default function Page() {
   };
 
   return (
-    <div>
-      <Card>
+    <div className="flex items-center justify-center h-screen">
+      <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle>Registrer deg</CardTitle>
           <CardDescription>

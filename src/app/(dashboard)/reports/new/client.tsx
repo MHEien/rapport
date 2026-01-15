@@ -23,14 +23,10 @@ import { Label } from "@/components/ui/label";
 import { createReport } from "@/lib/actions/dashboard-actions";
 
 interface NewReportClientProps {
-  userId: string;
   productTypes: string[];
 }
 
-export function NewReportClient({
-  userId,
-  productTypes,
-}: NewReportClientProps) {
+export function NewReportClient({ productTypes }: NewReportClientProps) {
   const router = useRouter();
   const [step, setStep] = useState(1);
 
@@ -44,7 +40,6 @@ export function NewReportClient({
   const mutation = useMutation({
     mutationFn: async () => {
       return createReport({
-        authorId: userId,
         customerName,
         productName,
         productType,

@@ -23,12 +23,30 @@ interface SidebarProps {
     email?: string | null;
     image?: string | null;
   };
+  organization?: {
+    id: string;
+    name: string;
+    slug: string | null;
+  };
+  membership?: {
+    id: string;
+    role: string;
+    createdAt: Date;
+  };
   collapsed?: boolean;
 }
 
-export function Sidebar({ user, collapsed = false }: SidebarProps) {
+export function Sidebar({
+  user,
+  organization,
+  membership,
+  collapsed = false,
+}: SidebarProps) {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
+
+  const _isOwnerOrAdmin =
+    membership?.role === "owner" || membership?.role === "admin";
 
   return (
     <>
@@ -75,7 +93,9 @@ export function Sidebar({ user, collapsed = false }: SidebarProps) {
           </div>
           {!collapsed && (
             <div className="flex-1 min-w-0">
-              <h1 className="font-bold text-white truncate">Service Rapport</h1>
+              <h1 className="font-bold text-white truncate">
+                {organization?.name ?? "Rapport"}
+              </h1>
               <p className="text-xs text-slate-400 truncate">Feltservice</p>
             </div>
           )}

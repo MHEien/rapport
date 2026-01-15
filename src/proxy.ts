@@ -19,8 +19,8 @@ export async function proxy(request: NextRequest) {
 
 export const config = {
   matcher: [
-    "/", 
-    "/reports/:path*",      // Matches /reports AND /reports/anything
-    "/data-editor/:path*"   // Matches /data-editor AND /data-editor/anything
+    "/",
+    "/reports/:path*", // Matches /reports AND /reports/anything
+    "/data-editor/:path*", // Matches /data-editor AND /data-editor/anything
   ],
 };

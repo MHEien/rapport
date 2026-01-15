@@ -11,10 +11,25 @@ interface AppShellClientProps {
     email?: string | null;
     image?: string | null;
   };
+  organization?: {
+    id: string;
+    name: string;
+    slug: string | null;
+  };
+  membership?: {
+    id: string;
+    role: string;
+    createdAt: Date;
+  };
   children: React.ReactNode;
 }
 
-export function AppShellClient({ user, children }: AppShellClientProps) {
+export function AppShellClient({
+  user,
+  organization,
+  membership,
+  children,
+}: AppShellClientProps) {
   const breakpoint = useBreakpoint();
   const isDesktop = breakpoint === "desktop";
   const isTablet = breakpoint === "tablet";
@@ -22,7 +37,12 @@ export function AppShellClient({ user, children }: AppShellClientProps) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
       {/* Desktop/Tablet: Sidebar */}
-      <Sidebar user={user} collapsed={isTablet} />
+      <Sidebar
+        user={user}
+        organization={organization}
+        membership={membership}
+        collapsed={isTablet}
+      />
 
       {/* Main content */}
       <main

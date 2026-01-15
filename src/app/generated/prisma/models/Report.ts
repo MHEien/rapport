@@ -43,6 +43,7 @@ export type ReportMinAggregateOutputType = {
   updatedAt: Date | null;
   status: $Enums.ReportStatus | null;
   authorId: string | null;
+  organizationId: string | null;
   serviceDate: Date | null;
   customerName: string | null;
   customerAddress: string | null;
@@ -64,6 +65,7 @@ export type ReportMaxAggregateOutputType = {
   updatedAt: Date | null;
   status: $Enums.ReportStatus | null;
   authorId: string | null;
+  organizationId: string | null;
   serviceDate: Date | null;
   customerName: string | null;
   customerAddress: string | null;
@@ -85,6 +87,7 @@ export type ReportCountAggregateOutputType = {
   updatedAt: number;
   status: number;
   authorId: number;
+  organizationId: number;
   serviceDate: number;
   customerName: number;
   customerAddress: number;
@@ -117,6 +120,7 @@ export type ReportMinAggregateInputType = {
   updatedAt?: true;
   status?: true;
   authorId?: true;
+  organizationId?: true;
   serviceDate?: true;
   customerName?: true;
   customerAddress?: true;
@@ -138,6 +142,7 @@ export type ReportMaxAggregateInputType = {
   updatedAt?: true;
   status?: true;
   authorId?: true;
+  organizationId?: true;
   serviceDate?: true;
   customerName?: true;
   customerAddress?: true;
@@ -159,6 +164,7 @@ export type ReportCountAggregateInputType = {
   updatedAt?: true;
   status?: true;
   authorId?: true;
+  organizationId?: true;
   serviceDate?: true;
   customerName?: true;
   customerAddress?: true;
@@ -274,6 +280,7 @@ export type ReportGroupByOutputType = {
   updatedAt: Date;
   status: $Enums.ReportStatus;
   authorId: string;
+  organizationId: string;
   serviceDate: Date;
   customerName: string;
   customerAddress: string | null;
@@ -316,6 +323,7 @@ export type ReportWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"Report"> | Date | string;
   status?: Prisma.EnumReportStatusFilter<"Report"> | $Enums.ReportStatus;
   authorId?: Prisma.StringFilter<"Report"> | string;
+  organizationId?: Prisma.StringFilter<"Report"> | string;
   serviceDate?: Prisma.DateTimeFilter<"Report"> | Date | string;
   customerName?: Prisma.StringFilter<"Report"> | string;
   customerAddress?: Prisma.StringNullableFilter<"Report"> | string | null;
@@ -329,6 +337,10 @@ export type ReportWhereInput = {
   overallComment?: Prisma.StringNullableFilter<"Report"> | string | null;
   signatureUrl?: Prisma.StringNullableFilter<"Report"> | string | null;
   author?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>;
+  organization?: Prisma.XOR<
+    Prisma.OrganizationScalarRelationFilter,
+    Prisma.OrganizationWhereInput
+  >;
   checklists?: Prisma.ChecklistResultListRelationFilter;
 };
 
@@ -339,6 +351,7 @@ export type ReportOrderByWithRelationInput = {
   updatedAt?: Prisma.SortOrder;
   status?: Prisma.SortOrder;
   authorId?: Prisma.SortOrder;
+  organizationId?: Prisma.SortOrder;
   serviceDate?: Prisma.SortOrder;
   customerName?: Prisma.SortOrder;
   customerAddress?: Prisma.SortOrderInput | Prisma.SortOrder;
@@ -352,6 +365,7 @@ export type ReportOrderByWithRelationInput = {
   overallComment?: Prisma.SortOrderInput | Prisma.SortOrder;
   signatureUrl?: Prisma.SortOrderInput | Prisma.SortOrder;
   author?: Prisma.UserOrderByWithRelationInput;
+  organization?: Prisma.OrganizationOrderByWithRelationInput;
   checklists?: Prisma.ChecklistResultOrderByRelationAggregateInput;
 };
 
@@ -366,6 +380,7 @@ export type ReportWhereUniqueInput = Prisma.AtLeast<
     updatedAt?: Prisma.DateTimeFilter<"Report"> | Date | string;
     status?: Prisma.EnumReportStatusFilter<"Report"> | $Enums.ReportStatus;
     authorId?: Prisma.StringFilter<"Report"> | string;
+    organizationId?: Prisma.StringFilter<"Report"> | string;
     serviceDate?: Prisma.DateTimeFilter<"Report"> | Date | string;
     customerName?: Prisma.StringFilter<"Report"> | string;
     customerAddress?: Prisma.StringNullableFilter<"Report"> | string | null;
@@ -379,6 +394,10 @@ export type ReportWhereUniqueInput = Prisma.AtLeast<
     overallComment?: Prisma.StringNullableFilter<"Report"> | string | null;
     signatureUrl?: Prisma.StringNullableFilter<"Report"> | string | null;
     author?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>;
+    organization?: Prisma.XOR<
+      Prisma.OrganizationScalarRelationFilter,
+      Prisma.OrganizationWhereInput
+    >;
     checklists?: Prisma.ChecklistResultListRelationFilter;
   },
   "id"
@@ -391,6 +410,7 @@ export type ReportOrderByWithAggregationInput = {
   updatedAt?: Prisma.SortOrder;
   status?: Prisma.SortOrder;
   authorId?: Prisma.SortOrder;
+  organizationId?: Prisma.SortOrder;
   serviceDate?: Prisma.SortOrder;
   customerName?: Prisma.SortOrder;
   customerAddress?: Prisma.SortOrderInput | Prisma.SortOrder;
@@ -426,6 +446,7 @@ export type ReportScalarWhereWithAggregatesInput = {
     | Prisma.EnumReportStatusWithAggregatesFilter<"Report">
     | $Enums.ReportStatus;
   authorId?: Prisma.StringWithAggregatesFilter<"Report"> | string;
+  organizationId?: Prisma.StringWithAggregatesFilter<"Report"> | string;
   serviceDate?: Prisma.DateTimeWithAggregatesFilter<"Report"> | Date | string;
   customerName?: Prisma.StringWithAggregatesFilter<"Report"> | string;
   customerAddress?:
@@ -479,6 +500,7 @@ export type ReportCreateInput = {
   overallComment?: string | null;
   signatureUrl?: string | null;
   author: Prisma.UserCreateNestedOneWithoutReportsInput;
+  organization: Prisma.OrganizationCreateNestedOneWithoutReportsInput;
   checklists?: Prisma.ChecklistResultCreateNestedManyWithoutReportInput;
 };
 
@@ -489,6 +511,7 @@ export type ReportUncheckedCreateInput = {
   updatedAt?: Date | string;
   status?: $Enums.ReportStatus;
   authorId: string;
+  organizationId: string;
   serviceDate?: Date | string;
   customerName: string;
   customerAddress?: string | null;
@@ -537,6 +560,7 @@ export type ReportUpdateInput = {
     | string
     | null;
   author?: Prisma.UserUpdateOneRequiredWithoutReportsNestedInput;
+  organization?: Prisma.OrganizationUpdateOneRequiredWithoutReportsNestedInput;
   checklists?: Prisma.ChecklistResultUpdateManyWithoutReportNestedInput;
 };
 
@@ -549,6 +573,7 @@ export type ReportUncheckedUpdateInput = {
     | Prisma.EnumReportStatusFieldUpdateOperationsInput
     | $Enums.ReportStatus;
   authorId?: Prisma.StringFieldUpdateOperationsInput | string;
+  organizationId?: Prisma.StringFieldUpdateOperationsInput | string;
   serviceDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
   customerName?: Prisma.StringFieldUpdateOperationsInput | string;
   customerAddress?:
@@ -583,6 +608,7 @@ export type ReportCreateManyInput = {
   updatedAt?: Date | string;
   status?: $Enums.ReportStatus;
   authorId: string;
+  organizationId: string;
   serviceDate?: Date | string;
   customerName: string;
   customerAddress?: string | null;
@@ -640,6 +666,7 @@ export type ReportUncheckedUpdateManyInput = {
     | Prisma.EnumReportStatusFieldUpdateOperationsInput
     | $Enums.ReportStatus;
   authorId?: Prisma.StringFieldUpdateOperationsInput | string;
+  organizationId?: Prisma.StringFieldUpdateOperationsInput | string;
   serviceDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
   customerName?: Prisma.StringFieldUpdateOperationsInput | string;
   customerAddress?:
@@ -683,6 +710,7 @@ export type ReportCountOrderByAggregateInput = {
   updatedAt?: Prisma.SortOrder;
   status?: Prisma.SortOrder;
   authorId?: Prisma.SortOrder;
+  organizationId?: Prisma.SortOrder;
   serviceDate?: Prisma.SortOrder;
   customerName?: Prisma.SortOrder;
   customerAddress?: Prisma.SortOrder;
@@ -709,6 +737,7 @@ export type ReportMaxOrderByAggregateInput = {
   updatedAt?: Prisma.SortOrder;
   status?: Prisma.SortOrder;
   authorId?: Prisma.SortOrder;
+  organizationId?: Prisma.SortOrder;
   serviceDate?: Prisma.SortOrder;
   customerName?: Prisma.SortOrder;
   customerAddress?: Prisma.SortOrder;
@@ -730,6 +759,7 @@ export type ReportMinOrderByAggregateInput = {
   updatedAt?: Prisma.SortOrder;
   status?: Prisma.SortOrder;
   authorId?: Prisma.SortOrder;
+  organizationId?: Prisma.SortOrder;
   serviceDate?: Prisma.SortOrder;
   customerName?: Prisma.SortOrder;
   customerAddress?: Prisma.SortOrder;
@@ -890,6 +920,92 @@ export type ReportUpdateOneRequiredWithoutChecklistsNestedInput = {
   >;
 };
 
+export type ReportCreateNestedManyWithoutOrganizationInput = {
+  create?:
+    | Prisma.XOR<
+        Prisma.ReportCreateWithoutOrganizationInput,
+        Prisma.ReportUncheckedCreateWithoutOrganizationInput
+      >
+    | Prisma.ReportCreateWithoutOrganizationInput[]
+    | Prisma.ReportUncheckedCreateWithoutOrganizationInput[];
+  connectOrCreate?:
+    | Prisma.ReportCreateOrConnectWithoutOrganizationInput
+    | Prisma.ReportCreateOrConnectWithoutOrganizationInput[];
+  createMany?: Prisma.ReportCreateManyOrganizationInputEnvelope;
+  connect?: Prisma.ReportWhereUniqueInput | Prisma.ReportWhereUniqueInput[];
+};
+
+export type ReportUncheckedCreateNestedManyWithoutOrganizationInput = {
+  create?:
+    | Prisma.XOR<
+        Prisma.ReportCreateWithoutOrganizationInput,
+        Prisma.ReportUncheckedCreateWithoutOrganizationInput
+      >
+    | Prisma.ReportCreateWithoutOrganizationInput[]
+    | Prisma.ReportUncheckedCreateWithoutOrganizationInput[];
+  connectOrCreate?:
+    | Prisma.ReportCreateOrConnectWithoutOrganizationInput
+    | Prisma.ReportCreateOrConnectWithoutOrganizationInput[];
+  createMany?: Prisma.ReportCreateManyOrganizationInputEnvelope;
+  connect?: Prisma.ReportWhereUniqueInput | Prisma.ReportWhereUniqueInput[];
+};
+
+export type ReportUpdateManyWithoutOrganizationNestedInput = {
+  create?:
+    | Prisma.XOR<
+        Prisma.ReportCreateWithoutOrganizationInput,
+        Prisma.ReportUncheckedCreateWithoutOrganizationInput
+      >
+    | Prisma.ReportCreateWithoutOrganizationInput[]
+    | Prisma.ReportUncheckedCreateWithoutOrganizationInput[];
+  connectOrCreate?:
+    | Prisma.ReportCreateOrConnectWithoutOrganizationInput
+    | Prisma.ReportCreateOrConnectWithoutOrganizationInput[];
+  upsert?:
+    | Prisma.ReportUpsertWithWhereUniqueWithoutOrganizationInput
+    | Prisma.ReportUpsertWithWhereUniqueWithoutOrganizationInput[];
+  createMany?: Prisma.ReportCreateManyOrganizationInputEnvelope;
+  set?: Prisma.ReportWhereUniqueInput | Prisma.ReportWhereUniqueInput[];
+  disconnect?: Prisma.ReportWhereUniqueInput | Prisma.ReportWhereUniqueInput[];
+  delete?: Prisma.ReportWhereUniqueInput | Prisma.ReportWhereUniqueInput[];
+  connect?: Prisma.ReportWhereUniqueInput | Prisma.ReportWhereUniqueInput[];
+  update?:
+    | Prisma.ReportUpdateWithWhereUniqueWithoutOrganizationInput
+    | Prisma.ReportUpdateWithWhereUniqueWithoutOrganizationInput[];
+  updateMany?:
+    | Prisma.ReportUpdateManyWithWhereWithoutOrganizationInput
+    | Prisma.ReportUpdateManyWithWhereWithoutOrganizationInput[];
+  deleteMany?: Prisma.ReportScalarWhereInput | Prisma.ReportScalarWhereInput[];
+};
+
+export type ReportUncheckedUpdateManyWithoutOrganizationNestedInput = {
+  create?:
+    | Prisma.XOR<
+        Prisma.ReportCreateWithoutOrganizationInput,
+        Prisma.ReportUncheckedCreateWithoutOrganizationInput
+      >
+    | Prisma.ReportCreateWithoutOrganizationInput[]
+    | Prisma.ReportUncheckedCreateWithoutOrganizationInput[];
+  connectOrCreate?:
+    | Prisma.ReportCreateOrConnectWithoutOrganizationInput
+    | Prisma.ReportCreateOrConnectWithoutOrganizationInput[];
+  upsert?:
+    | Prisma.ReportUpsertWithWhereUniqueWithoutOrganizationInput
+    | Prisma.ReportUpsertWithWhereUniqueWithoutOrganizationInput[];
+  createMany?: Prisma.ReportCreateManyOrganizationInputEnvelope;
+  set?: Prisma.ReportWhereUniqueInput | Prisma.ReportWhereUniqueInput[];
+  disconnect?: Prisma.ReportWhereUniqueInput | Prisma.ReportWhereUniqueInput[];
+  delete?: Prisma.ReportWhereUniqueInput | Prisma.ReportWhereUniqueInput[];
+  connect?: Prisma.ReportWhereUniqueInput | Prisma.ReportWhereUniqueInput[];
+  update?:
+    | Prisma.ReportUpdateWithWhereUniqueWithoutOrganizationInput
+    | Prisma.ReportUpdateWithWhereUniqueWithoutOrganizationInput[];
+  updateMany?:
+    | Prisma.ReportUpdateManyWithWhereWithoutOrganizationInput
+    | Prisma.ReportUpdateManyWithWhereWithoutOrganizationInput[];
+  deleteMany?: Prisma.ReportScalarWhereInput | Prisma.ReportScalarWhereInput[];
+};
+
 export type ReportCreateWithoutAuthorInput = {
   id?: string;
   reportNumber?: number;
@@ -908,6 +1024,7 @@ export type ReportCreateWithoutAuthorInput = {
   aiSummary?: string | null;
   overallComment?: string | null;
   signatureUrl?: string | null;
+  organization: Prisma.OrganizationCreateNestedOneWithoutReportsInput;
   checklists?: Prisma.ChecklistResultCreateNestedManyWithoutReportInput;
 };
 
@@ -917,6 +1034,7 @@ export type ReportUncheckedCreateWithoutAuthorInput = {
   createdAt?: Date | string;
   updatedAt?: Date | string;
   status?: $Enums.ReportStatus;
+  organizationId: string;
   serviceDate?: Date | string;
   customerName: string;
   customerAddress?: string | null;
@@ -985,6 +1103,7 @@ export type ReportScalarWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"Report"> | Date | string;
   status?: Prisma.EnumReportStatusFilter<"Report"> | $Enums.ReportStatus;
   authorId?: Prisma.StringFilter<"Report"> | string;
+  organizationId?: Prisma.StringFilter<"Report"> | string;
   serviceDate?: Prisma.DateTimeFilter<"Report"> | Date | string;
   customerName?: Prisma.StringFilter<"Report"> | string;
   customerAddress?: Prisma.StringNullableFilter<"Report"> | string | null;
@@ -1018,6 +1137,7 @@ export type ReportCreateWithoutChecklistsInput = {
   overallComment?: string | null;
   signatureUrl?: string | null;
   author: Prisma.UserCreateNestedOneWithoutReportsInput;
+  organization: Prisma.OrganizationCreateNestedOneWithoutReportsInput;
 };
 
 export type ReportUncheckedCreateWithoutChecklistsInput = {
@@ -1027,6 +1147,7 @@ export type ReportUncheckedCreateWithoutChecklistsInput = {
   updatedAt?: Date | string;
   status?: $Enums.ReportStatus;
   authorId: string;
+  organizationId: string;
   serviceDate?: Date | string;
   customerName: string;
   customerAddress?: string | null;
@@ -1102,6 +1223,7 @@ export type ReportUpdateWithoutChecklistsInput = {
     | string
     | null;
   author?: Prisma.UserUpdateOneRequiredWithoutReportsNestedInput;
+  organization?: Prisma.OrganizationUpdateOneRequiredWithoutReportsNestedInput;
 };
 
 export type ReportUncheckedUpdateWithoutChecklistsInput = {
@@ -1113,6 +1235,7 @@ export type ReportUncheckedUpdateWithoutChecklistsInput = {
     | Prisma.EnumReportStatusFieldUpdateOperationsInput
     | $Enums.ReportStatus;
   authorId?: Prisma.StringFieldUpdateOperationsInput | string;
+  organizationId?: Prisma.StringFieldUpdateOperationsInput | string;
   serviceDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
   customerName?: Prisma.StringFieldUpdateOperationsInput | string;
   customerAddress?:
@@ -1139,12 +1262,100 @@ export type ReportUncheckedUpdateWithoutChecklistsInput = {
     | null;
 };
 
+export type ReportCreateWithoutOrganizationInput = {
+  id?: string;
+  reportNumber?: number;
+  createdAt?: Date | string;
+  updatedAt?: Date | string;
+  status?: $Enums.ReportStatus;
+  serviceDate?: Date | string;
+  customerName: string;
+  customerAddress?: string | null;
+  contactPerson?: string | null;
+  productName: string;
+  productType: string;
+  serialNumber: string;
+  runningHours?: number | null;
+  type?: $Enums.ReportType;
+  aiSummary?: string | null;
+  overallComment?: string | null;
+  signatureUrl?: string | null;
+  author: Prisma.UserCreateNestedOneWithoutReportsInput;
+  checklists?: Prisma.ChecklistResultCreateNestedManyWithoutReportInput;
+};
+
+export type ReportUncheckedCreateWithoutOrganizationInput = {
+  id?: string;
+  reportNumber?: number;
+  createdAt?: Date | string;
+  updatedAt?: Date | string;
+  status?: $Enums.ReportStatus;
+  authorId: string;
+  serviceDate?: Date | string;
+  customerName: string;
+  customerAddress?: string | null;
+  contactPerson?: string | null;
+  productName: string;
+  productType: string;
+  serialNumber: string;
+  runningHours?: number | null;
+  type?: $Enums.ReportType;
+  aiSummary?: string | null;
+  overallComment?: string | null;
+  signatureUrl?: string | null;
+  checklists?: Prisma.ChecklistResultUncheckedCreateNestedManyWithoutReportInput;
+};
+
+export type ReportCreateOrConnectWithoutOrganizationInput = {
+  where: Prisma.ReportWhereUniqueInput;
+  create: Prisma.XOR<
+    Prisma.ReportCreateWithoutOrganizationInput,
+    Prisma.ReportUncheckedCreateWithoutOrganizationInput
+  >;
+};
+
+export type ReportCreateManyOrganizationInputEnvelope = {
+  data:
+    | Prisma.ReportCreateManyOrganizationInput
+    | Prisma.ReportCreateManyOrganizationInput[];
+  skipDuplicates?: boolean;
+};
+
+export type ReportUpsertWithWhereUniqueWithoutOrganizationInput = {
+  where: Prisma.ReportWhereUniqueInput;
+  update: Prisma.XOR<
+    Prisma.ReportUpdateWithoutOrganizationInput,
+    Prisma.ReportUncheckedUpdateWithoutOrganizationInput
+  >;
+  create: Prisma.XOR<
+    Prisma.ReportCreateWithoutOrganizationInput,
+    Prisma.ReportUncheckedCreateWithoutOrganizationInput
+  >;
+};
+
+export type ReportUpdateWithWhereUniqueWithoutOrganizationInput = {
+  where: Prisma.ReportWhereUniqueInput;
+  data: Prisma.XOR<
+    Prisma.ReportUpdateWithoutOrganizationInput,
+    Prisma.ReportUncheckedUpdateWithoutOrganizationInput
+  >;
+};
+
+export type ReportUpdateManyWithWhereWithoutOrganizationInput = {
+  where: Prisma.ReportScalarWhereInput;
+  data: Prisma.XOR<
+    Prisma.ReportUpdateManyMutationInput,
+    Prisma.ReportUncheckedUpdateManyWithoutOrganizationInput
+  >;
+};
+
 export type ReportCreateManyAuthorInput = {
   id?: string;
   reportNumber?: number;
   createdAt?: Date | string;
   updatedAt?: Date | string;
   status?: $Enums.ReportStatus;
+  organizationId: string;
   serviceDate?: Date | string;
   customerName: string;
   customerAddress?: string | null;
@@ -1191,6 +1402,7 @@ export type ReportUpdateWithoutAuthorInput = {
     | Prisma.NullableStringFieldUpdateOperationsInput
     | string
     | null;
+  organization?: Prisma.OrganizationUpdateOneRequiredWithoutReportsNestedInput;
   checklists?: Prisma.ChecklistResultUpdateManyWithoutReportNestedInput;
 };
 
@@ -1202,6 +1414,7 @@ export type ReportUncheckedUpdateWithoutAuthorInput = {
   status?:
     | Prisma.EnumReportStatusFieldUpdateOperationsInput
     | $Enums.ReportStatus;
+  organizationId?: Prisma.StringFieldUpdateOperationsInput | string;
   serviceDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
   customerName?: Prisma.StringFieldUpdateOperationsInput | string;
   customerAddress?:
@@ -1237,6 +1450,135 @@ export type ReportUncheckedUpdateManyWithoutAuthorInput = {
   status?:
     | Prisma.EnumReportStatusFieldUpdateOperationsInput
     | $Enums.ReportStatus;
+  organizationId?: Prisma.StringFieldUpdateOperationsInput | string;
+  serviceDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+  customerName?: Prisma.StringFieldUpdateOperationsInput | string;
+  customerAddress?:
+    | Prisma.NullableStringFieldUpdateOperationsInput
+    | string
+    | null;
+  contactPerson?:
+    | Prisma.NullableStringFieldUpdateOperationsInput
+    | string
+    | null;
+  productName?: Prisma.StringFieldUpdateOperationsInput | string;
+  productType?: Prisma.StringFieldUpdateOperationsInput | string;
+  serialNumber?: Prisma.StringFieldUpdateOperationsInput | string;
+  runningHours?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null;
+  type?: Prisma.EnumReportTypeFieldUpdateOperationsInput | $Enums.ReportType;
+  aiSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+  overallComment?:
+    | Prisma.NullableStringFieldUpdateOperationsInput
+    | string
+    | null;
+  signatureUrl?:
+    | Prisma.NullableStringFieldUpdateOperationsInput
+    | string
+    | null;
+};
+
+export type ReportCreateManyOrganizationInput = {
+  id?: string;
+  reportNumber?: number;
+  createdAt?: Date | string;
+  updatedAt?: Date | string;
+  status?: $Enums.ReportStatus;
+  authorId: string;
+  serviceDate?: Date | string;
+  customerName: string;
+  customerAddress?: string | null;
+  contactPerson?: string | null;
+  productName: string;
+  productType: string;
+  serialNumber: string;
+  runningHours?: number | null;
+  type?: $Enums.ReportType;
+  aiSummary?: string | null;
+  overallComment?: string | null;
+  signatureUrl?: string | null;
+};
+
+export type ReportUpdateWithoutOrganizationInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string;
+  reportNumber?: Prisma.IntFieldUpdateOperationsInput | number;
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+  status?:
+    | Prisma.EnumReportStatusFieldUpdateOperationsInput
+    | $Enums.ReportStatus;
+  serviceDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+  customerName?: Prisma.StringFieldUpdateOperationsInput | string;
+  customerAddress?:
+    | Prisma.NullableStringFieldUpdateOperationsInput
+    | string
+    | null;
+  contactPerson?:
+    | Prisma.NullableStringFieldUpdateOperationsInput
+    | string
+    | null;
+  productName?: Prisma.StringFieldUpdateOperationsInput | string;
+  productType?: Prisma.StringFieldUpdateOperationsInput | string;
+  serialNumber?: Prisma.StringFieldUpdateOperationsInput | string;
+  runningHours?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null;
+  type?: Prisma.EnumReportTypeFieldUpdateOperationsInput | $Enums.ReportType;
+  aiSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+  overallComment?:
+    | Prisma.NullableStringFieldUpdateOperationsInput
+    | string
+    | null;
+  signatureUrl?:
+    | Prisma.NullableStringFieldUpdateOperationsInput
+    | string
+    | null;
+  author?: Prisma.UserUpdateOneRequiredWithoutReportsNestedInput;
+  checklists?: Prisma.ChecklistResultUpdateManyWithoutReportNestedInput;
+};
+
+export type ReportUncheckedUpdateWithoutOrganizationInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string;
+  reportNumber?: Prisma.IntFieldUpdateOperationsInput | number;
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+  status?:
+    | Prisma.EnumReportStatusFieldUpdateOperationsInput
+    | $Enums.ReportStatus;
+  authorId?: Prisma.StringFieldUpdateOperationsInput | string;
+  serviceDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+  customerName?: Prisma.StringFieldUpdateOperationsInput | string;
+  customerAddress?:
+    | Prisma.NullableStringFieldUpdateOperationsInput
+    | string
+    | null;
+  contactPerson?:
+    | Prisma.NullableStringFieldUpdateOperationsInput
+    | string
+    | null;
+  productName?: Prisma.StringFieldUpdateOperationsInput | string;
+  productType?: Prisma.StringFieldUpdateOperationsInput | string;
+  serialNumber?: Prisma.StringFieldUpdateOperationsInput | string;
+  runningHours?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null;
+  type?: Prisma.EnumReportTypeFieldUpdateOperationsInput | $Enums.ReportType;
+  aiSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+  overallComment?:
+    | Prisma.NullableStringFieldUpdateOperationsInput
+    | string
+    | null;
+  signatureUrl?:
+    | Prisma.NullableStringFieldUpdateOperationsInput
+    | string
+    | null;
+  checklists?: Prisma.ChecklistResultUncheckedUpdateManyWithoutReportNestedInput;
+};
+
+export type ReportUncheckedUpdateManyWithoutOrganizationInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string;
+  reportNumber?: Prisma.IntFieldUpdateOperationsInput | number;
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+  status?:
+    | Prisma.EnumReportStatusFieldUpdateOperationsInput
+    | $Enums.ReportStatus;
+  authorId?: Prisma.StringFieldUpdateOperationsInput | string;
   serviceDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
   customerName?: Prisma.StringFieldUpdateOperationsInput | string;
   customerAddress?:
@@ -1312,6 +1654,7 @@ export type ReportSelect<
     updatedAt?: boolean;
     status?: boolean;
     authorId?: boolean;
+    organizationId?: boolean;
     serviceDate?: boolean;
     customerName?: boolean;
     customerAddress?: boolean;
@@ -1325,6 +1668,7 @@ export type ReportSelect<
     overallComment?: boolean;
     signatureUrl?: boolean;
     author?: boolean | Prisma.UserDefaultArgs<ExtArgs>;
+    organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>;
     checklists?: boolean | Prisma.Report$checklistsArgs<ExtArgs>;
     _count?: boolean | Prisma.ReportCountOutputTypeDefaultArgs<ExtArgs>;
   },
@@ -1342,6 +1686,7 @@ export type ReportSelectCreateManyAndReturn<
     updatedAt?: boolean;
     status?: boolean;
     authorId?: boolean;
+    organizationId?: boolean;
     serviceDate?: boolean;
     customerName?: boolean;
     customerAddress?: boolean;
@@ -1355,6 +1700,7 @@ export type ReportSelectCreateManyAndReturn<
     overallComment?: boolean;
     signatureUrl?: boolean;
     author?: boolean | Prisma.UserDefaultArgs<ExtArgs>;
+    organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>;
   },
   ExtArgs["result"]["report"]
 >;
@@ -1370,6 +1716,7 @@ export type ReportSelectUpdateManyAndReturn<
     updatedAt?: boolean;
     status?: boolean;
     authorId?: boolean;
+    organizationId?: boolean;
     serviceDate?: boolean;
     customerName?: boolean;
     customerAddress?: boolean;
@@ -1383,6 +1730,7 @@ export type ReportSelectUpdateManyAndReturn<
     overallComment?: boolean;
     signatureUrl?: boolean;
     author?: boolean | Prisma.UserDefaultArgs<ExtArgs>;
+    organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>;
   },
   ExtArgs["result"]["report"]
 >;
@@ -1394,6 +1742,7 @@ export type ReportSelectScalar = {
   updatedAt?: boolean;
   status?: boolean;
   authorId?: boolean;
+  organizationId?: boolean;
   serviceDate?: boolean;
   customerName?: boolean;
   customerAddress?: boolean;
@@ -1418,6 +1767,7 @@ export type ReportOmit<
   | "updatedAt"
   | "status"
   | "authorId"
+  | "organizationId"
   | "serviceDate"
   | "customerName"
   | "customerAddress"
@@ -1437,6 +1787,7 @@ export type ReportInclude<
     runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs,
 > = {
   author?: boolean | Prisma.UserDefaultArgs<ExtArgs>;
+  organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>;
   checklists?: boolean | Prisma.Report$checklistsArgs<ExtArgs>;
   _count?: boolean | Prisma.ReportCountOutputTypeDefaultArgs<ExtArgs>;
 };
@@ -1445,12 +1796,14 @@ export type ReportIncludeCreateManyAndReturn<
     runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs,
 > = {
   author?: boolean | Prisma.UserDefaultArgs<ExtArgs>;
+  organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>;
 };
 export type ReportIncludeUpdateManyAndReturn<
   ExtArgs extends
     runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs,
 > = {
   author?: boolean | Prisma.UserDefaultArgs<ExtArgs>;
+  organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>;
 };
 
 export type $ReportPayload<
@@ -1460,6 +1813,7 @@ export type $ReportPayload<
   name: "Report";
   objects: {
     author: Prisma.$UserPayload<ExtArgs>;
+    organization: Prisma.$OrganizationPayload<ExtArgs>;
     checklists: Prisma.$ChecklistResultPayload<ExtArgs>[];
   };
   scalars: runtime.Types.Extensions.GetPayloadResult<
@@ -1470,6 +1824,7 @@ export type $ReportPayload<
       updatedAt: Date;
       status: $Enums.ReportStatus;
       authorId: string;
+      organizationId: string;
       serviceDate: Date;
       customerName: string;
       customerAddress: string | null;
@@ -2046,6 +2401,20 @@ export interface Prisma__ReportClient<
     ExtArgs,
     GlobalOmitOptions
   >;
+  organization<T extends Prisma.OrganizationDefaultArgs<ExtArgs> = {}>(
+    args?: Prisma.Subset<T, Prisma.OrganizationDefaultArgs<ExtArgs>>,
+  ): Prisma.Prisma__OrganizationClient<
+    | runtime.Types.Result.GetResult<
+        Prisma.$OrganizationPayload<ExtArgs>,
+        T,
+        "findUniqueOrThrow",
+        GlobalOmitOptions
+      >
+    | Null,
+    Null,
+    ExtArgs,
+    GlobalOmitOptions
+  >;
   checklists<T extends Prisma.Report$checklistsArgs<ExtArgs> = {}>(
     args?: Prisma.Subset<T, Prisma.Report$checklistsArgs<ExtArgs>>,
   ): Prisma.PrismaPromise<
@@ -2105,6 +2474,7 @@ export interface ReportFieldRefs {
   readonly updatedAt: Prisma.FieldRef<"Report", "DateTime">;
   readonly status: Prisma.FieldRef<"Report", "ReportStatus">;
   readonly authorId: Prisma.FieldRef<"Report", "String">;
+  readonly organizationId: Prisma.FieldRef<"Report", "String">;
   readonly serviceDate: Prisma.FieldRef<"Report", "DateTime">;
   readonly customerName: Prisma.FieldRef<"Report", "String">;
   readonly customerAddress: Prisma.FieldRef<"Report", "String">;
