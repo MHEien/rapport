@@ -394,7 +394,9 @@ export function TeamSettingsClient({
                           </DropdownMenuItem>
                           {currentUserRole === "owner" && (
                             <DropdownMenuItem
-                              onClick={() => handleUpdateRole(member.id, "owner")}
+                              onClick={() =>
+                                handleUpdateRole(member.id, "owner")
+                              }
                             >
                               Sett til Eier
                             </DropdownMenuItem>
