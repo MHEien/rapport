@@ -18,5 +18,6 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/", "reports", "data-editor"], // Specify the routes the middleware applies to
+  // Add the leading slash to all paths
+  matcher: ["/", "/reports", "/data-editor"], 
 };
