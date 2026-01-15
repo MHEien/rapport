@@ -12,7 +12,7 @@ import {
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import type { ChecklistResult, Report } from "@/app/generated/prisma/client";
-import { ChecklistWizard } from "@/components/report/checklist-wizard";
+import { ChecklistWizard } from "@/components/reports/checklist-wizard";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -415,7 +415,7 @@ export function ReportEditClient({
 
   const handleComplete = () => {
     // Navigate to completed report view
-    router.push(`/report/${report.id}`);
+    router.push(`/reports/${report.id}`);
   };
 
   return (

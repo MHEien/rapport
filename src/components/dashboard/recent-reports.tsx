@@ -98,8 +98,8 @@ export function RecentReports({ reports }: RecentReportsProps) {
               key={report.id}
               href={
                 report.status === "DRAFT"
-                  ? `/report/${report.id}/edit`
-                  : `/report/${report.id}`
+                  ? `/reports/${report.id}/edit`
+                  : `/reports/${report.id}`
               }
               className={cn(
                 "flex items-center gap-4 p-4 hover:bg-white/5 transition-colors group",

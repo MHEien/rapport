@@ -161,7 +161,7 @@ export function ReportsClient({
   const handleDuplicate = async (reportId: string) => {
     const result = await duplicateReport(reportId, userId);
     if (result.success && result.report) {
-      router.push(`/report/${result.report.id}/edit`);
+      router.push(`/reports/${result.report.id}/edit`);
     }
   };
 
@@ -182,7 +182,7 @@ export function ReportsClient({
               asChild
               className="bg-gradient-to-r from-blue-500 to-indigo-600 shadow-lg shadow-blue-500/20"
             >
-              <Link href="/report/new">
+              <Link href="/reports/new">
                 <Plus className="size-4 mr-2" />
                 Ny rapport
               </Link>
@@ -237,7 +237,7 @@ export function ReportsClient({
             </p>
             {!search && statusFilter === "ALL" && (
               <Button asChild>
-                <Link href="/report/new">
+                <Link href="/reports/new">
                   <Plus className="size-4 mr-2" />
                   Opprett rapport
                 </Link>
@@ -274,8 +274,8 @@ export function ReportsClient({
                     <Link
                       href={
                         report.status === "DRAFT"
-                          ? `/report/${report.id}/edit`
-                          : `/report/${report.id}`
+                          ? `/reports/${report.id}/edit`
+                          : `/reports/${report.id}`
                       }
                       className="cursor-pointer block"
                     >
@@ -311,8 +311,8 @@ export function ReportsClient({
                     </div>
                     <div>
                       <ReportActions
-                        onView={() => router.push(`/report/${report.id}`)}
-                        onEdit={() => router.push(`/report/${report.id}/edit`)}
+                        onView={() => router.push(`/reports/${report.id}`)}
+                        onEdit={() => router.push(`/reports/${report.id}/edit`)}
                         onDuplicate={() => handleDuplicate(report.id)}
                         onDelete={() => {
                           setReportToDelete(report.id);
@@ -326,8 +326,8 @@ export function ReportsClient({
                   <Link
                     href={
                       report.status === "DRAFT"
-                        ? `/report/${report.id}/edit`
-                        : `/report/${report.id}`
+                        ? `/reports/${report.id}/edit`
+                        : `/reports/${report.id}`
                     }
                     className="flex lg:hidden items-center gap-4 px-4 py-4 hover:bg-white/5 transition-colors cursor-pointer"
                   >

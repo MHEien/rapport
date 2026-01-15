@@ -44,7 +44,7 @@ export function DashboardHero({ userName }: DashboardHeroProps) {
               size="lg"
               className="h-12 px-6 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 shadow-lg shadow-blue-500/25 text-base"
             >
-              <Link href="/report/new">
+              <Link href="/reports/new">
                 <Plus className="size-5 mr-2" />
                 Ny Rapport
               </Link>

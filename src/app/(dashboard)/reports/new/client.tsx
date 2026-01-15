@@ -52,7 +52,7 @@ export function NewReportClient({
       });
     },
     onSuccess: (report) => {
-      router.push(`/report/${report.id}/edit`);
+      router.push(`/reports/${report.id}/edit`);
     },
   });
 
