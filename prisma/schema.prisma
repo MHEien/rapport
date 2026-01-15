@@ -8,28 +8,27 @@ datasource db {
   provider = "postgresql"
 }
 
+// ---------------------------------------------------------
+// 1. AUTHENTICATION (Better Auth Standard)
+// ---------------------------------------------------------
+
 model User {
   id            Int       @id @default(autoincrement())
   email         String    @unique
   name          String?
-  posts         Post[]
   emailVerified Boolean   @default(false)
   image         String?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
+  
   sessions      Session[]
   accounts      Account[]
+  
+  // App Relations
+  posts         Post[]    
+  reports       Report[]  // Technicians own their reports
 
   @@map("user")
-}
-
-model Post {
-  id        Int     @id @default(autoincrement())
-  title     String
-  content   String?
-  published Boolean @default(false)
-  authorId  Int
-  author    User    @relation(fields: [authorId], references: [id])
 }
 
 model Session {
@@ -78,4 +77,127 @@ model Verification {
 
   @@index([identifier])
   @@map("verification")
+}
+
+// ---------------------------------------------------------
+// 2. CORE DOMAIN: REPORTS & FIELD DATA
+// ---------------------------------------------------------
+
+model Report {
+  id            String       @id @default(cuid())
+  reportNumber  Int          @default(autoincrement()) 
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  // Workflow State
+  status        ReportStatus @default(DRAFT)
+  
+  // Relations
+  authorId      Int
+  author        User         @relation(fields: [authorId], references: [id])
+  
+  // Job Details
+  serviceDate   DateTime     @default(now())
+  customerName  String
+  customerAddress String?
+  contactPerson String?
+  
+  // Equipment Data
+  productName   String       // e.g. "Caterpillar Generator"
+  productType   String       // Links to Master Data (ServicePoint)
+  serialNumber  String
+  runningHours  Float?       
+  
+  // Data
+  type          ReportType   @default(SERVICE)
+  checklists    ChecklistResult[]
+
+  // AI & Formatting
+  aiSummary     String?      @db.Text // The AI generated "Professional Conclusion"
+  overallComment String?     @db.Text
+  signatureUrl  String?      // Vercel Blob URL for signature
+
+  @@index([authorId])
+  @@index([customerName])
+  @@index([serialNumber])
+}
+
+model ChecklistResult {
+  id        String   @id @default(cuid())
+  
+  reportId  String
+  report    Report   @relation(fields: [reportId], references: [id], onDelete: Cascade)
+
+  // Snapshot of the question at time of report
+  category  String   
+  question  String   
+  
+  status    ChecklistStatus
+  comment   String?  
+  
+  // Visual Evidence
+  photos    Media[]  
+
+  @@index([reportId])
+}
+
+model Media {
+  id                String   @id @default(cuid())
+  url               String   // Vercel Blob URL
+  mimeType          String   // "image/jpeg", etc.
+  size              Int
+  
+  // Context
+  checklistResultId String?
+  checklistResult   ChecklistResult? @relation(fields: [checklistResultId], references: [id], onDelete: Cascade)
+  
+  createdAt         DateTime @default(now())
+}
+
+// ---------------------------------------------------------
+// 3. MASTER DATA (Templates)
+// ---------------------------------------------------------
+
+model ServicePoint {
+  id          String   @id @default(cuid())
+  productType String   
+  category    String   
+  text        String   
+  
+  isForService       Boolean @default(true)
+  isForCommissioning Boolean @default(true)
+
+  @@unique([productType, category, text])
+}
+
+model Post {
+  id        Int     @id @default(autoincrement())
+  title     String
+  content   String?
+  published Boolean @default(false)
+  authorId  Int
+  author    User    @relation(fields: [authorId], references: [id])
+}
+
+// ---------------------------------------------------------
+// ENUMS
+// ---------------------------------------------------------
+
+enum ReportType {
+  SERVICE
+  COMMISSIONING
+}
+
+enum ReportStatus {
+  DRAFT
+  SYNCED
+  COMPLETED
+  ARCHIVED
+}
+
+enum ChecklistStatus {
+  OK
+  BOR_UTBEDRES  // Should be fixed
+  MA_UTBEDRES   // Must be fixed
+  IKKE_AKTUELT  // N/A
 }

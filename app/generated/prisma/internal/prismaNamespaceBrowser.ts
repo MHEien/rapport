@@ -52,10 +52,14 @@ export const AnyNull = runtime.AnyNull
 
 export const ModelName = {
   User: 'User',
-  Post: 'Post',
   Session: 'Session',
   Account: 'Account',
-  Verification: 'Verification'
+  Verification: 'Verification',
+  Report: 'Report',
+  ChecklistResult: 'ChecklistResult',
+  Media: 'Media',
+  ServicePoint: 'ServicePoint',
+  Post: 'Post'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -85,17 +89,6 @@ export const UserScalarFieldEnum = {
 } as const
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
-
-
-export const PostScalarFieldEnum = {
-  id: 'id',
-  title: 'title',
-  content: 'content',
-  published: 'published',
-  authorId: 'authorId'
-} as const
-
-export type PostScalarFieldEnum = (typeof PostScalarFieldEnum)[keyof typeof PostScalarFieldEnum]
 
 
 export const SessionScalarFieldEnum = {
@@ -141,6 +134,77 @@ export const VerificationScalarFieldEnum = {
 } as const
 
 export type VerificationScalarFieldEnum = (typeof VerificationScalarFieldEnum)[keyof typeof VerificationScalarFieldEnum]
+
+
+export const ReportScalarFieldEnum = {
+  id: 'id',
+  reportNumber: 'reportNumber',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  status: 'status',
+  authorId: 'authorId',
+  serviceDate: 'serviceDate',
+  customerName: 'customerName',
+  customerAddress: 'customerAddress',
+  contactPerson: 'contactPerson',
+  productName: 'productName',
+  productType: 'productType',
+  serialNumber: 'serialNumber',
+  runningHours: 'runningHours',
+  type: 'type',
+  aiSummary: 'aiSummary',
+  overallComment: 'overallComment',
+  signatureUrl: 'signatureUrl'
+} as const
+
+export type ReportScalarFieldEnum = (typeof ReportScalarFieldEnum)[keyof typeof ReportScalarFieldEnum]
+
+
+export const ChecklistResultScalarFieldEnum = {
+  id: 'id',
+  reportId: 'reportId',
+  category: 'category',
+  question: 'question',
+  status: 'status',
+  comment: 'comment'
+} as const
+
+export type ChecklistResultScalarFieldEnum = (typeof ChecklistResultScalarFieldEnum)[keyof typeof ChecklistResultScalarFieldEnum]
+
+
+export const MediaScalarFieldEnum = {
+  id: 'id',
+  url: 'url',
+  mimeType: 'mimeType',
+  size: 'size',
+  checklistResultId: 'checklistResultId',
+  createdAt: 'createdAt'
+} as const
+
+export type MediaScalarFieldEnum = (typeof MediaScalarFieldEnum)[keyof typeof MediaScalarFieldEnum]
+
+
+export const ServicePointScalarFieldEnum = {
+  id: 'id',
+  productType: 'productType',
+  category: 'category',
+  text: 'text',
+  isForService: 'isForService',
+  isForCommissioning: 'isForCommissioning'
+} as const
+
+export type ServicePointScalarFieldEnum = (typeof ServicePointScalarFieldEnum)[keyof typeof ServicePointScalarFieldEnum]
+
+
+export const PostScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  content: 'content',
+  published: 'published',
+  authorId: 'authorId'
+} as const
+
+export type PostScalarFieldEnum = (typeof PostScalarFieldEnum)[keyof typeof PostScalarFieldEnum]
 
 
 export const SortOrder = {

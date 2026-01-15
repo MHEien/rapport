@@ -23,11 +23,6 @@ export * from './enums';
  */
 export type User = Prisma.UserModel
 /**
- * Model Post
- * 
- */
-export type Post = Prisma.PostModel
-/**
  * Model Session
  * 
  */
@@ -42,3 +37,28 @@ export type Account = Prisma.AccountModel
  * 
  */
 export type Verification = Prisma.VerificationModel
+/**
+ * Model Report
+ * 
+ */
+export type Report = Prisma.ReportModel
+/**
+ * Model ChecklistResult
+ * 
+ */
+export type ChecklistResult = Prisma.ChecklistResultModel
+/**
+ * Model Media
+ * 
+ */
+export type Media = Prisma.MediaModel
+/**
+ * Model ServicePoint
+ * 
+ */
+export type ServicePoint = Prisma.ServicePointModel
+/**
+ * Model Post
+ * 
+ */
+export type Post = Prisma.PostModel
