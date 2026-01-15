@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
 import { useMutation } from "@tanstack/react-query";
+import { useCallback, useEffect, useState } from "react";
 
 const STORAGE_KEY = "rapport_offline_queue";
 
@@ -71,7 +71,10 @@ export function useOfflineMutation<TData, TPayload>(
       window.removeEventListener("online", handleOnline);
       window.removeEventListener("offline", handleOffline);
     };
-  }, []);
+  }, [
+    // Trigger sync when back online
+    processQueue,
+  ]);
 
   // Update status based on queue
   useEffect(() => {
@@ -100,7 +103,7 @@ export function useOfflineMutation<TData, TPayload>(
         const updatedQueue = currentQueue.filter((m) => m.id !== mutation.id);
         saveQueue(updatedQueue);
         setQueue(updatedQueue);
-      } catch (error) {
+      } catch (_error) {
         // Mark as failed but keep in queue
         const updatedQueue = currentQueue.map((m) =>
           m.id === mutation.id ? { ...m, status: "failed" as const } : m,

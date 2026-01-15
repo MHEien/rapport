@@ -4,6 +4,52 @@ A chronological log of development progress on the Field Service PWA.
 
 ---
 
+## 2026-01-15: Premium App Shell & Dashboard
+
+**Objective:** Build a WOW-factor responsive app shell and dashboard with Norwegian labels.
+
+### Completed
+
+1. **Responsive App Shell**
+   - `Sidebar` with glassmorphism styling (desktop/tablet)
+   - `BottomNav` with floating "Ny Rapport" button (mobile)
+   - `AppShellClient` handling responsive breakpoints
+   - Auth-gated layout with user session
+   - Global `SyncIndicator` (Synkronisert/Frakoblet)
+
+2. **Dashboard Components**
+   - `DashboardHero` with gradient animations, Norwegian greetings
+   - `StatsCards` with glassmorphism (I dag, Påbegynt, Denne uken, Venter på sync)
+   - `RecentReports` list with status badges and relative timestamps
+
+3. **Create Report Flow**
+   - 2-step wizard at `/report/new`
+   - Step 1: Kundeinformasjon (Customer selection)
+   - Step 2: Utstyrsinformasjon (Equipment/product type)
+   - Fixed: Invalid user ID type bug
+   - Auto-redirect to checklist wizard after creation
+
+4. **Data Editor (Service Points)**
+   - CRUD interface for service points
+   - Excel Import/Export
+   - Template download
+   - Bulk creation optimized
+
+5. **PDF Report & View**
+   - Premium PDF layout with `react-pdf`
+   - Client-side generation (offline friendly)
+   - View page `/report/[id]` (Read-only)
+   - Download & Print actions
+
+### Routes Now Available
+| Route | Status |
+|-------|--------|
+| `/` | ✅ Dashboard with hero + stats |
+| `/report/new` | ✅ Create report wizard |
+| `/report/[id]/edit` | ✅ Focus Mode Checklist |
+
+---
+
 ## 2026-01-15: Focus Mode Checklist Implementation
 
 **Objective:** Transform the basic database interface into a "Field-First" mobile experience with wizard-style reporting.

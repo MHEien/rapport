@@ -1,6 +1,6 @@
+import { notFound } from "next/navigation";
 import { getReportWithChecklist } from "@/lib/actions/checklist-actions";
 import { ReportEditClient } from "./client";
-import { notFound } from "next/navigation";
 
 interface ReportEditPageProps {
   params: Promise<{ id: string }>;

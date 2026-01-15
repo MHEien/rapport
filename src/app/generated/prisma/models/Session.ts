@@ -20,18 +20,8 @@ export type SessionModel =
 
 export type AggregateSession = {
   _count: SessionCountAggregateOutputType | null;
-  _avg: SessionAvgAggregateOutputType | null;
-  _sum: SessionSumAggregateOutputType | null;
   _min: SessionMinAggregateOutputType | null;
   _max: SessionMaxAggregateOutputType | null;
-};
-
-export type SessionAvgAggregateOutputType = {
-  userId: number | null;
-};
-
-export type SessionSumAggregateOutputType = {
-  userId: number | null;
 };
 
 export type SessionMinAggregateOutputType = {
@@ -42,7 +32,7 @@ export type SessionMinAggregateOutputType = {
   updatedAt: Date | null;
   ipAddress: string | null;
   userAgent: string | null;
-  userId: number | null;
+  userId: string | null;
 };
 
 export type SessionMaxAggregateOutputType = {
@@ -53,7 +43,7 @@ export type SessionMaxAggregateOutputType = {
   updatedAt: Date | null;
   ipAddress: string | null;
   userAgent: string | null;
-  userId: number | null;
+  userId: string | null;
 };
 
 export type SessionCountAggregateOutputType = {
@@ -66,14 +56,6 @@ export type SessionCountAggregateOutputType = {
   userAgent: number;
   userId: number;
   _all: number;
-};
-
-export type SessionAvgAggregateInputType = {
-  userId?: true;
-};
-
-export type SessionSumAggregateInputType = {
-  userId?: true;
 };
 
 export type SessionMinAggregateInputType = {
@@ -153,18 +135,6 @@ export type SessionAggregateArgs<
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    *
-   * Select which fields to average
-   **/
-  _avg?: SessionAvgAggregateInputType;
-  /**
-   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-   *
-   * Select which fields to sum
-   **/
-  _sum?: SessionSumAggregateInputType;
-  /**
-   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-   *
    * Select which fields to find the minimum value
    **/
   _min?: SessionMinAggregateInputType;
@@ -197,8 +167,6 @@ export type SessionGroupByArgs<
   take?: number;
   skip?: number;
   _count?: SessionCountAggregateInputType | true;
-  _avg?: SessionAvgAggregateInputType;
-  _sum?: SessionSumAggregateInputType;
   _min?: SessionMinAggregateInputType;
   _max?: SessionMaxAggregateInputType;
 };
@@ -211,10 +179,8 @@ export type SessionGroupByOutputType = {
   updatedAt: Date;
   ipAddress: string | null;
   userAgent: string | null;
-  userId: number;
+  userId: string;
   _count: SessionCountAggregateOutputType | null;
-  _avg: SessionAvgAggregateOutputType | null;
-  _sum: SessionSumAggregateOutputType | null;
   _min: SessionMinAggregateOutputType | null;
   _max: SessionMaxAggregateOutputType | null;
 };
@@ -243,7 +209,7 @@ export type SessionWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"Session"> | Date | string;
   ipAddress?: Prisma.StringNullableFilter<"Session"> | string | null;
   userAgent?: Prisma.StringNullableFilter<"Session"> | string | null;
-  userId?: Prisma.IntFilter<"Session"> | number;
+  userId?: Prisma.StringFilter<"Session"> | string;
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>;
 };
 
@@ -271,7 +237,7 @@ export type SessionWhereUniqueInput = Prisma.AtLeast<
     updatedAt?: Prisma.DateTimeFilter<"Session"> | Date | string;
     ipAddress?: Prisma.StringNullableFilter<"Session"> | string | null;
     userAgent?: Prisma.StringNullableFilter<"Session"> | string | null;
-    userId?: Prisma.IntFilter<"Session"> | number;
+    userId?: Prisma.StringFilter<"Session"> | string;
     user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>;
   },
   "id" | "token"
@@ -287,10 +253,8 @@ export type SessionOrderByWithAggregationInput = {
   userAgent?: Prisma.SortOrderInput | Prisma.SortOrder;
   userId?: Prisma.SortOrder;
   _count?: Prisma.SessionCountOrderByAggregateInput;
-  _avg?: Prisma.SessionAvgOrderByAggregateInput;
   _max?: Prisma.SessionMaxOrderByAggregateInput;
   _min?: Prisma.SessionMinOrderByAggregateInput;
-  _sum?: Prisma.SessionSumOrderByAggregateInput;
 };
 
 export type SessionScalarWhereWithAggregatesInput = {
@@ -314,7 +278,7 @@ export type SessionScalarWhereWithAggregatesInput = {
     | Prisma.StringNullableWithAggregatesFilter<"Session">
     | string
     | null;
-  userId?: Prisma.IntWithAggregatesFilter<"Session"> | number;
+  userId?: Prisma.StringWithAggregatesFilter<"Session"> | string;
 };
 
 export type SessionCreateInput = {
@@ -336,7 +300,7 @@ export type SessionUncheckedCreateInput = {
   updatedAt?: Date | string;
   ipAddress?: string | null;
   userAgent?: string | null;
-  userId: number;
+  userId: string;
 };
 
 export type SessionUpdateInput = {
@@ -358,7 +322,7 @@ export type SessionUncheckedUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
   ipAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
   userAgent?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
-  userId?: Prisma.IntFieldUpdateOperationsInput | number;
+  userId?: Prisma.StringFieldUpdateOperationsInput | string;
 };
 
 export type SessionCreateManyInput = {
@@ -369,7 +333,7 @@ export type SessionCreateManyInput = {
   updatedAt?: Date | string;
   ipAddress?: string | null;
   userAgent?: string | null;
-  userId: number;
+  userId: string;
 };
 
 export type SessionUpdateManyMutationInput = {
@@ -390,7 +354,7 @@ export type SessionUncheckedUpdateManyInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
   ipAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
   userAgent?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
-  userId?: Prisma.IntFieldUpdateOperationsInput | number;
+  userId?: Prisma.StringFieldUpdateOperationsInput | string;
 };
 
 export type SessionListRelationFilter = {
@@ -414,10 +378,6 @@ export type SessionCountOrderByAggregateInput = {
   userId?: Prisma.SortOrder;
 };
 
-export type SessionAvgOrderByAggregateInput = {
-  userId?: Prisma.SortOrder;
-};
-
 export type SessionMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder;
   expiresAt?: Prisma.SortOrder;
@@ -437,10 +397,6 @@ export type SessionMinOrderByAggregateInput = {
   updatedAt?: Prisma.SortOrder;
   ipAddress?: Prisma.SortOrder;
   userAgent?: Prisma.SortOrder;
-  userId?: Prisma.SortOrder;
-};
-
-export type SessionSumOrderByAggregateInput = {
   userId?: Prisma.SortOrder;
 };
 
@@ -610,7 +566,7 @@ export type SessionScalarWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"Session"> | Date | string;
   ipAddress?: Prisma.StringNullableFilter<"Session"> | string | null;
   userAgent?: Prisma.StringNullableFilter<"Session"> | string | null;
-  userId?: Prisma.IntFilter<"Session"> | number;
+  userId?: Prisma.StringFilter<"Session"> | string;
 };
 
 export type SessionCreateManyUserInput = {
@@ -768,7 +724,7 @@ export type $SessionPayload<
       updatedAt: Date;
       ipAddress: string | null;
       userAgent: string | null;
-      userId: number;
+      userId: string;
     },
     ExtArgs["result"]["session"]
   >;
@@ -1382,7 +1338,7 @@ export interface SessionFieldRefs {
   readonly updatedAt: Prisma.FieldRef<"Session", "DateTime">;
   readonly ipAddress: Prisma.FieldRef<"Session", "String">;
   readonly userAgent: Prisma.FieldRef<"Session", "String">;
-  readonly userId: Prisma.FieldRef<"Session", "Int">;
+  readonly userId: Prisma.FieldRef<"Session", "String">;
 }
 
 // Custom InputTypes

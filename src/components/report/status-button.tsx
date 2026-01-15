@@ -1,8 +1,8 @@
 "use client";
 
-import { cn } from "@/lib/utils";
-import { Check, AlertTriangle, XCircle, MinusCircle } from "lucide-react";
+import { AlertTriangle, Check, MinusCircle, XCircle } from "lucide-react";
 import type { ChecklistStatus } from "@/app/generated/prisma/client";
+import { cn } from "@/lib/utils";
 
 const statusConfig: Record<
   ChecklistStatus,

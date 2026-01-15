@@ -1,17 +1,18 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { useMutation } from "@tanstack/react-query";
 import {
+  Check,
   ChevronLeft,
   ChevronRight,
-  Check,
-  FileText,
   ClipboardList,
+  FileText,
   PenTool,
 } from "lucide-react";
-
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import type { ChecklistResult, Report } from "@/app/generated/prisma/client";
+import { ChecklistWizard } from "@/components/report/checklist-wizard";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -23,14 +24,10 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-
-import { ChecklistWizard } from "@/components/report/checklist-wizard";
 import {
   updateReportHeader,
   updateReportSignature,
 } from "@/lib/actions/checklist-actions";
-
-import type { Report, ChecklistResult } from "@/app/generated/prisma/client";
 
 // ============================================================================
 // TYPES
@@ -318,7 +315,7 @@ function SummaryStep({ report, onBack, onComplete }: SummaryStepProps) {
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext("2d");
     if (!ctx) return;
-    ctx.clearRect(0, 0, canvas!.width, canvas!.height);
+    ctx.clearRect(0, 0, canvas?.width, canvas?.height);
     setHasSignature(false);
   };
 

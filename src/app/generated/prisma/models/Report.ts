@@ -28,13 +28,11 @@ export type AggregateReport = {
 
 export type ReportAvgAggregateOutputType = {
   reportNumber: number | null;
-  authorId: number | null;
   runningHours: number | null;
 };
 
 export type ReportSumAggregateOutputType = {
   reportNumber: number | null;
-  authorId: number | null;
   runningHours: number | null;
 };
 
@@ -44,7 +42,7 @@ export type ReportMinAggregateOutputType = {
   createdAt: Date | null;
   updatedAt: Date | null;
   status: $Enums.ReportStatus | null;
-  authorId: number | null;
+  authorId: string | null;
   serviceDate: Date | null;
   customerName: string | null;
   customerAddress: string | null;
@@ -65,7 +63,7 @@ export type ReportMaxAggregateOutputType = {
   createdAt: Date | null;
   updatedAt: Date | null;
   status: $Enums.ReportStatus | null;
-  authorId: number | null;
+  authorId: string | null;
   serviceDate: Date | null;
   customerName: string | null;
   customerAddress: string | null;
@@ -104,13 +102,11 @@ export type ReportCountAggregateOutputType = {
 
 export type ReportAvgAggregateInputType = {
   reportNumber?: true;
-  authorId?: true;
   runningHours?: true;
 };
 
 export type ReportSumAggregateInputType = {
   reportNumber?: true;
-  authorId?: true;
   runningHours?: true;
 };
 
@@ -277,7 +273,7 @@ export type ReportGroupByOutputType = {
   createdAt: Date;
   updatedAt: Date;
   status: $Enums.ReportStatus;
-  authorId: number;
+  authorId: string;
   serviceDate: Date;
   customerName: string;
   customerAddress: string | null;
@@ -319,7 +315,7 @@ export type ReportWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"Report"> | Date | string;
   updatedAt?: Prisma.DateTimeFilter<"Report"> | Date | string;
   status?: Prisma.EnumReportStatusFilter<"Report"> | $Enums.ReportStatus;
-  authorId?: Prisma.IntFilter<"Report"> | number;
+  authorId?: Prisma.StringFilter<"Report"> | string;
   serviceDate?: Prisma.DateTimeFilter<"Report"> | Date | string;
   customerName?: Prisma.StringFilter<"Report"> | string;
   customerAddress?: Prisma.StringNullableFilter<"Report"> | string | null;
@@ -369,7 +365,7 @@ export type ReportWhereUniqueInput = Prisma.AtLeast<
     createdAt?: Prisma.DateTimeFilter<"Report"> | Date | string;
     updatedAt?: Prisma.DateTimeFilter<"Report"> | Date | string;
     status?: Prisma.EnumReportStatusFilter<"Report"> | $Enums.ReportStatus;
-    authorId?: Prisma.IntFilter<"Report"> | number;
+    authorId?: Prisma.StringFilter<"Report"> | string;
     serviceDate?: Prisma.DateTimeFilter<"Report"> | Date | string;
     customerName?: Prisma.StringFilter<"Report"> | string;
     customerAddress?: Prisma.StringNullableFilter<"Report"> | string | null;
@@ -429,7 +425,7 @@ export type ReportScalarWhereWithAggregatesInput = {
   status?:
     | Prisma.EnumReportStatusWithAggregatesFilter<"Report">
     | $Enums.ReportStatus;
-  authorId?: Prisma.IntWithAggregatesFilter<"Report"> | number;
+  authorId?: Prisma.StringWithAggregatesFilter<"Report"> | string;
   serviceDate?: Prisma.DateTimeWithAggregatesFilter<"Report"> | Date | string;
   customerName?: Prisma.StringWithAggregatesFilter<"Report"> | string;
   customerAddress?:
@@ -492,7 +488,7 @@ export type ReportUncheckedCreateInput = {
   createdAt?: Date | string;
   updatedAt?: Date | string;
   status?: $Enums.ReportStatus;
-  authorId: number;
+  authorId: string;
   serviceDate?: Date | string;
   customerName: string;
   customerAddress?: string | null;
@@ -552,7 +548,7 @@ export type ReportUncheckedUpdateInput = {
   status?:
     | Prisma.EnumReportStatusFieldUpdateOperationsInput
     | $Enums.ReportStatus;
-  authorId?: Prisma.IntFieldUpdateOperationsInput | number;
+  authorId?: Prisma.StringFieldUpdateOperationsInput | string;
   serviceDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
   customerName?: Prisma.StringFieldUpdateOperationsInput | string;
   customerAddress?:
@@ -586,7 +582,7 @@ export type ReportCreateManyInput = {
   createdAt?: Date | string;
   updatedAt?: Date | string;
   status?: $Enums.ReportStatus;
-  authorId: number;
+  authorId: string;
   serviceDate?: Date | string;
   customerName: string;
   customerAddress?: string | null;
@@ -643,7 +639,7 @@ export type ReportUncheckedUpdateManyInput = {
   status?:
     | Prisma.EnumReportStatusFieldUpdateOperationsInput
     | $Enums.ReportStatus;
-  authorId?: Prisma.IntFieldUpdateOperationsInput | number;
+  authorId?: Prisma.StringFieldUpdateOperationsInput | string;
   serviceDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
   customerName?: Prisma.StringFieldUpdateOperationsInput | string;
   customerAddress?:
@@ -703,7 +699,6 @@ export type ReportCountOrderByAggregateInput = {
 
 export type ReportAvgOrderByAggregateInput = {
   reportNumber?: Prisma.SortOrder;
-  authorId?: Prisma.SortOrder;
   runningHours?: Prisma.SortOrder;
 };
 
@@ -751,7 +746,6 @@ export type ReportMinOrderByAggregateInput = {
 
 export type ReportSumOrderByAggregateInput = {
   reportNumber?: Prisma.SortOrder;
-  authorId?: Prisma.SortOrder;
   runningHours?: Prisma.SortOrder;
 };
 
@@ -844,6 +838,14 @@ export type ReportUncheckedUpdateManyWithoutAuthorNestedInput = {
     | Prisma.ReportUpdateManyWithWhereWithoutAuthorInput
     | Prisma.ReportUpdateManyWithWhereWithoutAuthorInput[];
   deleteMany?: Prisma.ReportScalarWhereInput | Prisma.ReportScalarWhereInput[];
+};
+
+export type IntFieldUpdateOperationsInput = {
+  set?: number;
+  increment?: number;
+  decrement?: number;
+  multiply?: number;
+  divide?: number;
 };
 
 export type EnumReportStatusFieldUpdateOperationsInput = {
@@ -982,7 +984,7 @@ export type ReportScalarWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"Report"> | Date | string;
   updatedAt?: Prisma.DateTimeFilter<"Report"> | Date | string;
   status?: Prisma.EnumReportStatusFilter<"Report"> | $Enums.ReportStatus;
-  authorId?: Prisma.IntFilter<"Report"> | number;
+  authorId?: Prisma.StringFilter<"Report"> | string;
   serviceDate?: Prisma.DateTimeFilter<"Report"> | Date | string;
   customerName?: Prisma.StringFilter<"Report"> | string;
   customerAddress?: Prisma.StringNullableFilter<"Report"> | string | null;
@@ -1024,7 +1026,7 @@ export type ReportUncheckedCreateWithoutChecklistsInput = {
   createdAt?: Date | string;
   updatedAt?: Date | string;
   status?: $Enums.ReportStatus;
-  authorId: number;
+  authorId: string;
   serviceDate?: Date | string;
   customerName: string;
   customerAddress?: string | null;
@@ -1110,7 +1112,7 @@ export type ReportUncheckedUpdateWithoutChecklistsInput = {
   status?:
     | Prisma.EnumReportStatusFieldUpdateOperationsInput
     | $Enums.ReportStatus;
-  authorId?: Prisma.IntFieldUpdateOperationsInput | number;
+  authorId?: Prisma.StringFieldUpdateOperationsInput | string;
   serviceDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
   customerName?: Prisma.StringFieldUpdateOperationsInput | string;
   customerAddress?:
@@ -1467,7 +1469,7 @@ export type $ReportPayload<
       createdAt: Date;
       updatedAt: Date;
       status: $Enums.ReportStatus;
-      authorId: number;
+      authorId: string;
       serviceDate: Date;
       customerName: string;
       customerAddress: string | null;
@@ -2102,7 +2104,7 @@ export interface ReportFieldRefs {
   readonly createdAt: Prisma.FieldRef<"Report", "DateTime">;
   readonly updatedAt: Prisma.FieldRef<"Report", "DateTime">;
   readonly status: Prisma.FieldRef<"Report", "ReportStatus">;
-  readonly authorId: Prisma.FieldRef<"Report", "Int">;
+  readonly authorId: Prisma.FieldRef<"Report", "String">;
   readonly serviceDate: Prisma.FieldRef<"Report", "DateTime">;
   readonly customerName: Prisma.FieldRef<"Report", "String">;
   readonly customerAddress: Prisma.FieldRef<"Report", "String">;

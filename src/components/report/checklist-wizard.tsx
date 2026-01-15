@@ -1,33 +1,28 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { ChevronLeft, Cloud, CloudOff, Wifi, WifiOff } from "lucide-react";
-import { cn } from "@/lib/utils";
-
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-
-import { StatusButtonRow, statusConfig } from "./status-button";
-import { ChecklistProgress } from "./checklist-progress";
-import { PhotoCapture } from "./photo-capture";
-
-import {
-  getServicePointsByProductType,
-  saveChecklistResult,
-  type SaveChecklistInput,
-} from "@/lib/actions/checklist-actions";
-import {
-  useOfflineMutation,
-  type SyncStatus,
-} from "@/hooks/use-offline-mutation";
-
+import { useQuery } from "@tanstack/react-query";
+import { ChevronLeft, Cloud, CloudOff, WifiOff } from "lucide-react";
+import { useCallback, useState } from "react";
 import type {
-  ServicePoint,
   ChecklistResult,
   ChecklistStatus,
 } from "@/app/generated/prisma/client";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  type SyncStatus,
+  useOfflineMutation,
+} from "@/hooks/use-offline-mutation";
+import {
+  getServicePointsByProductType,
+  type SaveChecklistInput,
+  saveChecklistResult,
+} from "@/lib/actions/checklist-actions";
+import { cn } from "@/lib/utils";
+import { ChecklistProgress } from "./checklist-progress";
+import { PhotoCapture } from "./photo-capture";
+import { StatusButtonRow } from "./status-button";
 
 // ============================================================================
 // SYNC STATUS INDICATOR

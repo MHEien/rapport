@@ -14,6 +14,8 @@ A professional field service reporting application for heavy machinery technicia
 - TanStack Query (offline mutations)
 - Vercel Blob (photos/signatures)
 - Shadcn UI (dark mode)
+- @react-pdf/renderer (client-side PDF)
+- xlsx (Excel import/export)
 
 ---
 
@@ -53,14 +55,13 @@ ServicePoint (templates)
     → [Complete]
 ```
 
-### 2. Desktop Dashboard (Original)
+### 2. Premium Dashboard
 
 ```
 [Dashboard]
-    → Left: Assignment details
-    → Center: Checklist table with toggles
-    → Add equipment to single report
-    → [Save] / [PDF]
+    → Stats Cards (Today, Sync Status, etc.)
+    → Recent Reports (Quick Access)
+    → "New Report" Wizard Quick Launch
 ```
 
 ---
@@ -69,11 +70,11 @@ ServicePoint (templates)
 
 | Route | Status | Description |
 |-------|--------|-------------|
-| `/` | 🟡 Planned | Landing / Dashboard |
+| `/` | ✅ Done | Premium Dashboard |
 | `/report/[id]/edit` | ✅ Done | Mobile wizard flow |
-| `/report/[id]` | 🟡 Planned | View completed report |
-| `/reports` | 🟡 Planned | Report archive with search |
-| `/data-editor` | 🟡 Planned | Manage service points |
+| `/report/[id]` | ✅ Done | View completed report (PDF) |
+| `/reports` | ✅ Done | Report archive with search |
+| `/data-editor` | ✅ Done | Manage service points & Excel |
 | `/auth/*` | ✅ Done | Better Auth routes |
 
 ---
@@ -97,7 +98,7 @@ ServicePoint (templates)
 
 ---
 
-## Future Roadmap
+## Roadmap Status
 
 ### Phase 1: Core Mobile ✅
 - [x] Focus Mode Checklist
@@ -105,16 +106,16 @@ ServicePoint (templates)
 - [x] Photo capture
 - [x] Signature pad
 
-### Phase 2: Report Lifecycle
-- [ ] Create new report flow
-- [ ] Report view (read-only)
-- [ ] PDF generation
-- [ ] Report archive with search
+### Phase 2: Report Lifecycle ✅
+- [x] Create new report flow
+- [x] Report view (read-only)
+- [x] PDF generation (react-pdf)
+- [x] Report archive with search
 
-### Phase 3: Data Management
-- [ ] Service points editor
-- [ ] Product type management
-- [ ] Excel import/export
+### Phase 3: Data Management ✅
+- [x] Service points editor
+- [x] Product type management
+- [x] Excel import/export
 
 ### Phase 4: Team Features
 - [ ] Multi-technician support
@@ -137,3 +138,5 @@ ServicePoint (templates)
 | Canvas signature vs library | Lightweight, no extra dependencies |
 | Dark mode default | Battery savings, field conditions |
 | Norwegian preserved | Matches brother's original for familiarity |
+| React-PDF | Client-side generation, offline capable, premium styling |
+| XLSX | Robust Excel parsing for bulk import |

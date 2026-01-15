@@ -20,36 +20,24 @@ export type PostModel =
 
 export type AggregatePost = {
   _count: PostCountAggregateOutputType | null;
-  _avg: PostAvgAggregateOutputType | null;
-  _sum: PostSumAggregateOutputType | null;
   _min: PostMinAggregateOutputType | null;
   _max: PostMaxAggregateOutputType | null;
 };
 
-export type PostAvgAggregateOutputType = {
-  id: number | null;
-  authorId: number | null;
-};
-
-export type PostSumAggregateOutputType = {
-  id: number | null;
-  authorId: number | null;
-};
-
 export type PostMinAggregateOutputType = {
-  id: number | null;
+  id: string | null;
   title: string | null;
   content: string | null;
   published: boolean | null;
-  authorId: number | null;
+  authorId: string | null;
 };
 
 export type PostMaxAggregateOutputType = {
-  id: number | null;
+  id: string | null;
   title: string | null;
   content: string | null;
   published: boolean | null;
-  authorId: number | null;
+  authorId: string | null;
 };
 
 export type PostCountAggregateOutputType = {
@@ -59,16 +47,6 @@ export type PostCountAggregateOutputType = {
   published: number;
   authorId: number;
   _all: number;
-};
-
-export type PostAvgAggregateInputType = {
-  id?: true;
-  authorId?: true;
-};
-
-export type PostSumAggregateInputType = {
-  id?: true;
-  authorId?: true;
 };
 
 export type PostMinAggregateInputType = {
@@ -139,18 +117,6 @@ export type PostAggregateArgs<
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    *
-   * Select which fields to average
-   **/
-  _avg?: PostAvgAggregateInputType;
-  /**
-   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-   *
-   * Select which fields to sum
-   **/
-  _sum?: PostSumAggregateInputType;
-  /**
-   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-   *
    * Select which fields to find the minimum value
    **/
   _min?: PostMinAggregateInputType;
@@ -183,21 +149,17 @@ export type PostGroupByArgs<
   take?: number;
   skip?: number;
   _count?: PostCountAggregateInputType | true;
-  _avg?: PostAvgAggregateInputType;
-  _sum?: PostSumAggregateInputType;
   _min?: PostMinAggregateInputType;
   _max?: PostMaxAggregateInputType;
 };
 
 export type PostGroupByOutputType = {
-  id: number;
+  id: string;
   title: string;
   content: string | null;
   published: boolean;
-  authorId: number;
+  authorId: string;
   _count: PostCountAggregateOutputType | null;
-  _avg: PostAvgAggregateOutputType | null;
-  _sum: PostSumAggregateOutputType | null;
   _min: PostMinAggregateOutputType | null;
   _max: PostMaxAggregateOutputType | null;
 };
@@ -218,11 +180,11 @@ export type PostWhereInput = {
   AND?: Prisma.PostWhereInput | Prisma.PostWhereInput[];
   OR?: Prisma.PostWhereInput[];
   NOT?: Prisma.PostWhereInput | Prisma.PostWhereInput[];
-  id?: Prisma.IntFilter<"Post"> | number;
+  id?: Prisma.StringFilter<"Post"> | string;
   title?: Prisma.StringFilter<"Post"> | string;
   content?: Prisma.StringNullableFilter<"Post"> | string | null;
   published?: Prisma.BoolFilter<"Post"> | boolean;
-  authorId?: Prisma.IntFilter<"Post"> | number;
+  authorId?: Prisma.StringFilter<"Post"> | string;
   author?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>;
 };
 
@@ -237,14 +199,14 @@ export type PostOrderByWithRelationInput = {
 
 export type PostWhereUniqueInput = Prisma.AtLeast<
   {
-    id?: number;
+    id?: string;
     AND?: Prisma.PostWhereInput | Prisma.PostWhereInput[];
     OR?: Prisma.PostWhereInput[];
     NOT?: Prisma.PostWhereInput | Prisma.PostWhereInput[];
     title?: Prisma.StringFilter<"Post"> | string;
     content?: Prisma.StringNullableFilter<"Post"> | string | null;
     published?: Prisma.BoolFilter<"Post"> | boolean;
-    authorId?: Prisma.IntFilter<"Post"> | number;
+    authorId?: Prisma.StringFilter<"Post"> | string;
     author?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>;
   },
   "id"
@@ -257,10 +219,8 @@ export type PostOrderByWithAggregationInput = {
   published?: Prisma.SortOrder;
   authorId?: Prisma.SortOrder;
   _count?: Prisma.PostCountOrderByAggregateInput;
-  _avg?: Prisma.PostAvgOrderByAggregateInput;
   _max?: Prisma.PostMaxOrderByAggregateInput;
   _min?: Prisma.PostMinOrderByAggregateInput;
-  _sum?: Prisma.PostSumOrderByAggregateInput;
 };
 
 export type PostScalarWhereWithAggregatesInput = {
@@ -271,14 +231,15 @@ export type PostScalarWhereWithAggregatesInput = {
   NOT?:
     | Prisma.PostScalarWhereWithAggregatesInput
     | Prisma.PostScalarWhereWithAggregatesInput[];
-  id?: Prisma.IntWithAggregatesFilter<"Post"> | number;
+  id?: Prisma.StringWithAggregatesFilter<"Post"> | string;
   title?: Prisma.StringWithAggregatesFilter<"Post"> | string;
   content?: Prisma.StringNullableWithAggregatesFilter<"Post"> | string | null;
   published?: Prisma.BoolWithAggregatesFilter<"Post"> | boolean;
-  authorId?: Prisma.IntWithAggregatesFilter<"Post"> | number;
+  authorId?: Prisma.StringWithAggregatesFilter<"Post"> | string;
 };
 
 export type PostCreateInput = {
+  id?: string;
   title: string;
   content?: string | null;
   published?: boolean;
@@ -286,14 +247,15 @@ export type PostCreateInput = {
 };
 
 export type PostUncheckedCreateInput = {
-  id?: number;
+  id?: string;
   title: string;
   content?: string | null;
   published?: boolean;
-  authorId: number;
+  authorId: string;
 };
 
 export type PostUpdateInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string;
   title?: Prisma.StringFieldUpdateOperationsInput | string;
   content?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
   published?: Prisma.BoolFieldUpdateOperationsInput | boolean;
@@ -301,33 +263,34 @@ export type PostUpdateInput = {
 };
 
 export type PostUncheckedUpdateInput = {
-  id?: Prisma.IntFieldUpdateOperationsInput | number;
+  id?: Prisma.StringFieldUpdateOperationsInput | string;
   title?: Prisma.StringFieldUpdateOperationsInput | string;
   content?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
   published?: Prisma.BoolFieldUpdateOperationsInput | boolean;
-  authorId?: Prisma.IntFieldUpdateOperationsInput | number;
+  authorId?: Prisma.StringFieldUpdateOperationsInput | string;
 };
 
 export type PostCreateManyInput = {
-  id?: number;
+  id?: string;
   title: string;
   content?: string | null;
   published?: boolean;
-  authorId: number;
+  authorId: string;
 };
 
 export type PostUpdateManyMutationInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string;
   title?: Prisma.StringFieldUpdateOperationsInput | string;
   content?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
   published?: Prisma.BoolFieldUpdateOperationsInput | boolean;
 };
 
 export type PostUncheckedUpdateManyInput = {
-  id?: Prisma.IntFieldUpdateOperationsInput | number;
+  id?: Prisma.StringFieldUpdateOperationsInput | string;
   title?: Prisma.StringFieldUpdateOperationsInput | string;
   content?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
   published?: Prisma.BoolFieldUpdateOperationsInput | boolean;
-  authorId?: Prisma.IntFieldUpdateOperationsInput | number;
+  authorId?: Prisma.StringFieldUpdateOperationsInput | string;
 };
 
 export type PostListRelationFilter = {
@@ -348,11 +311,6 @@ export type PostCountOrderByAggregateInput = {
   authorId?: Prisma.SortOrder;
 };
 
-export type PostAvgOrderByAggregateInput = {
-  id?: Prisma.SortOrder;
-  authorId?: Prisma.SortOrder;
-};
-
 export type PostMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder;
   title?: Prisma.SortOrder;
@@ -366,11 +324,6 @@ export type PostMinOrderByAggregateInput = {
   title?: Prisma.SortOrder;
   content?: Prisma.SortOrder;
   published?: Prisma.SortOrder;
-  authorId?: Prisma.SortOrder;
-};
-
-export type PostSumOrderByAggregateInput = {
-  id?: Prisma.SortOrder;
   authorId?: Prisma.SortOrder;
 };
 
@@ -461,13 +414,14 @@ export type PostUncheckedUpdateManyWithoutAuthorNestedInput = {
 };
 
 export type PostCreateWithoutAuthorInput = {
+  id?: string;
   title: string;
   content?: string | null;
   published?: boolean;
 };
 
 export type PostUncheckedCreateWithoutAuthorInput = {
-  id?: number;
+  id?: string;
   title: string;
   content?: string | null;
   published?: boolean;
@@ -518,35 +472,36 @@ export type PostScalarWhereInput = {
   AND?: Prisma.PostScalarWhereInput | Prisma.PostScalarWhereInput[];
   OR?: Prisma.PostScalarWhereInput[];
   NOT?: Prisma.PostScalarWhereInput | Prisma.PostScalarWhereInput[];
-  id?: Prisma.IntFilter<"Post"> | number;
+  id?: Prisma.StringFilter<"Post"> | string;
   title?: Prisma.StringFilter<"Post"> | string;
   content?: Prisma.StringNullableFilter<"Post"> | string | null;
   published?: Prisma.BoolFilter<"Post"> | boolean;
-  authorId?: Prisma.IntFilter<"Post"> | number;
+  authorId?: Prisma.StringFilter<"Post"> | string;
 };
 
 export type PostCreateManyAuthorInput = {
-  id?: number;
+  id?: string;
   title: string;
   content?: string | null;
   published?: boolean;
 };
 
 export type PostUpdateWithoutAuthorInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string;
   title?: Prisma.StringFieldUpdateOperationsInput | string;
   content?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
   published?: Prisma.BoolFieldUpdateOperationsInput | boolean;
 };
 
 export type PostUncheckedUpdateWithoutAuthorInput = {
-  id?: Prisma.IntFieldUpdateOperationsInput | number;
+  id?: Prisma.StringFieldUpdateOperationsInput | string;
   title?: Prisma.StringFieldUpdateOperationsInput | string;
   content?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
   published?: Prisma.BoolFieldUpdateOperationsInput | boolean;
 };
 
 export type PostUncheckedUpdateManyWithoutAuthorInput = {
-  id?: Prisma.IntFieldUpdateOperationsInput | number;
+  id?: Prisma.StringFieldUpdateOperationsInput | string;
   title?: Prisma.StringFieldUpdateOperationsInput | string;
   content?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
   published?: Prisma.BoolFieldUpdateOperationsInput | boolean;
@@ -641,11 +596,11 @@ export type $PostPayload<
   };
   scalars: runtime.Types.Extensions.GetPayloadResult<
     {
-      id: number;
+      id: string;
       title: string;
       content: string | null;
       published: boolean;
-      authorId: number;
+      authorId: string;
     },
     ExtArgs["result"]["post"]
   >;
@@ -1252,11 +1207,11 @@ export interface Prisma__PostClient<
  * Fields of the Post model
  */
 export interface PostFieldRefs {
-  readonly id: Prisma.FieldRef<"Post", "Int">;
+  readonly id: Prisma.FieldRef<"Post", "String">;
   readonly title: Prisma.FieldRef<"Post", "String">;
   readonly content: Prisma.FieldRef<"Post", "String">;
   readonly published: Prisma.FieldRef<"Post", "Boolean">;
-  readonly authorId: Prisma.FieldRef<"Post", "Int">;
+  readonly authorId: Prisma.FieldRef<"Post", "String">;
 }
 
 // Custom InputTypes

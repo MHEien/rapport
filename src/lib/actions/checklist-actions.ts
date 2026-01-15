@@ -1,8 +1,8 @@
 "use server";
 
-import { prisma } from "@/lib/prisma";
-import type { ChecklistStatus } from "@/app/generated/prisma/client";
 import { put } from "@vercel/blob";
+import type { ChecklistStatus } from "@/app/generated/prisma/client";
+import { prisma } from "@/lib/prisma";
 
 // ============================================================================
 // GET SERVICE POINTS

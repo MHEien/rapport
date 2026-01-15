@@ -1,8 +1,7 @@
 "use client";
 
-import { cn } from "@/lib/utils";
-
 import { Check } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface ChecklistProgressProps {
   total: number;

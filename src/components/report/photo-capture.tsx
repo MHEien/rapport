@@ -1,9 +1,9 @@
 "use client";
 
+import { Camera, Loader2 } from "lucide-react";
 import { useRef, useState } from "react";
-import { Camera, X, Loader2 } from "lucide-react";
-import { cn } from "@/lib/utils";
 import { uploadChecklistPhoto } from "@/lib/actions/checklist-actions";
+import { cn } from "@/lib/utils";
 
 interface PhotoCaptureProps {
   checklistResultId: string | null;
