@@ -18,6 +18,9 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  // Add the leading slash to all paths
-  matcher: ["/", "/reports", "/data-editor"], 
+  matcher: [
+    "/", 
+    "/reports/:path*",      // Matches /reports AND /reports/anything
+    "/data-editor/:path*"   // Matches /data-editor AND /data-editor/anything
+  ],
 };
