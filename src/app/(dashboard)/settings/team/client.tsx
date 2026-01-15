@@ -28,6 +28,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -43,10 +44,37 @@ import {
   updateMemberRole,
 } from "@/lib/actions/org-actions";
 
+interface MemberUser {
+  id: string;
+  name: string | null;
+  email: string;
+  image: string | null;
+}
+
+interface Member {
+  id: string;
+  role: string;
+  userId: string;
+  user: MemberUser;
+}
+
+interface InvitationInviter {
+  name: string | null;
+  email: string;
+}
+
+interface Invitation {
+  id: string;
+  email: string;
+  role: string;
+  createdAt: Date;
+  inviter: InvitationInviter;
+}
+
 interface TeamSettingsClientProps {
   organizationId: string;
-  initialMembers: any[];
-  initialInvitations: any[];
+  initialMembers: Member[];
+  initialInvitations: Invitation[];
   currentUserRole: string;
   currentUserId: string;
 }
@@ -163,10 +191,14 @@ export function TeamSettingsClient({
             </DialogHeader>
             <div className="space-y-4 py-4">
               <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-200">
+                <Label
+                  htmlFor="invite-email"
+                  className="text-sm font-medium text-slate-200"
+                >
                   E-postadresse
-                </label>
+                </Label>
                 <Input
+                  id="invite-email"
                   placeholder="navn@bedrift.no"
                   value={inviteEmail}
                   onChange={(e) => setInviteEmail(e.target.value)}
@@ -174,11 +206,17 @@ export function TeamSettingsClient({
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-200">
+                <Label
+                  htmlFor="invite-role"
+                  className="text-sm font-medium text-slate-200"
+                >
                   Rolle
-                </label>
+                </Label>
                 <Select value={inviteRole} onValueChange={setInviteRole}>
-                  <SelectTrigger className="bg-slate-800 border-slate-700 text-white">
+                  <SelectTrigger
+                    id="invite-role"
+                    className="bg-slate-800 border-slate-700 text-white"
+                  >
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent className="bg-slate-900 border-slate-800 text-white">
@@ -255,6 +293,7 @@ export function TeamSettingsClient({
       <div className="space-y-4">
         <div className="flex border-b border-white/10">
           <button
+            type="button"
             onClick={() => setActiveTab("members")}
             className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
               activeTab === "members"
@@ -265,6 +304,7 @@ export function TeamSettingsClient({
             Medlemmer
           </button>
           <button
+            type="button"
             onClick={() => setActiveTab("invites")}
             className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
               activeTab === "invites"
@@ -286,7 +326,7 @@ export function TeamSettingsClient({
                 >
                   <div className="flex items-center gap-3">
                     <Avatar>
-                      <AvatarImage src={member.user.image} />
+                      <AvatarImage src={member.user.image || undefined} />
                       <AvatarFallback className="bg-blue-600/20 text-blue-400">
                         {member.user.name?.[0] ||
                           member.user.email[0].toUpperCase()}
@@ -354,9 +394,7 @@ export function TeamSettingsClient({
                           </DropdownMenuItem>
                           {currentUserRole === "owner" && (
                             <DropdownMenuItem
-                              onClick={() =>
-                                handleUpdateRole(member.id, "owner")
-                              }
+                              onClick={() => handleUpdateRole(member.id, "owner")}
                             >
                               Sett til Eier
                             </DropdownMenuItem>

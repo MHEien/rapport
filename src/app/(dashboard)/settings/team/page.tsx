@@ -38,9 +38,9 @@ export default async function TeamSettingsPage() {
   return (
     <TeamSettingsClient
       organizationId={orgData.organization.id}
-      initialMembers={membersResult.success ? membersResult.members : []}
+      initialMembers={membersResult.success ? membersResult.members ?? [] : []}
       initialInvitations={
-        invitationsResult.success ? invitationsResult.invitations : []
+        invitationsResult.success ? invitationsResult.invitations ?? [] : []
       }
       currentUserRole={orgData.membership.role}
       currentUserId={session.user.id}
