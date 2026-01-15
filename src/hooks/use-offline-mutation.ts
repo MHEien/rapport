@@ -49,6 +49,31 @@ export function useOfflineMutation<TData, TPayload>(
   const [syncStatus, setSyncStatus] = useState<SyncStatus>("synced");
   const [isOnline, setIsOnline] = useState(true);
 
+    // Process queued mutations
+  const processQueue = useCallback(async () => {
+    const currentQueue = loadQueue();
+    const pendingMutations = currentQueue.filter(
+      (m) => m.status === "pending" || m.status === "failed",
+    );
+
+    for (const mutation of pendingMutations) {
+      try {
+        await mutationFn(mutation.payload as TPayload);
+        // Remove from queue on success
+        const updatedQueue = currentQueue.filter((m) => m.id !== mutation.id);
+        saveQueue(updatedQueue);
+        setQueue(updatedQueue);
+      } catch (_error) {
+        // Mark as failed but keep in queue
+        const updatedQueue = currentQueue.map((m) =>
+          m.id === mutation.id ? { ...m, status: "failed" as const } : m,
+        );
+        saveQueue(updatedQueue);
+        setQueue(updatedQueue);
+      }
+    }
+  }, [mutationFn]);
+
   // Load queue on mount
   useEffect(() => {
     setQueue(loadQueue());
@@ -89,30 +114,7 @@ export function useOfflineMutation<TData, TPayload>(
     }
   }, [queue, isOnline]);
 
-  // Process queued mutations
-  const processQueue = useCallback(async () => {
-    const currentQueue = loadQueue();
-    const pendingMutations = currentQueue.filter(
-      (m) => m.status === "pending" || m.status === "failed",
-    );
 
-    for (const mutation of pendingMutations) {
-      try {
-        await mutationFn(mutation.payload as TPayload);
-        // Remove from queue on success
-        const updatedQueue = currentQueue.filter((m) => m.id !== mutation.id);
-        saveQueue(updatedQueue);
-        setQueue(updatedQueue);
-      } catch (_error) {
-        // Mark as failed but keep in queue
-        const updatedQueue = currentQueue.map((m) =>
-          m.id === mutation.id ? { ...m, status: "failed" as const } : m,
-        );
-        saveQueue(updatedQueue);
-        setQueue(updatedQueue);
-      }
-    }
-  }, [mutationFn]);
 
   // Main mutation
   const mutation = useMutation({

@@ -30,3 +30,10 @@ The agent should use these to verify work:
 - **NEVER** modify `schema.prisma` without explicitly asking for a "Schema Review" first.
 - **NEVER** use `any` type in TypeScript.
 - **NEVER** leave sensitive keys in code (use `process.env`).
+
+## 6. Important Notes
+- The app is a PWA and should work offline.
+- The app is a mobile-first app and should be optimized for mobile and tablet devices.
+- The app is a work-in-progress and should be updated frequently.
+- Always refer to the `AGENTS.md` file for the latest information.
+- Always refer to the docs folder for previous progress logs and information.
