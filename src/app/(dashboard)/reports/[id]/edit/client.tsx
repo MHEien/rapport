@@ -12,7 +12,7 @@ import {
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import type { ChecklistResult, Report } from "@/app/generated/prisma/client";
-import { ChecklistWizard } from "@/components/reports/checklist-wizard";
+import { ChecklistWizard } from "@/components/report/checklist-wizard";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -314,7 +314,7 @@ function SummaryStep({ report, onBack, onComplete }: SummaryStepProps) {
   const clearSignature = () => {
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext("2d");
-    if (!ctx) return;
+    if (!ctx || !canvas) return;
     ctx.clearRect(0, 0, canvas?.width, canvas?.height);
     setHasSignature(false);
   };
