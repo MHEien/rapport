@@ -14,7 +14,7 @@ import {
   Upload,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useRef, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import * as XLSX from "xlsx";
 import {
   AlertDialog,
@@ -72,13 +72,18 @@ export function DataEditorClient({
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // State
-  const [data, _setData] = useState(initialData);
+  const [data, setData] = useState(initialData);
   const [expandedTypes, setExpandedTypes] = useState<Set<string>>(
     new Set(productTypes.slice(0, 1)),
   );
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(
     new Set(),
   );
+
+  // Sync data state with initialData prop when it changes (after router.refresh)
+  useEffect(() => {
+    setData(initialData);
+  }, [initialData]);
 
   // Dialog state
   const [addDialogOpen, setAddDialogOpen] = useState(false);
