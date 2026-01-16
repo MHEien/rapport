@@ -1,8 +1,8 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { getCurrentOrganization } from "./org-actions";
-import { revalidatePath } from "next/cache";
 
 /**
  * Get all service points for the current organization
