@@ -23,7 +23,10 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { createReportWithEquipment, type BulkEquipmentInput } from "@/lib/actions/equipment-actions";
+import {
+  type BulkEquipmentInput,
+  createReportWithEquipment,
+} from "@/lib/actions/equipment-actions";
 
 interface NewReportClientProps {
   productTypes: string[];
@@ -63,7 +66,7 @@ export function NewReportClient({ productTypes }: NewReportClientProps) {
       return createReportWithEquipment({
         customerName,
         contactPerson: contactPerson || undefined,
-        equipment: equipment.filter(eq => eq.included),
+        equipment: equipment.filter((eq) => eq.included),
       });
     },
     onSuccess: (report) => {
@@ -102,13 +105,16 @@ export function NewReportClient({ productTypes }: NewReportClientProps) {
   // Update equipment item
   const updateEquipment = (id: string, updates: Partial<EquipmentItem>) => {
     setEquipment((prev) =>
-      prev.map((eq) => (eq.id === id ? { ...eq, ...updates } : eq))
+      prev.map((eq) => (eq.id === id ? { ...eq, ...updates } : eq)),
     );
   };
 
   const canProceedStep1 = customerName.trim().length > 0;
   const canProceedStep2 = equipment.some(
-    (eq) => eq.included && eq.productName.trim().length > 0 && eq.productType.length > 0
+    (eq) =>
+      eq.included &&
+      eq.productName.trim().length > 0 &&
+      eq.productType.length > 0,
   );
 
   return (
@@ -184,7 +190,9 @@ export function NewReportClient({ productTypes }: NewReportClientProps) {
                 <Package className="size-5 text-emerald-400" />
               </div>
               <div>
-                <h2 className="text-lg font-semibold text-white">Utstyrsliste</h2>
+                <h2 className="text-lg font-semibold text-white">
+                  Utstyrsliste
+                </h2>
                 <p className="text-sm text-slate-400">
                   Legg til utstyr som skal serviceres
                 </p>
@@ -238,7 +246,9 @@ export function NewReportClient({ productTypes }: NewReportClientProps) {
                         value={eq.jobType}
                         onChange={(e) =>
                           updateEquipment(eq.id, {
-                            jobType: e.target.value as "SERVICE" | "COMMISSIONING",
+                            jobType: e.target.value as
+                              | "SERVICE"
+                              | "COMMISSIONING",
                           })
                         }
                         className="w-full h-10 px-3 rounded-md bg-white/5 border border-white/10 text-white text-sm"
@@ -254,7 +264,9 @@ export function NewReportClient({ productTypes }: NewReportClientProps) {
                       <select
                         value={eq.productType}
                         onChange={(e) =>
-                          updateEquipment(eq.id, { productType: e.target.value })
+                          updateEquipment(eq.id, {
+                            productType: e.target.value,
+                          })
                         }
                         className="w-full h-10 px-3 rounded-md bg-white/5 border border-white/10 text-white text-sm"
                       >
@@ -269,7 +281,7 @@ export function NewReportClient({ productTypes }: NewReportClientProps) {
                                 <option key={type} value={type}>
                                   {type}
                                 </option>
-                              )
+                              ),
                             )}
                       </select>
                     </div>
@@ -312,7 +324,9 @@ export function NewReportClient({ productTypes }: NewReportClientProps) {
                       <Input
                         value={eq.serialNumber ?? ""}
                         onChange={(e) =>
-                          updateEquipment(eq.id, { serialNumber: e.target.value })
+                          updateEquipment(eq.id, {
+                            serialNumber: e.target.value,
+                          })
                         }
                         placeholder="Serienr."
                         className="bg-white/5 border-white/10"

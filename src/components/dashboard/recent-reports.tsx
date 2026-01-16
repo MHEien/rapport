@@ -99,7 +99,8 @@ export function RecentReports({ reports }: RecentReportsProps) {
             addSuffix: true,
             locale: nb,
           });
-          const equipmentName = report.equipment[0]?.productName ?? "Ingen utstyr";
+          const equipmentName =
+            report.equipment[0]?.productName ?? "Ingen utstyr";
           const equipmentCount = report._count.equipment;
 
           return (
@@ -126,7 +127,8 @@ export function RecentReports({ reports }: RecentReportsProps) {
                   {report.customerName}
                 </p>
                 <p className="text-sm text-slate-400 truncate">
-                  {equipmentName}{equipmentCount > 1 && ` +${equipmentCount - 1}`}
+                  {equipmentName}
+                  {equipmentCount > 1 && ` +${equipmentCount - 1}`}
                 </p>
               </div>
 

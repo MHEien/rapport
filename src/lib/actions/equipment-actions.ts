@@ -1,9 +1,9 @@
 "use server";
 
+import type { ReportType } from "@/app/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/server";
 import { getCurrentOrganization } from "./org-actions";
-import type { ReportType } from "@/app/generated/prisma/client";
 
 // ============================================================================
 // CREATE EQUIPMENT
@@ -81,7 +81,7 @@ export async function createReportWithEquipment(input: {
       status: "DRAFT",
       equipment: {
         create: input.equipment
-          .filter(eq => eq.included !== false)
+          .filter((eq) => eq.included !== false)
           .map((eq, index) => ({
             productType: eq.productType,
             productName: eq.productName,
@@ -125,8 +125,12 @@ export async function updateReportEquipment(input: UpdateEquipmentInput) {
       ...(data.productType && { productType: data.productType }),
       ...(data.productName && { productName: data.productName }),
       ...(data.model !== undefined && { model: data.model }),
-      ...(data.serialNumber !== undefined && { serialNumber: data.serialNumber }),
-      ...(data.runningHours !== undefined && { runningHours: data.runningHours }),
+      ...(data.serialNumber !== undefined && {
+        serialNumber: data.serialNumber,
+      }),
+      ...(data.runningHours !== undefined && {
+        runningHours: data.runningHours,
+      }),
       ...(data.jobType && { jobType: data.jobType }),
       ...(data.included !== undefined && { included: data.included }),
     },
@@ -152,8 +156,8 @@ export async function removeReportEquipment(equipmentId: string) {
 // ============================================================================
 
 export async function reorderReportEquipment(
-  reportId: string,
-  orderedIds: string[]
+  _reportId: string,
+  orderedIds: string[],
 ) {
   // Update sort order for each equipment item
   await prisma.$transaction(
@@ -161,8 +165,8 @@ export async function reorderReportEquipment(
       prisma.reportEquipment.update({
         where: { id },
         data: { sortOrder: index },
-      })
-    )
+      }),
+    ),
   );
 
   return { success: true };

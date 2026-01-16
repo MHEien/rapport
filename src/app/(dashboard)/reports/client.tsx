@@ -292,7 +292,9 @@ export function ReportsClient({
                       <p className="text-white">
                         {report.equipment[0]?.productName ?? "—"}
                         {report._count.equipment > 1 && (
-                          <span className="text-slate-400 ml-1">+{report._count.equipment - 1}</span>
+                          <span className="text-slate-400 ml-1">
+                            +{report._count.equipment - 1}
+                          </span>
                         )}
                       </p>
                       <p className="text-sm text-slate-400">
@@ -347,7 +349,8 @@ export function ReportsClient({
                       </p>
                       <p className="text-sm text-slate-400 truncate">
                         {report.equipment[0]?.productName ?? "Ingen utstyr"}
-                        {report._count.equipment > 1 && ` +${report._count.equipment - 1}`}
+                        {report._count.equipment > 1 &&
+                          ` +${report._count.equipment - 1}`}
                       </p>
                       <div className="flex items-center gap-2 mt-1">
                         <Badge

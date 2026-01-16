@@ -80,7 +80,11 @@ interface StatusButtonGroupProps {
   disabled?: boolean;
 }
 
-function StatusButtonGroup({ selectedStatus, onSelect, disabled }: StatusButtonGroupProps) {
+function StatusButtonGroup({
+  selectedStatus,
+  onSelect,
+  disabled,
+}: StatusButtonGroupProps) {
   const statuses: { value: ChecklistStatus; icon: string; color: string }[] = [
     { value: "OK", icon: "✓", color: "bg-emerald-500" },
     { value: "BOR_UTBEDRES", icon: "⚠", color: "bg-amber-500" },
@@ -101,7 +105,7 @@ function StatusButtonGroup({ selectedStatus, onSelect, disabled }: StatusButtonG
             "min-h-[48px] min-w-[48px]", // For gloved usage
             selectedStatus === s.value
               ? `${s.color} text-white border-transparent`
-              : "bg-white/5 text-slate-400"
+              : "bg-white/5 text-slate-400",
           )}
         >
           {s.icon}
@@ -133,7 +137,9 @@ function ChecklistRow({
   onSave,
   isSaving,
 }: ChecklistRowProps) {
-  const [status, setStatus] = useState<ChecklistStatus | undefined>(existingResult?.status);
+  const [status, setStatus] = useState<ChecklistStatus | undefined>(
+    existingResult?.status,
+  );
   const [comment, setComment] = useState(existingResult?.comment ?? "");
   const [showComment, setShowComment] = useState(!!existingResult?.comment);
 
@@ -286,7 +292,8 @@ function EquipmentTabContent({ equipment }: EquipmentTabContentProps) {
   // Fetch service points for this equipment's product type
   const { data: servicePoints = [], isLoading } = useQuery({
     queryKey: ["servicePoints", equipment.productType, equipment.jobType],
-    queryFn: () => getServicePointsByProductType(equipment.productType, equipment.jobType),
+    queryFn: () =>
+      getServicePointsByProductType(equipment.productType, equipment.jobType),
   });
 
   // Offline-aware mutation for saving results
@@ -294,7 +301,7 @@ function EquipmentTabContent({ equipment }: EquipmentTabContentProps) {
     saveChecklistResult,
     {
       actionName: "saveChecklistResult",
-    }
+    },
   );
 
   // Group service points by category
@@ -313,7 +320,7 @@ function EquipmentTabContent({ equipment }: EquipmentTabContentProps) {
     (input: SaveChecklistInput) => {
       saveResult(input);
     },
-    [saveResult]
+    [saveResult],
   );
 
   if (isLoading) {
@@ -407,7 +414,11 @@ export function ChecklistTable({ equipment, onComplete }: ChecklistTableProps) {
       </div>
 
       {/* Equipment Tabs */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
+      <Tabs
+        value={activeTab}
+        onValueChange={setActiveTab}
+        className="flex-1 flex flex-col"
+      >
         <div className="border-b border-white/5 px-4">
           <TabsList className="bg-transparent h-auto p-0 gap-0">
             {equipment.map((eq) => (
@@ -417,7 +428,7 @@ export function ChecklistTable({ equipment, onComplete }: ChecklistTableProps) {
                 className={cn(
                   "rounded-none border-b-2 border-transparent px-4 py-3 data-[state=active]:border-emerald-500",
                   "data-[state=active]:text-emerald-400 data-[state=active]:bg-transparent",
-                  "text-slate-400 hover:text-white transition-colors"
+                  "text-slate-400 hover:text-white transition-colors",
                 )}
               >
                 {eq.productName} -
@@ -428,7 +439,11 @@ export function ChecklistTable({ equipment, onComplete }: ChecklistTableProps) {
 
         {/* Tab Content */}
         {equipment.map((eq) => (
-          <TabsContent key={eq.id} value={eq.id} className="flex-1 mt-0 overflow-auto">
+          <TabsContent
+            key={eq.id}
+            value={eq.id}
+            className="flex-1 mt-0 overflow-auto"
+          >
             <EquipmentTabContent equipment={eq} />
           </TabsContent>
         ))}

@@ -127,10 +127,10 @@ export async function duplicateReport(reportId: string) {
 
   const original = await prisma.report.findFirst({
     where: { id: reportId, organizationId: orgData.organization.id },
-    include: { 
+    include: {
       equipment: {
-        include: { checklists: true }
-      }
+        include: { checklists: true },
+      },
     },
   });
 

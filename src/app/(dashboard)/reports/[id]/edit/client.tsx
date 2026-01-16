@@ -28,9 +28,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  updateReportSignature,
-} from "@/lib/actions/checklist-actions";
+import { updateReportSignature } from "@/lib/actions/checklist-actions";
 import { updateReportEquipment } from "@/lib/actions/equipment-actions";
 
 // ============================================================================
@@ -54,11 +52,7 @@ interface ReportEditClientProps {
 // STEP INDICATOR
 // ============================================================================
 
-function StepIndicator({
-  currentStep,
-}: {
-  currentStep: Step;
-}) {
+function StepIndicator({ currentStep }: { currentStep: Step }) {
   const steps: { key: Step; label: string; icon: React.ElementType }[] = [
     { key: "equipment", label: "Utstyr", icon: Package },
     { key: "checklist", label: "Sjekkliste", icon: ClipboardList },
@@ -159,7 +153,8 @@ function EquipmentStep({ equipment, onNext }: EquipmentStepProps) {
                 <div className="flex-1">
                   <CardTitle className="text-lg">{eq.productName}</CardTitle>
                   <CardDescription>
-                    {eq.productType} • {eq.jobType === "SERVICE" ? "Service" : "Igangkjøring"}
+                    {eq.productType} •{" "}
+                    {eq.jobType === "SERVICE" ? "Service" : "Igangkjøring"}
                   </CardDescription>
                 </div>
               </div>
@@ -187,10 +182,18 @@ function EquipmentStep({ equipment, onNext }: EquipmentStepProps) {
                     </div>
                   </div>
                   <div className="flex gap-2">
-                    <Button size="sm" onClick={saveEditing} disabled={mutation.isPending}>
+                    <Button
+                      size="sm"
+                      onClick={saveEditing}
+                      disabled={mutation.isPending}
+                    >
                       {mutation.isPending ? "Lagrer..." : "Lagre"}
                     </Button>
-                    <Button size="sm" variant="outline" onClick={() => setEditingId(null)}>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setEditingId(null)}
+                    >
                       Avbryt
                     </Button>
                   </div>
@@ -198,14 +201,22 @@ function EquipmentStep({ equipment, onNext }: EquipmentStepProps) {
               ) : (
                 <div className="flex items-center justify-between">
                   <div className="text-sm text-muted-foreground">
-                    {eq.model && <span className="mr-3">Modell: {eq.model}</span>}
-                    {eq.serialNumber && <span className="mr-3">SN: {eq.serialNumber}</span>}
+                    {eq.model && (
+                      <span className="mr-3">Modell: {eq.model}</span>
+                    )}
+                    {eq.serialNumber && (
+                      <span className="mr-3">SN: {eq.serialNumber}</span>
+                    )}
                     {eq.runningHours && <span>{eq.runningHours}t</span>}
                     {!eq.model && !eq.serialNumber && !eq.runningHours && (
                       <span className="italic">Ingen detaljer lagt til</span>
                     )}
                   </div>
-                  <Button size="sm" variant="ghost" onClick={() => startEditing(eq)}>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => startEditing(eq)}
+                  >
                     Rediger
                   </Button>
                 </div>
@@ -217,11 +228,7 @@ function EquipmentStep({ equipment, onNext }: EquipmentStepProps) {
 
       {/* Navigation */}
       <div className="sticky bottom-0 bg-background border-t px-4 py-4 pb-safe">
-        <Button
-          size="lg"
-          className="w-full h-14 text-lg"
-          onClick={onNext}
-        >
+        <Button size="lg" className="w-full h-14 text-lg" onClick={onNext}>
           Start sjekkliste
           <ChevronRight className="ml-2 size-5" />
         </Button>
@@ -258,7 +265,12 @@ interface SummaryStepProps {
   onComplete: () => void;
 }
 
-function SummaryStep({ report, equipment, onBack, onComplete }: SummaryStepProps) {
+function SummaryStep({
+  report,
+  equipment,
+  onBack,
+  onComplete,
+}: SummaryStepProps) {
   const [comment, setComment] = useState(report.overallComment ?? "");
   const canvasRef = React.useRef<HTMLCanvasElement>(null);
   const [isDrawing, setIsDrawing] = useState(false);
@@ -348,7 +360,10 @@ function SummaryStep({ report, equipment, onBack, onComplete }: SummaryStepProps
   };
 
   // Calculate totals
-  const totalItems = equipment.reduce((sum, eq) => sum + eq.checklists.length, 0);
+  const totalItems = equipment.reduce(
+    (sum, eq) => sum + eq.checklists.length,
+    0,
+  );
 
   return (
     <div className="flex-1 flex flex-col">
@@ -443,7 +458,8 @@ export function ReportEditClient({
   const [step, setStep] = useState<Step>("equipment");
 
   // Use report.equipment or fall back to existingResults
-  const equipment = report.equipment?.length > 0 ? report.equipment : existingResults;
+  const equipment =
+    report.equipment?.length > 0 ? report.equipment : existingResults;
 
   const handleComplete = () => {
     // Navigate to completed report view
@@ -455,7 +471,9 @@ export function ReportEditClient({
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <p className="text-lg font-medium">Ingen utstyr funnet</p>
-          <p className="text-muted-foreground">Denne rapporten har ingen utstyr registrert.</p>
+          <p className="text-muted-foreground">
+            Denne rapporten har ingen utstyr registrert.
+          </p>
         </div>
       </div>
     );

@@ -1,7 +1,13 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { ChevronLeft, Cloud, CloudOff, MessageSquare, WifiOff } from "lucide-react";
+import {
+  ChevronLeft,
+  Cloud,
+  CloudOff,
+  MessageSquare,
+  WifiOff,
+} from "lucide-react";
 import { useCallback, useState } from "react";
 import type {
   ChecklistResult,
@@ -84,20 +90,27 @@ export function ChecklistWizard({
 }: ChecklistWizardProps) {
   // Current position in the checklist
   const [currentIndex, setCurrentIndex] = useState(0);
-  
+
   // Comment state for current item
   const [comment, setComment] = useState("");
   const [showComment, setShowComment] = useState(false);
 
   // Local state for answers (optimistic updates)
   const [answers, setAnswers] = useState<
-    Map<string, { status: ChecklistStatus; resultId?: string; comment?: string }>
+    Map<
+      string,
+      { status: ChecklistStatus; resultId?: string; comment?: string }
+    >
   >(() => {
     // Initialize from existing results
     const map = new Map();
     for (const result of existingResults) {
       const key = `${result.category}:${result.question}`;
-      map.set(key, { status: result.status, resultId: result.id, comment: result.comment ?? "" });
+      map.set(key, {
+        status: result.status,
+        resultId: result.id,
+        comment: result.comment ?? "",
+      });
     }
     return map;
   });
@@ -118,7 +131,12 @@ export function ChecklistWizard({
     onOptimisticUpdate: (input: SaveChecklistInput) => {
       // Immediately update local state
       const key = `${input.category}:${input.question}`;
-      setAnswers((prev) => new Map(prev).set(key, { status: input.status, comment: input.comment }));
+      setAnswers((prev) =>
+        new Map(prev).set(key, {
+          status: input.status,
+          comment: input.comment,
+        }),
+      );
     },
     onSuccess: (data, input) => {
       // Update with actual result ID
@@ -204,17 +222,20 @@ export function ChecklistWizard({
     }
   }, [currentIndex, servicePoints, answers]);
 
-  const navigateTo = useCallback((index: number) => {
-    setCurrentIndex(index);
-    // Load comment for selected item
-    const point = servicePoints[index];
-    if (point) {
-      const key = `${point.category}:${point.text}`;
-      const answer = answers.get(key);
-      setComment(answer?.comment ?? "");
-      setShowComment(!!answer?.comment);
-    }
-  }, [servicePoints, answers]);
+  const navigateTo = useCallback(
+    (index: number) => {
+      setCurrentIndex(index);
+      // Load comment for selected item
+      const point = servicePoints[index];
+      if (point) {
+        const key = `${point.category}:${point.text}`;
+        const answer = answers.get(key);
+        setComment(answer?.comment ?? "");
+        setShowComment(!!answer?.comment);
+      }
+    },
+    [servicePoints, answers],
+  );
 
   // Loading state
   if (isLoading) {
@@ -235,7 +256,8 @@ export function ChecklistWizard({
         <div className="flex flex-col items-center gap-4 text-center px-6">
           <p className="text-lg font-medium">Ingen sjekkpunkter funnet</p>
           <p className="text-muted-foreground">
-            Det er ingen sjekkpunkter konfigurert for produkttype "{productType}".
+            Det er ingen sjekkpunkter konfigurert for produkttype "{productType}
+            ".
           </p>
           <Button onClick={() => onComplete?.()}>Gå videre</Button>
         </div>

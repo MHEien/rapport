@@ -44,7 +44,7 @@ export function ReportViewClient({ report }: ReportViewClientProps) {
 
   // Report info helper
   const equipmentCount = report.equipment?.length ?? 0;
-  const firstEquipment = report.equipment?.[0];
+  const _firstEquipment = report.equipment?.[0];
 
   return (
     <div className="min-h-screen bg-slate-950 flex flex-col">
@@ -111,33 +111,47 @@ export function ReportViewClient({ report }: ReportViewClientProps) {
         {/* Report summary card */}
         <div className="rounded-2xl border border-white/5 bg-white/[0.02] p-4 space-y-4">
           <div>
-            <p className="text-xs text-slate-400 uppercase tracking-wide">Kunde</p>
-            <p className="text-lg font-medium text-white">{report.customerName}</p>
+            <p className="text-xs text-slate-400 uppercase tracking-wide">
+              Kunde
+            </p>
+            <p className="text-lg font-medium text-white">
+              {report.customerName}
+            </p>
           </div>
-          
+
           {report.customerAddress && (
             <div>
-              <p className="text-xs text-slate-400 uppercase tracking-wide">Adresse</p>
+              <p className="text-xs text-slate-400 uppercase tracking-wide">
+                Adresse
+              </p>
               <p className="text-sm text-slate-300">{report.customerAddress}</p>
             </div>
           )}
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <p className="text-xs text-slate-400 uppercase tracking-wide">Utstyr</p>
+              <p className="text-xs text-slate-400 uppercase tracking-wide">
+                Utstyr
+              </p>
               <p className="text-sm text-white">{equipmentCount} stk</p>
             </div>
             <div>
-              <p className="text-xs text-slate-400 uppercase tracking-wide">Servicedato</p>
+              <p className="text-xs text-slate-400 uppercase tracking-wide">
+                Servicedato
+              </p>
               <p className="text-sm text-white">
-                {format(new Date(report.serviceDate), "d. MMM yyyy", { locale: nb })}
+                {format(new Date(report.serviceDate), "d. MMM yyyy", {
+                  locale: nb,
+                })}
               </p>
             </div>
           </div>
 
           {equipmentCount > 0 && (
             <div>
-              <p className="text-xs text-slate-400 uppercase tracking-wide mb-2">Utstyrsliste</p>
+              <p className="text-xs text-slate-400 uppercase tracking-wide mb-2">
+                Utstyrsliste
+              </p>
               <div className="space-y-2">
                 {report.equipment.map((eq, idx) => (
                   <div key={eq.id} className="flex items-center gap-2 text-sm">
