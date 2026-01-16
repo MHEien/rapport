@@ -1,4 +1,3 @@
-
 generator client {
   provider = "prisma-client"
   output   = "../src/app/generated/prisma"
@@ -13,24 +12,24 @@ datasource db {
 // ---------------------------------------------------------
 
 model User {
-  id            String       @id @default(cuid())
-  email         String    @unique
+  id            String   @id @default(cuid())
+  email         String   @unique
   name          String?
-  emailVerified Boolean   @default(false)
+  emailVerified Boolean  @default(false)
   image         String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  
-  sessions      Session[]
-  accounts      Account[]
-  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  sessions Session[]
+  accounts Account[]
+
   // App Relations
-  posts            Post[]    
-  reports          Report[]  // Technicians own their reports
-  
+  posts   Post[]
+  reports Report[] // Technicians own their reports
+
   // Organization Relations (Better Auth plugin)
-  members          Member[]
-  invitations      Invitation[]
+  members     Member[]
+  invitations Invitation[]
 
   @@map("user")
 }
@@ -45,7 +44,7 @@ model Session {
   userAgent String?
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+
   // Organization plugin: active organization
   activeOrganizationId String?
 
@@ -91,77 +90,103 @@ model Verification {
 // ---------------------------------------------------------
 
 model Report {
-  id            String       @id @default(cuid())
-  reportNumber  Int          @default(autoincrement()) 
-  createdAt     DateTime     @default(now())
-  updatedAt     DateTime     @updatedAt
+  id           String   @id @default(cuid())
+  reportNumber Int      @default(autoincrement())
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   // Workflow State
-  status        ReportStatus @default(DRAFT)
-  
+  status ReportStatus @default(DRAFT)
+
   // Relations
   authorId       String
   author         User         @relation(fields: [authorId], references: [id])
   organizationId String
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  
+
   // Job Details
-  serviceDate   DateTime     @default(now())
-  customerName  String
+  serviceDate     DateTime @default(now())
+  customerName    String
   customerAddress String?
-  contactPerson String?
-  
-  // Equipment Data
-  productName   String       // e.g. "Caterpillar Generator"
-  productType   String       // Links to Master Data (ServicePoint)
-  serialNumber  String
-  runningHours  Float?       
-  
-  // Data
-  type          ReportType   @default(SERVICE)
-  checklists    ChecklistResult[]
+  contactPerson   String?
+
+  // Legacy Equipment Data (deprecated - use equipment relation)
+  productName  String? // e.g. "Caterpillar Generator"
+  productType  String? // Links to Master Data (ServicePoint)
+  serialNumber String?
+  runningHours Float?
+  type         ReportType @default(SERVICE)
+
+  // Multi-Equipment Support
+  equipment ReportEquipment[]
 
   // AI & Formatting
-  aiSummary     String?      @db.Text // The AI generated "Professional Conclusion"
-  overallComment String?     @db.Text
-  signatureUrl  String?      // Vercel Blob URL for signature
+  aiSummary      String? @db.Text // The AI generated "Professional Conclusion"
+  overallComment String? @db.Text
+  signatureUrl   String? // Vercel Blob URL for signature
 
   @@index([authorId])
   @@index([organizationId])
   @@index([customerName])
-  @@index([serialNumber])
 }
 
-model ChecklistResult {
-  id        String   @id @default(cuid())
-  
-  reportId  String
-  report    Report   @relation(fields: [reportId], references: [id], onDelete: Cascade)
+model ReportEquipment {
+  id String @id @default(cuid())
 
-  // Snapshot of the question at time of report
-  category  String   
-  question  String   
-  
-  status    ChecklistStatus
-  comment   String?  
-  
-  // Visual Evidence
-  photos    Media[]  
+  reportId String
+  report   Report @relation(fields: [reportId], references: [id], onDelete: Cascade)
+
+  // Equipment Details
+  productType  String // Links to ServicePoint productType
+  productName  String // e.g. "Pumpe hovedbygg"
+  model        String? // Model designation
+  serialNumber String?
+  runningHours Float?
+
+  // Job Configuration
+  jobType  ReportType @default(SERVICE) // SERVICE or COMMISSIONING
+  included Boolean    @default(true) // Can exclude from report
+
+  // Order in the list
+  sortOrder Int @default(0)
+
+  // Checklists for this equipment
+  checklists ChecklistResult[]
 
   @@index([reportId])
 }
 
+model ChecklistResult {
+  id String @id @default(cuid())
+
+  // New: Link to equipment (preferred)
+  equipmentId String?
+  equipment   ReportEquipment? @relation(fields: [equipmentId], references: [id], onDelete: Cascade)
+
+  // Snapshot of the question at time of report
+  category String
+  question String
+
+  status  ChecklistStatus
+  comment String?
+
+  // Visual Evidence
+  photos Media[]
+
+  @@index([equipmentId])
+}
+
 model Media {
-  id                String   @id @default(cuid())
-  url               String   // Vercel Blob URL
-  mimeType          String   // "image/jpeg", etc.
-  size              Int
-  
+  id       String @id @default(cuid())
+  url      String // Vercel Blob URL
+  mimeType String // "image/jpeg", etc.
+  size     Int
+
   // Context
   checklistResultId String?
   checklistResult   ChecklistResult? @relation(fields: [checklistResultId], references: [id], onDelete: Cascade)
-  
-  createdAt         DateTime @default(now())
+
+  createdAt DateTime @default(now())
 }
 
 // ---------------------------------------------------------
@@ -169,11 +194,11 @@ model Media {
 // ---------------------------------------------------------
 
 model ServicePoint {
-  id          String   @id @default(cuid())
-  productType String   
-  category    String   
-  text        String   
-  
+  id          String @id @default(cuid())
+  productType String
+  category    String
+  text        String
+
   isForService       Boolean @default(true)
   isForCommissioning Boolean @default(true)
 
@@ -186,7 +211,7 @@ model ServicePoint {
 }
 
 model Post {
-  id        String     @id @default(cuid())
+  id        String  @id @default(cuid())
   title     String
   content   String?
   published Boolean @default(false)
@@ -212,9 +237,9 @@ enum ReportStatus {
 
 enum ChecklistStatus {
   OK
-  BOR_UTBEDRES  // Should be fixed
-  MA_UTBEDRES   // Must be fixed
-  IKKE_AKTUELT  // N/A
+  BOR_UTBEDRES // Should be fixed
+  MA_UTBEDRES // Must be fixed
+  IKKE_AKTUELT // N/A
 }
 
 // ---------------------------------------------------------
@@ -222,16 +247,16 @@ enum ChecklistStatus {
 // ---------------------------------------------------------
 
 model Organization {
-  id          String   @id @default(cuid())
-  name        String
-  slug        String?  @unique
-  logo        String?
-  metadata    String?  // JSON string for extra data
-  createdAt   DateTime @default(now())
+  id        String   @id @default(cuid())
+  name      String
+  slug      String?  @unique
+  logo      String?
+  metadata  String? // JSON string for extra data
+  createdAt DateTime @default(now())
 
-  members       Member[]
-  invitations   Invitation[]
-  
+  members     Member[]
+  invitations Invitation[]
+
   // App Relations
   reports       Report[]
   servicePoints ServicePoint[]
@@ -240,9 +265,9 @@ model Organization {
 }
 
 model Member {
-  id             String   @id @default(cuid())
-  role           String   @default("technician")
-  createdAt      DateTime @default(now())
+  id        String   @id @default(cuid())
+  role      String   @default("technician")
+  createdAt DateTime @default(now())
 
   userId         String
   user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -255,17 +280,17 @@ model Member {
 }
 
 model Invitation {
-  id               String   @id @default(cuid())
-  email            String
-  role             String   @default("technician")
-  status           String   @default("pending") // pending, accepted, rejected, canceled
-  expiresAt        DateTime
-  createdAt        DateTime @default(now())
+  id        String   @id @default(cuid())
+  email     String
+  role      String   @default("technician")
+  status    String   @default("pending") // pending, accepted, rejected, canceled
+  expiresAt DateTime
+  createdAt DateTime @default(now())
 
-  organizationId   String
-  organization     Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  inviterId        String
-  inviter          User         @relation(fields: [inviterId], references: [id])
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  inviterId      String
+  inviter        User         @relation(fields: [inviterId], references: [id])
 
   @@index([organizationId])
   @@index([email])

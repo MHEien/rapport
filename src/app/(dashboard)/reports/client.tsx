@@ -46,18 +46,22 @@ import { deleteReport, duplicateReport } from "@/lib/actions/reports-actions";
 import { cn } from "@/lib/utils";
 
 // Types
+interface Equipment {
+  id: string;
+  productName: string;
+  productType: string;
+}
+
 interface Report {
   id: string;
   reportNumber: number;
   customerName: string;
-  productName: string;
-  productType: string;
-  serialNumber: string;
   status: ReportStatus;
   serviceDate: Date;
   createdAt: Date;
   updatedAt: Date;
-  _count: { checklists: number };
+  equipment: Equipment[];
+  _count: { equipment: number };
 }
 
 interface Pagination {
@@ -285,9 +289,14 @@ export function ReportsClient({
                       </p>
                     </Link>
                     <div>
-                      <p className="text-white">{report.productName}</p>
+                      <p className="text-white">
+                        {report.equipment[0]?.productName ?? "—"}
+                        {report._count.equipment > 1 && (
+                          <span className="text-slate-400 ml-1">+{report._count.equipment - 1}</span>
+                        )}
+                      </p>
                       <p className="text-sm text-slate-400">
-                        {report.serialNumber || "—"}
+                        {report.equipment[0]?.productType ?? "—"}
                       </p>
                     </div>
                     <div className="text-sm text-slate-400">
@@ -296,7 +305,7 @@ export function ReportsClient({
                       })}
                     </div>
                     <div className="text-sm text-slate-400">
-                      {report._count.checklists} punkt
+                      {report._count.equipment} utstyr
                     </div>
                     <div>
                       <Badge
@@ -337,7 +346,8 @@ export function ReportsClient({
                         {report.customerName}
                       </p>
                       <p className="text-sm text-slate-400 truncate">
-                        {report.productName}
+                        {report.equipment[0]?.productName ?? "Ingen utstyr"}
+                        {report._count.equipment > 1 && ` +${report._count.equipment - 1}`}
                       </p>
                       <div className="flex items-center gap-2 mt-1">
                         <Badge

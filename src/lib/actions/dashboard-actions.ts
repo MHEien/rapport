@@ -1,7 +1,6 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { getSession } from "@/lib/server";
 import { getCurrentOrganization } from "./org-actions";
 
 /**
@@ -67,11 +66,18 @@ export async function getRecentReports(limit = 5) {
     select: {
       id: true,
       customerName: true,
-      productName: true,
       status: true,
       updatedAt: true,
-      author: {
-        select: { id: true, name: true },
+      equipment: {
+        select: {
+          id: true,
+          productName: true,
+          productType: true,
+        },
+        take: 1,
+      },
+      _count: {
+        select: { equipment: true },
       },
     },
   });
@@ -79,36 +85,4 @@ export async function getRecentReports(limit = 5) {
   return reports;
 }
 
-/**
- * Create a new report in the current organization
- */
-export async function createReport(input: {
-  customerName: string;
-  productName: string;
-  productType: string;
-  serialNumber?: string;
-}) {
-  const session = await getSession();
-  if (!session?.user) {
-    throw new Error("Ikke autentisert");
-  }
-
-  const orgData = await getCurrentOrganization();
-  if (!orgData) {
-    throw new Error("Ingen organisasjon funnet");
-  }
-
-  const report = await prisma.report.create({
-    data: {
-      authorId: session.user.id,
-      organizationId: orgData.organization.id,
-      customerName: input.customerName,
-      productName: input.productName,
-      productType: input.productType,
-      serialNumber: input.serialNumber ?? "",
-      status: "DRAFT",
-    },
-  });
-
-  return report;
-}
+// Note: createReport is deprecated - use createReportWithEquipment from equipment-actions.ts

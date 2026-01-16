@@ -30,8 +30,6 @@ export async function getReports(
     status?: ReportStatus;
     OR?: Array<{
       customerName?: { contains: string; mode: "insensitive" };
-      productName?: { contains: string; mode: "insensitive" };
-      serialNumber?: { contains: string; mode: "insensitive" };
     }>;
   } = {
     organizationId: orgData.organization.id,
@@ -41,11 +39,11 @@ export async function getReports(
     where.status = filters.status;
   }
 
+  // Note: productName and serialNumber are now on equipment relation
+  // For now, only search by customerName - could add equipment-level search later
   if (filters?.search?.trim()) {
     where.OR = [
       { customerName: { contains: filters.search, mode: "insensitive" } },
-      { productName: { contains: filters.search, mode: "insensitive" } },
-      { serialNumber: { contains: filters.search, mode: "insensitive" } },
     ];
   }
 
@@ -59,9 +57,6 @@ export async function getReports(
         id: true,
         reportNumber: true,
         customerName: true,
-        productName: true,
-        productType: true,
-        serialNumber: true,
         status: true,
         serviceDate: true,
         createdAt: true,
@@ -69,8 +64,16 @@ export async function getReports(
         author: {
           select: { id: true, name: true },
         },
+        equipment: {
+          select: {
+            id: true,
+            productName: true,
+            productType: true,
+          },
+          take: 3, // Only fetch first 3 for preview
+        },
         _count: {
-          select: { checklists: true },
+          select: { equipment: true },
         },
       },
     }),
@@ -124,7 +127,11 @@ export async function duplicateReport(reportId: string) {
 
   const original = await prisma.report.findFirst({
     where: { id: reportId, organizationId: orgData.organization.id },
-    include: { checklists: true },
+    include: { 
+      equipment: {
+        include: { checklists: true }
+      }
+    },
   });
 
   if (!original) {
@@ -145,11 +152,17 @@ export async function duplicateReport(reportId: string) {
       customerName: original.customerName,
       customerAddress: original.customerAddress,
       contactPerson: original.contactPerson,
-      productName: original.productName,
-      productType: original.productType,
-      serialNumber: original.serialNumber,
-      type: original.type,
       status: "DRAFT",
+      equipment: {
+        create: original.equipment.map((eq, index) => ({
+          productType: eq.productType,
+          productName: eq.productName,
+          model: eq.model,
+          serialNumber: eq.serialNumber,
+          jobType: eq.jobType,
+          sortOrder: index,
+        })),
+      },
     },
   });
 
