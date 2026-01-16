@@ -2,6 +2,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { getCurrentOrganization } from "./org-actions";
+import { revalidatePath } from "next/cache";
 
 /**
  * Get all service points for the current organization
@@ -78,6 +79,7 @@ export async function createServicePoint(input: {
       isForCommissioning: input.isForCommissioning ?? true,
     },
   });
+  revalidatePath("/service-points");
   return { success: true, point };
 }
 
