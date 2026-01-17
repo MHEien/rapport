@@ -64,6 +64,9 @@ export async function getReports(
         author: {
           select: { id: true, name: true },
         },
+        assignedTo: {
+          select: { id: true, name: true },
+        },
         equipment: {
           select: {
             id: true,
@@ -167,4 +170,114 @@ export async function duplicateReport(reportId: string) {
   });
 
   return { success: true, report: duplicate };
+}
+
+/**
+ * Assign a report to a technician
+ * Only org owners/admins can assign reports
+ */
+export async function assignReport(reportId: string, userId: string) {
+  const orgData = await getCurrentOrganization();
+  if (!orgData) {
+    return { success: false, error: "Ikke autentisert" };
+  }
+
+  // Check if current user is owner/admin
+  if (
+    orgData.membership.role !== "owner" &&
+    orgData.membership.role !== "admin"
+  ) {
+    return { success: false, error: "Kun administratorer kan tildele rapporter" };
+  }
+
+  // Verify report belongs to org
+  const report = await prisma.report.findFirst({
+    where: { id: reportId, organizationId: orgData.organization.id },
+  });
+
+  if (!report) {
+    return { success: false, error: "Rapport ikke funnet" };
+  }
+
+  // Verify user is a member of the org
+  const member = await prisma.member.findFirst({
+    where: { userId, organizationId: orgData.organization.id },
+  });
+
+  if (!member) {
+    return { success: false, error: "Bruker er ikke medlem av organisasjonen" };
+  }
+
+  await prisma.report.update({
+    where: { id: reportId },
+    data: { assignedToId: userId },
+  });
+
+  return { success: true };
+}
+
+/**
+ * Remove assignment from a report
+ */
+export async function unassignReport(reportId: string) {
+  const orgData = await getCurrentOrganization();
+  if (!orgData) {
+    return { success: false, error: "Ikke autentisert" };
+  }
+
+  // Check if current user is owner/admin
+  if (
+    orgData.membership.role !== "owner" &&
+    orgData.membership.role !== "admin"
+  ) {
+    return {
+      success: false,
+      error: "Kun administratorer kan fjerne tildeling",
+    };
+  }
+
+  // Verify report belongs to org
+  const report = await prisma.report.findFirst({
+    where: { id: reportId, organizationId: orgData.organization.id },
+  });
+
+  if (!report) {
+    return { success: false, error: "Rapport ikke funnet" };
+  }
+
+  await prisma.report.update({
+    where: { id: reportId },
+    data: { assignedToId: null },
+  });
+
+  return { success: true };
+}
+
+/**
+ * Get all technicians in the organization for assignment dropdown
+ */
+export async function getOrganizationTechnicians() {
+  const orgData = await getCurrentOrganization();
+  if (!orgData) {
+    return [];
+  }
+
+  const members = await prisma.member.findMany({
+    where: { organizationId: orgData.organization.id },
+    select: {
+      userId: true,
+      role: true,
+      user: {
+        select: { id: true, name: true, email: true },
+      },
+    },
+    orderBy: { user: { name: "asc" } },
+  });
+
+  return members.map((m) => ({
+    id: m.user.id,
+    name: m.user.name,
+    email: m.user.email,
+    role: m.role,
+  }));
 }

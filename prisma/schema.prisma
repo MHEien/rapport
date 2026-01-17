@@ -24,8 +24,9 @@ model User {
   accounts Account[]
 
   // App Relations
-  posts   Post[]
-  reports Report[] // Technicians own their reports
+  posts           Post[]
+  authoredReports Report[] @relation("ReportAuthor") // Reports created by this user
+  assignedReports Report[] @relation("ReportAssignee") // Reports assigned to this user
 
   // Organization Relations (Better Auth plugin)
   members     Member[]
@@ -100,7 +101,9 @@ model Report {
 
   // Relations
   authorId       String
-  author         User         @relation(fields: [authorId], references: [id])
+  author         User         @relation("ReportAuthor", fields: [authorId], references: [id])
+  assignedToId   String? // Assigned technician (optional)
+  assignedTo     User?        @relation("ReportAssignee", fields: [assignedToId], references: [id])
   organizationId String
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
@@ -126,6 +129,7 @@ model Report {
   signatureUrl   String? // Vercel Blob URL for signature
 
   @@index([authorId])
+  @@index([assignedToId])
   @@index([organizationId])
   @@index([customerName])
 }
