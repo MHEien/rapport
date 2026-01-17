@@ -2,7 +2,7 @@
 
 import { format } from "date-fns";
 import { nb } from "date-fns/locale";
-import { Loader2, Mail, MoreVertical, Plus, Trash2 } from "lucide-react";
+import { Link2, Loader2, Mail, MoreVertical, Plus, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -94,6 +94,21 @@ export function TeamSettingsClient({
   // Invite form state
   const [inviteEmail, setInviteEmail] = useState("");
   const [inviteRole, setInviteRole] = useState("technician");
+
+  const getInviteLink = (invitationId: string) => {
+    const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
+    return `${baseUrl}/accept-invitation/${invitationId}`;
+  };
+
+  const handleCopyLink = async (invitationId: string) => {
+    const link = getInviteLink(invitationId);
+    try {
+      await navigator.clipboard.writeText(link);
+      toast.success("Invitasjonslenke kopiert!");
+    } catch (_error) {
+      toast.error("Kunne ikke kopiere lenke");
+    }
+  };
 
   const handleInvite = async () => {
     if (!inviteEmail) return;
@@ -456,6 +471,15 @@ export function TeamSettingsClient({
                       >
                         {invite.role}
                       </Badge>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleCopyLink(invite.id)}
+                        className="text-blue-400 hover:text-blue-300 hover:bg-blue-900/20"
+                      >
+                        <Link2 className="size-4 mr-1" />
+                        Kopier lenke
+                      </Button>
                       <Button
                         variant="ghost"
                         size="sm"

@@ -6,6 +6,8 @@ import {
   ChevronRight,
   FileText,
   Package,
+  Plus,
+  Trash2,
   User,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -20,40 +22,100 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { createReport } from "@/lib/actions/dashboard-actions";
+import { Switch } from "@/components/ui/switch";
+import {
+  type BulkEquipmentInput,
+  createReportWithEquipment,
+} from "@/lib/actions/equipment-actions";
 
 interface NewReportClientProps {
   productTypes: string[];
+}
+
+interface EquipmentItem extends BulkEquipmentInput {
+  id: string; // Local ID for UI tracking
+}
+
+function generateId() {
+  return Math.random().toString(36).substring(2, 9);
 }
 
 export function NewReportClient({ productTypes }: NewReportClientProps) {
   const router = useRouter();
   const [step, setStep] = useState(1);
 
-  // Form state
+  // Form state - Step 1: Customer
   const [customerName, setCustomerName] = useState("");
   const [contactPerson, setContactPerson] = useState("");
-  const [productName, setProductName] = useState("");
-  const [productType, setProductType] = useState("");
-  const [serialNumber, setSerialNumber] = useState("");
+
+  // Form state - Step 2: Equipment list
+  const [equipment, setEquipment] = useState<EquipmentItem[]>([
+    {
+      id: generateId(),
+      productType: productTypes[0] ?? "Generator",
+      productName: "",
+      model: "",
+      serialNumber: "",
+      jobType: "SERVICE",
+      included: true,
+    },
+  ]);
 
   const mutation = useMutation({
     mutationFn: async () => {
-      return createReport({
+      return createReportWithEquipment({
         customerName,
-        productName,
-        productType,
-        serialNumber: serialNumber || undefined,
+        contactPerson: contactPerson || undefined,
+        equipment: equipment.filter((eq) => eq.included),
       });
     },
     onSuccess: (report) => {
-      router.push(`/reports/${report.id}/edit`);
+      // Navigate to edit - start with first equipment's checklist
+      if (report.equipment.length > 0) {
+        router.push(`/reports/${report.id}/edit`);
+      } else {
+        router.push(`/reports/${report.id}`);
+      }
     },
   });
 
+  // Add new equipment item
+  const addEquipment = () => {
+    setEquipment((prev) => [
+      ...prev,
+      {
+        id: generateId(),
+        productType: productTypes[0] ?? "Generator",
+        productName: "",
+        model: "",
+        serialNumber: "",
+        jobType: "SERVICE",
+        included: true,
+      },
+    ]);
+  };
+
+  // Remove equipment item
+  const removeEquipment = (id: string) => {
+    if (equipment.length > 1) {
+      setEquipment((prev) => prev.filter((eq) => eq.id !== id));
+    }
+  };
+
+  // Update equipment item
+  const updateEquipment = (id: string, updates: Partial<EquipmentItem>) => {
+    setEquipment((prev) =>
+      prev.map((eq) => (eq.id === id ? { ...eq, ...updates } : eq)),
+    );
+  };
+
   const canProceedStep1 = customerName.trim().length > 0;
-  const canProceedStep2 =
-    productName.trim().length > 0 && productType.length > 0;
+  const canProceedStep2 = equipment.some(
+    (eq) =>
+      eq.included &&
+      eq.productName.trim().length > 0 &&
+      eq.productType.length > 0,
+  );
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -83,7 +145,7 @@ export function NewReportClient({ productTypes }: NewReportClientProps) {
       </header>
 
       {/* Content */}
-      <main className="flex-1 px-4 py-6">
+      <main className="flex-1 px-4 py-6 overflow-y-auto">
         {step === 1 && (
           <Card className="border-white/5 bg-white/[0.02]">
             <CardHeader>
@@ -121,86 +183,172 @@ export function NewReportClient({ productTypes }: NewReportClientProps) {
         )}
 
         {step === 2 && (
-          <Card className="border-white/5 bg-white/[0.02]">
-            <CardHeader>
-              <div className="size-12 rounded-xl bg-gradient-to-br from-emerald-500/20 to-teal-500/10 flex items-center justify-center mb-2">
-                <Package className="size-6 text-emerald-400" />
+          <div className="space-y-4">
+            {/* Section header */}
+            <div className="flex items-center gap-3 mb-4">
+              <div className="size-10 rounded-xl bg-gradient-to-br from-emerald-500/20 to-teal-500/10 flex items-center justify-center">
+                <Package className="size-5 text-emerald-400" />
               </div>
-              <CardTitle className="text-xl text-white">
-                Utstyrsinformasjon
-              </CardTitle>
-              <CardDescription>
-                Hvilket utstyr skal du servicere?
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-2">
-                <Label htmlFor="productName">Produktnavn *</Label>
-                <Input
-                  id="productName"
-                  value={productName}
-                  onChange={(e) => setProductName(e.target.value)}
-                  placeholder="F.eks. Caterpillar Generator"
-                  className="h-14 text-lg bg-white/5 border-white/10"
-                />
+              <div>
+                <h2 className="text-lg font-semibold text-white">
+                  Utstyrsliste
+                </h2>
+                <p className="text-sm text-slate-400">
+                  Legg til utstyr som skal serviceres
+                </p>
               </div>
+            </div>
 
-              <div className="space-y-2">
-                <Label>Produkttype *</Label>
-                <div className="grid grid-cols-2 gap-2">
-                  {productTypes.length > 0
-                    ? productTypes.map((type) => (
-                        <button
-                          key={type}
-                          type="button"
-                          onClick={() => setProductType(type)}
-                          className={`
-                          p-4 rounded-xl border text-left transition-all
-                          ${
-                            productType === type
-                              ? "border-blue-500 bg-blue-500/10 text-white"
-                              : "border-white/10 bg-white/5 text-slate-300 hover:bg-white/10"
+            {/* Equipment list */}
+            {equipment.map((eq, index) => (
+              <Card
+                key={eq.id}
+                className={`border-white/5 bg-white/[0.02] ${
+                  !eq.included ? "opacity-50" : ""
+                }`}
+              >
+                <CardHeader className="pb-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <span className="flex items-center justify-center size-7 rounded-lg bg-blue-500/20 text-blue-400 text-sm font-bold">
+                        {index + 1}
+                      </span>
+                      <div className="flex items-center gap-2">
+                        <Switch
+                          checked={eq.included}
+                          onCheckedChange={(checked) =>
+                            updateEquipment(eq.id, { included: checked })
                           }
-                        `}
-                        >
-                          <p className="font-medium">{type}</p>
-                        </button>
-                      ))
-                    : // Fallback options if no types defined
-                      ["Generator", "UV-system", "Tørker", "Annet"].map(
-                        (type) => (
-                          <button
-                            key={type}
-                            type="button"
-                            onClick={() => setProductType(type)}
-                            className={`
-                            p-4 rounded-xl border text-left transition-all
-                            ${
-                              productType === type
-                                ? "border-blue-500 bg-blue-500/10 text-white"
-                                : "border-white/10 bg-white/5 text-slate-300 hover:bg-white/10"
-                            }
-                          `}
-                          >
-                            <p className="font-medium">{type}</p>
-                          </button>
-                        ),
-                      )}
-                </div>
-              </div>
+                        />
+                        <span className="text-sm text-slate-300">Inkluder</span>
+                      </div>
+                    </div>
+                    {equipment.length > 1 && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="text-slate-400 hover:text-red-400"
+                        onClick={() => removeEquipment(eq.id)}
+                      >
+                        <Trash2 className="size-4" />
+                      </Button>
+                    )}
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {/* Job Type & Product Type */}
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-2">
+                      <Label className="text-xs uppercase text-slate-400">
+                        Type jobb
+                      </Label>
+                      <select
+                        value={eq.jobType}
+                        onChange={(e) =>
+                          updateEquipment(eq.id, {
+                            jobType: e.target.value as
+                              | "SERVICE"
+                              | "COMMISSIONING",
+                          })
+                        }
+                        className="w-full h-10 px-3 rounded-md bg-white/5 border border-white/10 text-white text-sm"
+                      >
+                        <option value="SERVICE">Service</option>
+                        <option value="COMMISSIONING">Igangkjøring</option>
+                      </select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-xs uppercase text-slate-400">
+                        Produkt
+                      </Label>
+                      <select
+                        value={eq.productType}
+                        onChange={(e) =>
+                          updateEquipment(eq.id, {
+                            productType: e.target.value,
+                          })
+                        }
+                        className="w-full h-10 px-3 rounded-md bg-white/5 border border-white/10 text-white text-sm"
+                      >
+                        {productTypes.length > 0
+                          ? productTypes.map((type) => (
+                              <option key={type} value={type}>
+                                {type}
+                              </option>
+                            ))
+                          : ["Generator", "UV-system", "Tørker", "Annet"].map(
+                              (type) => (
+                                <option key={type} value={type}>
+                                  {type}
+                                </option>
+                              ),
+                            )}
+                      </select>
+                    </div>
+                  </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="serialNumber">Serienummer</Label>
-                <Input
-                  id="serialNumber"
-                  value={serialNumber}
-                  onChange={(e) => setSerialNumber(e.target.value)}
-                  placeholder="Valgfritt"
-                  className="h-14 text-lg bg-white/5 border-white/10"
-                />
+                  {/* Name/Marking */}
+                  <div className="space-y-2">
+                    <Label className="text-xs uppercase text-slate-400">
+                      Merking / Navn
+                    </Label>
+                    <Input
+                      value={eq.productName}
+                      onChange={(e) =>
+                        updateEquipment(eq.id, { productName: e.target.value })
+                      }
+                      placeholder="F.eks. Pumpe hovedbygg"
+                      className="bg-white/5 border-white/10"
+                    />
+                  </div>
+
+                  {/* Model & Serial Number */}
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-2">
+                      <Label className="text-xs uppercase text-slate-400">
+                        Modell
+                      </Label>
+                      <Input
+                        value={eq.model ?? ""}
+                        onChange={(e) =>
+                          updateEquipment(eq.id, { model: e.target.value })
+                        }
+                        placeholder="Modellbetegnelse"
+                        className="bg-white/5 border-white/10"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-xs uppercase text-slate-400">
+                        Serienummer
+                      </Label>
+                      <Input
+                        value={eq.serialNumber ?? ""}
+                        onChange={(e) =>
+                          updateEquipment(eq.id, {
+                            serialNumber: e.target.value,
+                          })
+                        }
+                        placeholder="Serienr."
+                        className="bg-white/5 border-white/10"
+                      />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+
+            {/* Add equipment button */}
+            <button
+              type="button"
+              onClick={addEquipment}
+              className="w-full py-6 rounded-xl border-2 border-dashed border-white/10 hover:border-blue-500/50 hover:bg-blue-500/5 transition-colors flex flex-col items-center gap-2 text-slate-400 hover:text-blue-400"
+            >
+              <div className="size-10 rounded-full bg-blue-500/20 flex items-center justify-center">
+                <Plus className="size-5 text-blue-400" />
               </div>
-            </CardContent>
-          </Card>
+              <span className="text-sm font-medium">Legg til nytt utstyr</span>
+            </button>
+          </div>
         )}
       </main>
 

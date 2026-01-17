@@ -1,7 +1,13 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { ChevronLeft, Cloud, CloudOff, WifiOff } from "lucide-react";
+import {
+  ChevronLeft,
+  Cloud,
+  CloudOff,
+  MessageSquare,
+  WifiOff,
+} from "lucide-react";
 import { useCallback, useState } from "react";
 import type {
   ChecklistResult,
@@ -10,6 +16,7 @@ import type {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Textarea } from "@/components/ui/textarea";
 import {
   type SyncStatus,
   useOfflineMutation,
@@ -67,7 +74,7 @@ function SyncStatusIndicator({ status }: { status: SyncStatus }) {
 // ============================================================================
 
 interface ChecklistWizardProps {
-  reportId: string;
+  equipmentId: string;
   productType: string;
   reportType?: "SERVICE" | "COMMISSIONING";
   existingResults?: ChecklistResult[];
@@ -75,7 +82,7 @@ interface ChecklistWizardProps {
 }
 
 export function ChecklistWizard({
-  reportId,
+  equipmentId,
   productType,
   reportType = "SERVICE",
   existingResults = [],
@@ -84,15 +91,26 @@ export function ChecklistWizard({
   // Current position in the checklist
   const [currentIndex, setCurrentIndex] = useState(0);
 
+  // Comment state for current item
+  const [comment, setComment] = useState("");
+  const [showComment, setShowComment] = useState(false);
+
   // Local state for answers (optimistic updates)
   const [answers, setAnswers] = useState<
-    Map<string, { status: ChecklistStatus; resultId?: string }>
+    Map<
+      string,
+      { status: ChecklistStatus; resultId?: string; comment?: string }
+    >
   >(() => {
     // Initialize from existing results
     const map = new Map();
     for (const result of existingResults) {
       const key = `${result.category}:${result.question}`;
-      map.set(key, { status: result.status, resultId: result.id });
+      map.set(key, {
+        status: result.status,
+        resultId: result.id,
+        comment: result.comment ?? "",
+      });
     }
     return map;
   });
@@ -113,7 +131,12 @@ export function ChecklistWizard({
     onOptimisticUpdate: (input: SaveChecklistInput) => {
       // Immediately update local state
       const key = `${input.category}:${input.question}`;
-      setAnswers((prev) => new Map(prev).set(key, { status: input.status }));
+      setAnswers((prev) =>
+        new Map(prev).set(key, {
+          status: input.status,
+          comment: input.comment,
+        }),
+      );
     },
     onSuccess: (data, input) => {
       // Update with actual result ID
@@ -122,6 +145,7 @@ export function ChecklistWizard({
         new Map(prev).set(key, {
           status: input.status,
           resultId: data.result.id,
+          comment: input.comment,
         }),
       );
     },
@@ -149,13 +173,18 @@ export function ChecklistWizard({
     (status: ChecklistStatus) => {
       if (!currentPoint) return;
 
-      // Save the result
+      // Save the result with comment
       saveResult({
-        reportId,
+        equipmentId,
         category: currentPoint.category,
         question: currentPoint.text,
         status,
+        comment: comment.trim() || undefined,
       });
+
+      // Reset comment state for next item
+      setComment("");
+      setShowComment(false);
 
       // Auto-advance after a brief delay
       setTimeout(() => {
@@ -171,9 +200,10 @@ export function ChecklistWizard({
       currentPoint,
       currentIndex,
       servicePoints.length,
-      reportId,
+      equipmentId,
       saveResult,
       onComplete,
+      comment,
     ],
   );
 
@@ -181,12 +211,31 @@ export function ChecklistWizard({
   const goBack = useCallback(() => {
     if (currentIndex > 0) {
       setCurrentIndex((prev) => prev - 1);
+      // Load comment for previous item
+      const prevPoint = servicePoints[currentIndex - 1];
+      if (prevPoint) {
+        const key = `${prevPoint.category}:${prevPoint.text}`;
+        const answer = answers.get(key);
+        setComment(answer?.comment ?? "");
+        setShowComment(!!answer?.comment);
+      }
     }
-  }, [currentIndex]);
+  }, [currentIndex, servicePoints, answers]);
 
-  const navigateTo = useCallback((index: number) => {
-    setCurrentIndex(index);
-  }, []);
+  const navigateTo = useCallback(
+    (index: number) => {
+      setCurrentIndex(index);
+      // Load comment for selected item
+      const point = servicePoints[index];
+      if (point) {
+        const key = `${point.category}:${point.text}`;
+        const answer = answers.get(key);
+        setComment(answer?.comment ?? "");
+        setShowComment(!!answer?.comment);
+      }
+    },
+    [servicePoints, answers],
+  );
 
   // Loading state
   if (isLoading) {
@@ -194,7 +243,7 @@ export function ChecklistWizard({
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="flex flex-col items-center gap-4">
           <div className="size-8 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
-          <p className="text-muted-foreground">Loading checklist...</p>
+          <p className="text-muted-foreground">Laster sjekkliste...</p>
         </div>
       </div>
     );
@@ -205,11 +254,12 @@ export function ChecklistWizard({
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="flex flex-col items-center gap-4 text-center px-6">
-          <p className="text-lg font-medium">No Service Points Found</p>
+          <p className="text-lg font-medium">Ingen sjekkpunkter funnet</p>
           <p className="text-muted-foreground">
-            There are no service points configured for product type "
-            {productType}".
+            Det er ingen sjekkpunkter konfigurert for produkttype "{productType}
+            ".
           </p>
+          <Button onClick={() => onComplete?.()}>Gå videre</Button>
         </div>
       </div>
     );
@@ -223,9 +273,9 @@ export function ChecklistWizard({
           <div className="size-16 rounded-full bg-[var(--status-ok)]/20 flex items-center justify-center">
             <Cloud className="size-8 text-[var(--status-ok)]" />
           </div>
-          <p className="text-lg font-medium">Checklist Complete!</p>
+          <p className="text-lg font-medium">Sjekkliste fullført!</p>
           <p className="text-muted-foreground">
-            All {servicePoints.length} items have been reviewed.
+            Alle {servicePoints.length} punkter er gjennomgått.
           </p>
           <SyncStatusIndicator status={syncStatus} />
         </div>
@@ -274,12 +324,50 @@ export function ChecklistWizard({
             </CardTitle>
           </CardHeader>
 
-          <CardContent className="space-y-6">
+          <CardContent className="space-y-4">
             {/* Photo capture */}
             <PhotoCapture
               checklistResultId={currentAnswer?.resultId ?? null}
               disabled={isSaving}
             />
+
+            {/* Comment section */}
+            <div className="space-y-2">
+              {!showComment ? (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowComment(true)}
+                  className="w-full justify-start text-muted-foreground"
+                >
+                  <MessageSquare className="size-4 mr-2" />
+                  Legg til kommentar
+                </Button>
+              ) : (
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium">Kommentar</span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        setShowComment(false);
+                        setComment("");
+                      }}
+                      className="text-xs h-6"
+                    >
+                      Skjul
+                    </Button>
+                  </div>
+                  <Textarea
+                    value={comment}
+                    onChange={(e) => setComment(e.target.value)}
+                    placeholder="Legg til observasjoner, notater eller anbefalinger..."
+                    className="min-h-[80px] text-sm"
+                  />
+                </div>
+              )}
+            </div>
           </CardContent>
         </Card>
       </div>

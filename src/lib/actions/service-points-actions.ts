@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { getCurrentOrganization } from "./org-actions";
 
@@ -78,6 +79,7 @@ export async function createServicePoint(input: {
       isForCommissioning: input.isForCommissioning ?? true,
     },
   });
+  revalidatePath("/data-editor");
   return { success: true, point };
 }
 
@@ -108,6 +110,7 @@ export async function bulkCreateServicePoints(
       isForCommissioning: input.isForCommissioning ?? true,
     })),
   });
+  revalidatePath("/data-editor");
   return { success: true, count: count.count };
 }
 
@@ -140,6 +143,7 @@ export async function updateServicePoint(
     where: { id },
     data: input,
   });
+  revalidatePath("/data-editor");
   return { success: true, point };
 }
 
@@ -163,6 +167,7 @@ export async function deleteServicePoint(id: string) {
   await prisma.servicePoint.delete({
     where: { id },
   });
+  revalidatePath("/data-editor");
   return { success: true };
 }
 

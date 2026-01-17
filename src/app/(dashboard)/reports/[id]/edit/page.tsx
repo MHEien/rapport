@@ -16,6 +16,6 @@ export default async function ReportEditPage({ params }: ReportEditPageProps) {
   }
 
   return (
-    <ReportEditClient report={report} existingResults={report.checklists} />
+    <ReportEditClient report={report} existingResults={report.equipment} />
   );
 }

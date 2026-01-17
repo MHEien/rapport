@@ -33,9 +33,14 @@ export async function getReportWithChecklist(reportId: string) {
   const report = await prisma.report.findUnique({
     where: { id: reportId },
     include: {
-      checklists: {
+      equipment: {
+        orderBy: { sortOrder: "asc" },
         include: {
-          photos: true,
+          checklists: {
+            include: {
+              photos: true,
+            },
+          },
         },
       },
       author: {
@@ -56,7 +61,7 @@ export async function getReportWithChecklist(reportId: string) {
 // ============================================================================
 
 export type SaveChecklistInput = {
-  reportId: string;
+  equipmentId: string;
   category: string;
   question: string;
   status: ChecklistStatus;
@@ -64,12 +69,12 @@ export type SaveChecklistInput = {
 };
 
 export async function saveChecklistResult(input: SaveChecklistInput) {
-  const { reportId, category, question, status, comment } = input;
+  const { equipmentId, category, question, status, comment } = input;
 
   // First, check if a result already exists for this question
   const existing = await prisma.checklistResult.findFirst({
     where: {
-      reportId,
+      equipmentId,
       category,
       question,
     },
@@ -90,7 +95,7 @@ export async function saveChecklistResult(input: SaveChecklistInput) {
   // Create new result
   const created = await prisma.checklistResult.create({
     data: {
-      reportId,
+      equipmentId,
       category,
       question,
       status,

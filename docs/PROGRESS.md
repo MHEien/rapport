@@ -4,6 +4,95 @@ A chronological log of development progress on the Field Service PWA.
 
 ---
 
+## 2026-01-17: Phase 4 Team Features Implementation
+
+**Objective:** Implement remaining team features: report assignment, admin dashboard, team analytics.
+
+### Completed
+
+1. **Schema Changes**
+   - Added `assignedToId` field to `Report` model
+   - Added `assignedTo` relation with named relations in User model
+   - Added index on `assignedToId` for query performance
+
+2. **Server Actions** (`reports-actions.ts`, `dashboard-actions.ts`)
+   - `assignReport(reportId, userId)` — Assign report to technician
+   - `unassignReport(reportId)` — Remove assignment
+   - `getOrganizationTechnicians()` — Get technicians for dropdown
+   - `getTeamStats()` — Per-technician breakdown
+   - `getTeamReports(technicianId?)` — Filtered reports
+
+3. **Admin Dashboard** (`admin-dashboard.tsx`)
+   - Team overview with member count and total reports
+   - Summary cards (members, completed, drafts)
+   - Collapsible team member list with report stats
+   - Filtered reports view by technician
+   - Role badges (Eier/Administrator/Tekniker)
+
+4. **Dashboard Integration**
+   - Admin dashboard renders for owners/admins only
+   - Integrated into main dashboard below stats cards
+
+### Routes Updated
+| Route | Changes |
+|-------|---------|
+| `/` | Added AdminDashboard for owners/admins |
+
+### Remaining (Deferred)
+- Assignment dropdown UI in reports list page
+
+---
+
+## 2026-01-17: Copy Invitation Link Feature
+
+**Objective:** Allow admins to copy invitation links instead of requiring email sending.
+
+### Completed
+
+1. **Copy Link Button** (`/settings/team`)
+   - Added "Kopier lenke" button to each pending invitation
+   - Uses `navigator.clipboard.writeText` to copy URL
+   - Toast notification on success
+
+2. **Accept Invitation Page** (Pre-existing)
+   - `/accept-invitation/[id]` already handles invitation acceptance
+   - Validates invitation status and expiry
+   - Shows organization info and inviter details
+
+---
+
+## 2026-01-16: PDF & Checklist UI Redesign
+
+**Objective:** Redesign PDF layout and transform checklist from wizard to continuous list.
+
+### Completed
+
+1. **PDF Layout Redesign**
+   - Updated `ReportPDF` component to match reference design
+   - Professional header with company info
+   - Equipment details section
+   - Checklist results table with status indicators
+   
+2. **Checklist UI Redesign**
+   - Transformed from step-by-step wizard to continuous list
+   - Equipment tabs for multi-equipment reports
+   - Status buttons, value fields, comment fields per row
+   - Camera buttons for visual evidence per checkpoint
+   - Mobile-first "Thumb-Friendly" UX maintained
+
+3. **LiveDataVisualizer Component**
+   - Dashboard widget with real-time line chart simulation
+   - Tracks "Vannrenhet" (increasing) and "Energibruk" (decreasing)
+   - Integrated into Hero section
+   - Responsive layout (right side on desktop, stacked on mobile)
+
+4. **Visual Evidence Verification**
+   - Confirmed image capture, annotation, and upload working
+   - Backend API routes for image handling verified
+   - Images correctly display in report view and PDFs
+
+---
+
 ## 2026-01-15: Premium App Shell & Dashboard
 
 **Objective:** Build a WOW-factor responsive app shell and dashboard with Norwegian labels.
