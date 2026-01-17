@@ -34,6 +34,7 @@ type EquipmentWithChecklists = ReportEquipment & {
 
 interface ChecklistTableProps {
   equipment: EquipmentWithChecklists[];
+  organizationId: string;
   onComplete?: () => void;
 }
 
@@ -286,14 +287,16 @@ function CategorySection({
 
 interface EquipmentTabContentProps {
   equipment: EquipmentWithChecklists;
+  organizationId: string;
 }
 
-function EquipmentTabContent({ equipment }: EquipmentTabContentProps) {
+function EquipmentTabContent({ equipment, organizationId }: EquipmentTabContentProps) {
   // Fetch service points for this equipment's product type
+  const reportType = equipment.jobType === "COMMISSIONING" ? "COMMISSIONING" : "SERVICE";
   const { data: servicePoints = [], isLoading } = useQuery({
-    queryKey: ["servicePoints", equipment.productType, equipment.jobType],
+    queryKey: ["servicePoints", equipment.productType, organizationId, reportType],
     queryFn: () =>
-      getServicePointsByProductType(equipment.productType, equipment.jobType),
+      getServicePointsByProductType(equipment.productType, organizationId, reportType),
   });
 
   // Offline-aware mutation for saving results
@@ -377,7 +380,7 @@ function EquipmentTabContent({ equipment }: EquipmentTabContentProps) {
 // MAIN CHECKLIST TABLE
 // ============================================================================
 
-export function ChecklistTable({ equipment, onComplete }: ChecklistTableProps) {
+export function ChecklistTable({ equipment, organizationId, onComplete }: ChecklistTableProps) {
   const [activeTab, setActiveTab] = useState(equipment[0]?.id ?? "");
 
   // Track sync status across all equipment
@@ -444,7 +447,7 @@ export function ChecklistTable({ equipment, onComplete }: ChecklistTableProps) {
             value={eq.id}
             className="flex-1 mt-0 overflow-auto"
           >
-            <EquipmentTabContent equipment={eq} />
+            <EquipmentTabContent equipment={eq} organizationId={organizationId} />
           </TabsContent>
         ))}
       </Tabs>

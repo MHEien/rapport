@@ -243,13 +243,14 @@ function EquipmentStep({ equipment, onNext }: EquipmentStepProps) {
 
 interface ChecklistStepProps {
   equipment: EquipmentWithChecklists[];
+  organizationId: string;
   onComplete: () => void;
 }
 
-function ChecklistStep({ equipment, onComplete }: ChecklistStepProps) {
+function ChecklistStep({ equipment, organizationId, onComplete }: ChecklistStepProps) {
   return (
     <div className="flex-1 flex flex-col">
-      <ChecklistTable equipment={equipment} onComplete={onComplete} />
+      <ChecklistTable equipment={equipment} organizationId={organizationId} onComplete={onComplete} />
     </div>
   );
 }
@@ -495,6 +496,7 @@ export function ReportEditClient({
       {step === "checklist" && (
         <ChecklistStep
           equipment={equipment}
+          organizationId={report.organizationId}
           onComplete={() => setStep("summary")}
         />
       )}

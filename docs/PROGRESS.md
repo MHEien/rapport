@@ -4,6 +4,30 @@ A chronological log of development progress on the Field Service PWA.
 
 ---
 
+## 2026-01-17: Service Point Ordering & Full Display
+
+**Objective:** Custom ordering in Data Editor + show ALL service points in report/PDF.
+
+### Completed
+
+1. **Schema Changes**
+   - Added `sortOrder` field to `ServicePoint` model
+   - Added index on `[organizationId, productType, sortOrder]`
+
+2. **Drag-and-Drop Ordering** (`/data-editor`)
+   - Installed `@dnd-kit/core`, `@dnd-kit/sortable`, `@dnd-kit/utilities`
+   - Added `SortableServicePoint` component with drag handles
+   - Added `updateServicePointOrder(items)` server action
+   - Order persists on drag-end
+
+3. **Report Full Display**
+   - Updated `getReportWithChecklist` to merge ALL service points
+   - Unchecked items now appear in PDF with empty status
+   - Items ordered by `sortOrder` instead of alphabetical
+   - Fixed bug where service points failed to load if report had no organizationId in context
+
+---
+
 ## 2026-01-17: Phase 4 Team Features Implementation
 
 **Objective:** Implement remaining team features: report assignment, admin dashboard, team analytics.

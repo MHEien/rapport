@@ -19,7 +19,8 @@ import type {
 
 // Define the shape of data we expect
 type EquipmentWithChecklists = ReportEquipment & {
-  checklists: (ChecklistResult & {
+  checklists: (Omit<ChecklistResult, "status"> & {
+    status: ChecklistResult["status"] | null;
     photos: Media[];
   })[];
 };
