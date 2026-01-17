@@ -198,11 +198,12 @@ model Media {
 // ---------------------------------------------------------
 
 model ServicePoint {
-  id          String @id @default(cuid())
-  productType String
-  category    String
-  text        String
-  sortOrder   Int    @default(0) // For custom ordering in Data Editor
+  id                String @id @default(cuid())
+  productType       String
+  category          String
+  text              String
+  sortOrder         Int    @default(0) // For custom ordering in Data Editor
+  categorySortOrder Int    @default(0) // For ordering categories
 
   isForService       Boolean @default(true)
   isForCommissioning Boolean @default(true)
@@ -213,7 +214,7 @@ model ServicePoint {
 
   @@unique([organizationId, productType, category, text])
   @@index([organizationId])
-  @@index([organizationId, productType, sortOrder])
+  @@index([organizationId, productType, categorySortOrder, sortOrder])
 }
 
 model Post {

@@ -213,6 +213,7 @@ export const ServicePointScalarFieldEnum = {
   category: 'category',
   text: 'text',
   sortOrder: 'sortOrder',
+  categorySortOrder: 'categorySortOrder',
   isForService: 'isForService',
   isForCommissioning: 'isForCommissioning',
   organizationId: 'organizationId'

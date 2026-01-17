@@ -26,6 +26,11 @@ A chronological log of development progress on the Field Service PWA.
    - Items ordered by `sortOrder` instead of alphabetical
    - Fixed bug where service points failed to load if report had no organizationId in context
 
+4. **Category Reordering** (`/data-editor`)
+   - Added `categorySortOrder` to `ServicePoint` model
+   - Implemented nested drag-and-drop for categories within product types
+   - Order persists and sorts all items in that category
+
 ---
 
 ## 2026-01-17: Phase 4 Team Features Implementation

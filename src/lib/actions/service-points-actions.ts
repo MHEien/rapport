@@ -15,7 +15,12 @@ export async function getServicePoints() {
 
   const servicePoints = await prisma.servicePoint.findMany({
     where: { organizationId: orgData.organization.id },
-    orderBy: [{ productType: "asc" }, { category: "asc" }, { sortOrder: "asc" }],
+    orderBy: [
+      { productType: "asc" },
+      { categorySortOrder: "asc" },
+      { category: "asc" },
+      { sortOrder: "asc" },
+    ],
   });
 
   // Group by product type and category
@@ -80,6 +85,17 @@ export async function createServicePoint(input: {
   });
   const nextSortOrder = (maxSort._max.sortOrder ?? -1) + 1;
 
+  // Get existing category order (if any) or default to 0
+  const existingCategoryPoint = await prisma.servicePoint.findFirst({
+    where: {
+      organizationId: orgData.organization.id,
+      productType: input.productType,
+      category: input.category,
+    },
+    select: { categorySortOrder: true },
+  });
+  const categorySortOrder = existingCategoryPoint?.categorySortOrder ?? 0;
+
   const point = await prisma.servicePoint.create({
     data: {
       organizationId: orgData.organization.id,
@@ -87,6 +103,7 @@ export async function createServicePoint(input: {
       category: input.category,
       text: input.text,
       sortOrder: nextSortOrder,
+      categorySortOrder,
       isForService: input.isForService ?? true,
       isForCommissioning: input.isForCommissioning ?? true,
     },
@@ -120,6 +137,8 @@ export async function bulkCreateServicePoints(
       text: input.text,
       isForService: input.isForService ?? true,
       isForCommissioning: input.isForCommissioning ?? true,
+      // Default to 0 for bulk import; user can reorder later
+      categorySortOrder: 0, 
     })),
   });
   revalidatePath("/data-editor");
@@ -210,6 +229,40 @@ export async function updateServicePointOrder(
           organizationId: orgData.organization.id,
         },
         data: { sortOrder: item.sortOrder },
+      }),
+    ),
+  );
+
+  revalidatePath("/data-editor");
+  return { success: true };
+}
+
+/**
+ * Update sort order for categories (drag-and-drop reordering)
+ */
+export async function updateCategoryOrder(
+  items: Array<{
+    productType: string;
+    category: string;
+    sortOrder: number;
+  }>,
+) {
+  const orgData = await getCurrentOrganization();
+  if (!orgData) {
+    return { success: false, error: "Ikke autentisert" };
+  }
+
+  // Since categories aren't normalized, we have to update all service points
+  // that belong to the productType + category combination.
+  await prisma.$transaction(
+    items.map((item) =>
+      prisma.servicePoint.updateMany({
+        where: {
+          organizationId: orgData.organization.id,
+          productType: item.productType,
+          category: item.category,
+        },
+        data: { categorySortOrder: item.sortOrder },
       }),
     ),
   );
