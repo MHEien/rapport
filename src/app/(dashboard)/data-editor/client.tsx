@@ -1,12 +1,30 @@
 "use client";
 
 import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import {
   ChevronDown,
   ChevronRight,
   Database,
   Download,
   FileSpreadsheet,
   FileText,
+  GripVertical,
   Layers,
   Pencil,
   Plus,
@@ -43,6 +61,7 @@ import {
   createServicePoint,
   deleteServicePoint,
   updateServicePoint,
+  updateServicePointOrder,
 } from "@/lib/actions/service-points-actions";
 
 // Types
@@ -51,6 +70,7 @@ interface ServicePoint {
   productType: string;
   category: string;
   text: string;
+  sortOrder: number;
   isForService: boolean;
   isForCommissioning: boolean;
 }
@@ -101,6 +121,43 @@ export function DataEditorClient({
 
   // Import state
   const [isImporting, setIsImporting] = useState(false);
+
+  // DnD sensors - require 8px movement before drag starts (avoids accidental drags)
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
+  );
+
+  // Handle drag end - reorder and persist
+  const handleDragEnd = async (
+    event: DragEndEvent,
+    categoryPoints: ServicePoint[],
+    productType: string,
+    category: string,
+  ) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+
+    const oldIndex = categoryPoints.findIndex((p) => p.id === active.id);
+    const newIndex = categoryPoints.findIndex((p) => p.id === over.id);
+    if (oldIndex === -1 || newIndex === -1) return;
+
+    // Optimistically update UI
+    const reordered = arrayMove(categoryPoints, oldIndex, newIndex);
+    setData((prev) => {
+      const newGrouped = { ...prev.grouped };
+      if (!newGrouped[productType]) newGrouped[productType] = {};
+      newGrouped[productType] = { ...newGrouped[productType] };
+      newGrouped[productType][category] = reordered;
+      return { ...prev, grouped: newGrouped };
+    });
+
+    // Persist to database
+    const updates = reordered.map((p, idx) => ({ id: p.id, sortOrder: idx }));
+    await updateServicePointOrder(updates);
+  };
 
   // Toggle expansion
   const toggleType = (type: string) => {
@@ -410,60 +467,41 @@ export function DataEditorClient({
 
                             {/* Points */}
                             {isCatExpanded && (
-                              <div className="bg-white/[0.02]">
-                                {points.map((point) => (
-                                  <div
-                                    key={point.id}
-                                    className="group flex items-center gap-3 px-4 py-3 pl-14 border-t border-white/5 hover:bg-white/5 transition-colors"
-                                  >
-                                    <p className="flex-1 text-slate-300">
-                                      {point.text}
-                                    </p>
-                                    <div className="flex items-center gap-2">
-                                      {point.isForService && (
-                                        <span className="text-xs px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400">
-                                          Service
-                                        </span>
-                                      )}
-                                      {point.isForCommissioning && (
-                                        <span className="text-xs px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-400">
-                                          Igangkjøring
-                                        </span>
-                                      )}
-                                    </div>
-                                    <div className="opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
-                                      <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        className="h-8 w-8"
-                                        onClick={() => openEditDialog(point)}
-                                      >
-                                        <Pencil className="size-3.5" />
-                                      </Button>
-                                      <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        className="h-8 w-8 text-red-400 hover:text-red-300 hover:bg-red-500/10"
-                                        onClick={() => {
+                              <DndContext
+                                sensors={sensors}
+                                collisionDetection={closestCenter}
+                                onDragEnd={(e) =>
+                                  handleDragEnd(e, points, type, category)
+                                }
+                              >
+                                <SortableContext
+                                  items={points.map((p) => p.id)}
+                                  strategy={verticalListSortingStrategy}
+                                >
+                                  <div className="bg-white/[0.02]">
+                                    {points.map((point) => (
+                                      <SortableServicePoint
+                                        key={point.id}
+                                        point={point}
+                                        onEdit={() => openEditDialog(point)}
+                                        onDelete={() => {
                                           setPointToDelete(point.id);
                                           setDeleteDialogOpen(true);
                                         }}
-                                      >
-                                        <Trash2 className="size-3.5" />
-                                      </Button>
-                                    </div>
+                                      />
+                                    ))}
+                                    {/* Add to category button */}
+                                    <Button
+                                      variant="ghost"
+                                      onClick={() => openAddDialog(type, category)}
+                                      className="w-full justify-start gap-2 px-4 py-2 pl-14 text-sm text-slate-500 hover:text-blue-400 hover:bg-white/5 rounded-none h-10"
+                                    >
+                                      <Plus className="size-4" />
+                                      Legg til punkt i {category}
+                                    </Button>
                                   </div>
-                                ))}
-                                {/* Add to category button */}
-                                <Button
-                                  variant="ghost"
-                                  onClick={() => openAddDialog(type, category)}
-                                  className="w-full justify-start gap-2 px-4 py-2 pl-14 text-sm text-slate-500 hover:text-blue-400 hover:bg-white/5 rounded-none h-10"
-                                >
-                                  <Plus className="size-4" />
-                                  Legg til punkt i {category}
-                                </Button>
-                              </div>
+                                </SortableContext>
+                              </DndContext>
                             )}
                           </div>
                         );
@@ -626,6 +664,71 @@ export function DataEditorClient({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+    </div>
+  );
+}
+
+// Sortable service point component with drag handle
+function SortableServicePoint({
+  point,
+  onEdit,
+  onDelete,
+}: {
+  point: ServicePoint;
+  onEdit: () => void;
+  onDelete: () => void;
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
+    useSortable({ id: point.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    zIndex: isDragging ? 1 : 0,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className="group flex items-center gap-2 px-4 py-3 pl-10 border-t border-white/5 hover:bg-white/5 transition-colors"
+    >
+      {/* Drag handle - 64px touch target */}
+      <button
+        type="button"
+        {...attributes}
+        {...listeners}
+        className="flex items-center justify-center size-8 -ml-4 touch-none cursor-grab active:cursor-grabbing text-slate-500 hover:text-slate-300"
+      >
+        <GripVertical className="size-4" />
+      </button>
+      <p className="flex-1 text-slate-300">{point.text}</p>
+      <div className="flex items-center gap-2">
+        {point.isForService && (
+          <span className="text-xs px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400">
+            Service
+          </span>
+        )}
+        {point.isForCommissioning && (
+          <span className="text-xs px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-400">
+            Igangkjøring
+          </span>
+        )}
+      </div>
+      <div className="opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
+        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onEdit}>
+          <Pencil className="size-3.5" />
+        </Button>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-8 w-8 text-red-400 hover:text-red-300 hover:bg-red-500/10"
+          onClick={onDelete}
+        >
+          <Trash2 className="size-3.5" />
+        </Button>
+      </div>
     </div>
   );
 }

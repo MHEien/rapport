@@ -76,6 +76,7 @@ function SyncStatusIndicator({ status }: { status: SyncStatus }) {
 interface ChecklistWizardProps {
   equipmentId: string;
   productType: string;
+  organizationId: string;
   reportType?: "SERVICE" | "COMMISSIONING";
   existingResults?: ChecklistResult[];
   onComplete?: () => void;
@@ -84,6 +85,7 @@ interface ChecklistWizardProps {
 export function ChecklistWizard({
   equipmentId,
   productType,
+  organizationId,
   reportType = "SERVICE",
   existingResults = [],
   onComplete,
@@ -118,7 +120,7 @@ export function ChecklistWizard({
   // Fetch service points for this product type
   const { data: servicePoints = [], isLoading } = useQuery({
     queryKey: ["servicePoints", productType, reportType],
-    queryFn: () => getServicePointsByProductType(productType, reportType),
+    queryFn: () => getServicePointsByProductType(productType, organizationId, reportType),
   });
 
   // Offline-aware mutation for saving results

@@ -15,7 +15,7 @@ export async function getServicePoints() {
 
   const servicePoints = await prisma.servicePoint.findMany({
     where: { organizationId: orgData.organization.id },
-    orderBy: [{ productType: "asc" }, { category: "asc" }, { text: "asc" }],
+    orderBy: [{ productType: "asc" }, { category: "asc" }, { sortOrder: "asc" }],
   });
 
   // Group by product type and category
@@ -69,12 +69,24 @@ export async function createServicePoint(input: {
     return { success: false, error: "Ikke autentisert" };
   }
 
+  // Get max sortOrder for this category to append new item at end
+  const maxSort = await prisma.servicePoint.aggregate({
+    where: {
+      organizationId: orgData.organization.id,
+      productType: input.productType,
+      category: input.category,
+    },
+    _max: { sortOrder: true },
+  });
+  const nextSortOrder = (maxSort._max.sortOrder ?? -1) + 1;
+
   const point = await prisma.servicePoint.create({
     data: {
       organizationId: orgData.organization.id,
       productType: input.productType,
       category: input.category,
       text: input.text,
+      sortOrder: nextSortOrder,
       isForService: input.isForService ?? true,
       isForCommissioning: input.isForCommissioning ?? true,
     },
@@ -176,4 +188,32 @@ export async function deleteServicePoint(id: string) {
  */
 export async function createProductType(name: string) {
   return { success: true, productType: name };
+}
+
+/**
+ * Update sort order for multiple service points (drag-and-drop reordering)
+ */
+export async function updateServicePointOrder(
+  items: Array<{ id: string; sortOrder: number }>,
+) {
+  const orgData = await getCurrentOrganization();
+  if (!orgData) {
+    return { success: false, error: "Ikke autentisert" };
+  }
+
+  // Update each item's sortOrder
+  await prisma.$transaction(
+    items.map((item) =>
+      prisma.servicePoint.updateMany({
+        where: {
+          id: item.id,
+          organizationId: orgData.organization.id,
+        },
+        data: { sortOrder: item.sortOrder },
+      }),
+    ),
+  );
+
+  revalidatePath("/data-editor");
+  return { success: true };
 }

@@ -1547,6 +1547,7 @@ export const ServicePointScalarFieldEnum = {
   productType: 'productType',
   category: 'category',
   text: 'text',
+  sortOrder: 'sortOrder',
   isForService: 'isForService',
   isForCommissioning: 'isForCommissioning',
   organizationId: 'organizationId'

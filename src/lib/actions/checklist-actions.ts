@@ -10,16 +10,18 @@ import { prisma } from "@/lib/prisma";
 
 export async function getServicePointsByProductType(
   productType: string,
+  organizationId: string,
   reportType: "SERVICE" | "COMMISSIONING" = "SERVICE",
 ) {
   const servicePoints = await prisma.servicePoint.findMany({
     where: {
       productType,
+      organizationId,
       ...(reportType === "SERVICE"
         ? { isForService: true }
         : { isForCommissioning: true }),
     },
-    orderBy: [{ category: "asc" }, { text: "asc" }],
+    orderBy: [{ category: "asc" }, { sortOrder: "asc" }],
   });
 
   return servicePoints;
@@ -53,7 +55,64 @@ export async function getReportWithChecklist(reportId: string) {
     },
   });
 
-  return report;
+  if (!report) return null;
+
+  // For each equipment, get ALL service points for its productType and merge
+  const equipmentWithAllPoints = await Promise.all(
+    report.equipment.map(async (eq) => {
+      // Fetch master service points for this product type
+      console.log(`[getReportWithChecklist] Fetching service points for productType: ${eq.productType}, orgId: ${report.organizationId}`);
+      
+      const allServicePoints = await prisma.servicePoint.findMany({
+        where: {
+          productType: eq.productType,
+          organizationId: report.organizationId,
+          isForService: true, // Default to service mode (commissioning support can be added later)
+        },
+        orderBy: [{ category: "asc" }, { sortOrder: "asc" }],
+      });
+      
+      console.log(`[getReportWithChecklist] Found ${allServicePoints.length} service points for ${eq.productType}`);
+
+      // Create a lookup map of existing checklist answers by question
+      const existingAnswers = new Map(
+        eq.checklists.map((c) => [`${c.category}:${c.question}`, c]),
+      );
+
+      // Merge: create checklist entries for ALL service points
+      const mergedChecklists = allServicePoints.map((sp) => {
+        const key = `${sp.category}:${sp.text}`;
+        const existing = existingAnswers.get(key);
+
+        if (existing) {
+          // Use existing answer with sortOrder for proper ordering
+          return { ...existing, sortOrder: sp.sortOrder };
+        }
+
+        // Create placeholder for unanswered service point
+        return {
+          id: `placeholder-${sp.id}`,
+          equipmentId: eq.id,
+          category: sp.category,
+          question: sp.text,
+          status: null as unknown as "OK" | "BOR_UTBEDRES" | "MA_UTBEDRES" | "IKKE_AKTUELT",
+          comment: null,
+          sortOrder: sp.sortOrder,
+          photos: [],
+        };
+      });
+
+      return {
+        ...eq,
+        checklists: mergedChecklists,
+      };
+    }),
+  );
+
+  return {
+    ...report,
+    equipment: equipmentWithAllPoints,
+  };
 }
 
 // ============================================================================
