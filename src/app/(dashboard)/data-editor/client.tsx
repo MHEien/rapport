@@ -62,6 +62,7 @@ import {
   deleteServicePoint,
   updateServicePoint,
   updateServicePointOrder,
+  updateCategoryOrder,
 } from "@/lib/actions/service-points-actions";
 
 // Types
@@ -71,6 +72,7 @@ interface ServicePoint {
   category: string;
   text: string;
   sortOrder: number;
+  categorySortOrder?: number; // Optional on client until refreshed
   isForService: boolean;
   isForCommissioning: boolean;
 }
@@ -130,8 +132,8 @@ export function DataEditorClient({
     }),
   );
 
-  // Handle drag end - reorder and persist
-  const handleDragEnd = async (
+  // Handle point drag end - reorder points within a category
+  const handlePointDragEnd = async (
     event: DragEndEvent,
     categoryPoints: ServicePoint[],
     productType: string,
@@ -151,12 +153,69 @@ export function DataEditorClient({
       if (!newGrouped[productType]) newGrouped[productType] = {};
       newGrouped[productType] = { ...newGrouped[productType] };
       newGrouped[productType][category] = reordered;
+      
+      // Also update the flat list to ensure consistency if we use it for anything else
+      // (Though derived categories primarily use grouped or filtered list)
+      // Ideally we'd update the flat list too, but for point ordering inside a cat,
+      // grouped is the primary display source.
+      
       return { ...prev, grouped: newGrouped };
     });
 
     // Persist to database
     const updates = reordered.map((p, idx) => ({ id: p.id, sortOrder: idx }));
     await updateServicePointOrder(updates);
+  };
+
+  // Handle category drag end - reorder categories within a product type
+  const handleCategoryDragEnd = async (
+    event: DragEndEvent,
+    currentCategories: string[],
+    productType: string,
+  ) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+
+    const oldIndex = currentCategories.indexOf(String(active.id));
+    const newIndex = currentCategories.indexOf(String(over.id));
+
+    if (oldIndex === -1 || newIndex === -1) return;
+
+    // 1. Calculate new order
+    const reorderedCats = arrayMove(currentCategories, oldIndex, newIndex);
+
+    // 2. Optimistically update data
+    // We need to update the `data.servicePoints` array because `categoryNames` is derived from it.
+    // We'll re-sort the service points for this product type based on the new category order.
+    
+    setData((prev) => {
+      // Create a map of category -> index
+      const catIndexMap = new Map(reorderedCats.map((c, i) => [c, i]));
+      
+      // Sort the flat list
+      const newServicePoints = [...prev.servicePoints].sort((a, b) => {
+        // Only affect items of this product type
+        if (a.productType === productType && b.productType === productType) {
+           const idxA = catIndexMap.get(a.category) ?? 999;
+           const idxB = catIndexMap.get(b.category) ?? 999;
+           if (idxA !== idxB) return idxA - idxB;
+           return a.sortOrder - b.sortOrder; // Fallback to item sort
+        }
+        return 0; // Don't move items of other types relative to each other (stable sort ideally)
+      });
+
+      return { ...prev, servicePoints: newServicePoints };
+    });
+
+    // 3. Persist to database
+    // We send the new order indices for these categories
+    const updates = reorderedCats.map((cat, idx) => ({
+      productType,
+      category: cat,
+      sortOrder: idx,
+    }));
+    
+    await updateCategoryOrder(updates);
   };
 
   // Toggle expansion
@@ -252,6 +311,13 @@ export function DataEditorClient({
         Service: "Ja",
         Igangkjøring: "Nei",
       },
+      {
+        Produkttype: "Generator",
+        Kategori: "Motor",
+        Tekst: "Sjekk kjølevæske",
+        Service: "Ja",
+        Igangkjøring: "Ja",
+      },
     ]);
 
     // Set column widths
@@ -306,7 +372,7 @@ export function DataEditorClient({
     }
   };
 
-  // Get all categories across all types
+  // Get all unique categories across all types for autocomplete
   const allCategories = [
     ...new Set(data.servicePoints.map((p) => p.category)),
   ].sort();
@@ -394,9 +460,20 @@ export function DataEditorClient({
           <div className="space-y-4">
             {productTypes.map((type) => {
               const isExpanded = expandedTypes.has(type);
+              
+              // Key change: Derive categories based on current data state order
+              // Only consider points of this product type
+              const typePoints = data.servicePoints.filter(p => p.productType === type);
+              
+              // Get unique categories maintaining the order they appear in `typePoints`
+              // Since `data.servicePoints` is sorted by `categorySortOrder`, this preserves that order.
+              const categoryNames = typePoints.reduce((acc, p) => {
+                if (!acc.includes(p.category)) acc.push(p.category);
+                return acc;
+              }, [] as string[]);
+
               const categories = data.grouped[type] ?? {};
-              const categoryNames = Object.keys(categories).sort();
-              const totalPoints = Object.values(categories).flat().length;
+              const totalPoints = typePoints.length;
 
               return (
                 <div
@@ -431,86 +508,82 @@ export function DataEditorClient({
                   {/* Categories */}
                   {isExpanded && (
                     <div className="border-t border-white/5">
-                      {categoryNames.map((category) => {
-                        const catKey = `${type}:${category}`;
-                        const isCatExpanded = expandedCategories.has(catKey);
-                        const points = categories[category];
+                      {/* Nested DndContext for Categories */}
+                      <DndContext
+                        sensors={sensors}
+                        collisionDetection={closestCenter}
+                        onDragEnd={(e) => handleCategoryDragEnd(e, categoryNames, type)}
+                      >
+                        <SortableContext
+                          items={categoryNames} // Strings are valid IDs
+                          strategy={verticalListSortingStrategy}
+                        >
+                          {categoryNames.map((category) => {
+                            const catKey = `${type}:${category}`;
+                            const isCatExpanded = expandedCategories.has(catKey);
+                            const points = categories[category] || [];
 
-                        return (
-                          <div
-                            key={catKey}
-                            className="border-b border-white/5 last:border-b-0"
-                          >
-                            {/* Category header */}
-                            <Button
-                              onClick={() => toggleCategory(catKey)}
-                              variant="ghost"
-                              className="w-full justify-between h-auto py-3 px-4 pl-8 hover:bg-white/5 rounded-none"
-                            >
-                              <div className="flex items-center gap-4">
-                                <FileText className="size-4 text-slate-400" />
-                                <span className="font-medium text-slate-200">
-                                  {category}
-                                </span>
-                              </div>
-                              <div className="flex items-center gap-4">
-                                <span className="text-sm text-slate-500">
-                                  {points.length} punkter
-                                </span>
-                                {isCatExpanded ? (
-                                  <ChevronDown className="size-4 text-slate-500" />
-                                ) : (
-                                  <ChevronRight className="size-4 text-slate-500" />
-                                )}
-                              </div>
-                            </Button>
-
-                            {/* Points */}
-                            {isCatExpanded && (
-                              <DndContext
-                                sensors={sensors}
-                                collisionDetection={closestCenter}
-                                onDragEnd={(e) =>
-                                  handleDragEnd(e, points, type, category)
-                                }
+                            return (
+                              <SortableCategory
+                                key={catKey}
+                                id={category} // Using category name as ID for DnD
+                                categoryName={category}
+                                pointCount={points.length}
+                                isExpanded={isCatExpanded}
+                                onToggle={() => toggleCategory(catKey)}
                               >
-                                <SortableContext
-                                  items={points.map((p) => p.id)}
-                                  strategy={verticalListSortingStrategy}
-                                >
-                                  <div className="bg-white/[0.02]">
-                                    {points.map((point) => (
-                                      <SortableServicePoint
-                                        key={point.id}
-                                        point={point}
-                                        onEdit={() => openEditDialog(point)}
-                                        onDelete={() => {
-                                          setPointToDelete(point.id);
-                                          setDeleteDialogOpen(true);
-                                        }}
-                                      />
-                                    ))}
-                                    {/* Add to category button */}
-                                    <Button
-                                      variant="ghost"
-                                      onClick={() => openAddDialog(type, category)}
-                                      className="w-full justify-start gap-2 px-4 py-2 pl-14 text-sm text-slate-500 hover:text-blue-400 hover:bg-white/5 rounded-none h-10"
-                                    >
-                                      <Plus className="size-4" />
-                                      Legg til punkt i {category}
-                                    </Button>
-                                  </div>
-                                </SortableContext>
-                              </DndContext>
-                            )}
-                          </div>
-                        );
-                      })}
-                      {/* Add category button */}
+                                {isCatExpanded && (
+                                  <DndContext
+                                    sensors={sensors}
+                                    collisionDetection={closestCenter}
+                                    onDragEnd={(e) =>
+                                      handlePointDragEnd(e, points, type, category)
+                                    }
+                                  >
+                                    <div className="border-t border-white/5">
+                                      <SortableContext
+                                        items={points.map((p) => p.id)}
+                                        strategy={verticalListSortingStrategy}
+                                      >
+                                        <div className="bg-white/[0.02]">
+                                          {points.map((point) => (
+                                            <SortableServicePoint
+                                              key={point.id}
+                                              point={point}
+                                              onEdit={() => openEditDialog(point)}
+                                              onDelete={() => {
+                                                setPointToDelete(point.id);
+                                                setDeleteDialogOpen(true);
+                                              }}
+                                            />
+                                          ))}
+                                          {/* Add to category button */}
+                                          <Button
+                                            variant="ghost"
+                                            onClick={() =>
+                                              openAddDialog(type, category)
+                                            }
+                                            className="w-full justify-start gap-2 px-4 py-2 pl-14 text-sm text-slate-500 hover:text-blue-400 hover:bg-white/5 rounded-none h-10"
+                                          >
+                                            <Plus className="size-4" />
+                                            Legg til punkt i {category}
+                                          </Button>
+                                        </div>
+                                      </SortableContext>
+                                    </div>
+                                  </DndContext>
+                                )}
+                              </SortableCategory>
+                            );
+                          })}
+                        </SortableContext>
+                      </DndContext>
+
+                      {/* Add category button (outside sortable) */}
                       <Button
                         variant="ghost"
                         onClick={() => openAddDialog(type)}
-                        className="w-full justify-start gap-2 px-4 py-3 pl-8 text-sm text-slate-500 hover:text-blue-400 hover:bg-white/5 rounded-none h-12"
+                        className="w-full justify-start gap-2 px-4 py-3 pl-8 text-sm text-slate-500 hover:text-blue-400 hover:bg-white/5 rounded-none h-12 border-t border-white/5"
                       >
                         <Plus className="size-4" />
                         Legg til ny kategori
@@ -668,6 +741,91 @@ export function DataEditorClient({
   );
 }
 
+// Sortable Category with Header
+function SortableCategory({
+  id,
+  categoryName,
+  pointCount,
+  isExpanded,
+  onToggle,
+  children,
+}: {
+  id: string;
+  categoryName: string;
+  pointCount: number;
+  isExpanded: boolean;
+  onToggle: () => void;
+  children: React.ReactNode;
+}) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    zIndex: isDragging ? 1 : 0,
+    backgroundColor: isDragging ? "rgba(255,255,255,0.05)" : undefined,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className="border-b border-white/5 last:border-b-0"
+    >
+      {/* Category header */}
+      <div
+        className="w-full flex items-center justify-between h-auto py-3 px-4 hover:bg-white/5 transition-colors group"
+      >
+        <div className="flex items-center gap-4 flex-1">
+          {/* Drag Handle - only visible on hover (or if dragging) */}
+           <button
+             type="button"
+             {...attributes}
+             {...listeners}
+             className="flex items-center justify-center size-8 -ml-2 rounded text-slate-600 hover:text-slate-300 hover:bg-white/10 touch-none cursor-grab active:cursor-grabbing transition-colors"
+           >
+             <GripVertical className="size-4" />
+           </button>
+
+          <button 
+             type="button"
+             className="flex items-center gap-3 cursor-pointer select-none flex-1 text-left bg-transparent border-none p-0"
+             onClick={onToggle}
+          >
+             <FileText className="size-4 text-slate-400" />
+             <span className="font-medium text-slate-200">
+               {categoryName}
+             </span>
+          </button>
+        </div>
+        
+        <div className="flex items-center gap-4">
+          <span className="text-sm text-slate-500">
+            {pointCount} punkter
+          </span>
+          <button type="button" onClick={onToggle} className="p-1 hover:bg-white/10 rounded">
+            {isExpanded ? (
+              <ChevronDown className="size-4 text-slate-500" />
+            ) : (
+              <ChevronRight className="size-4 text-slate-500" />
+            )}
+          </button>
+        </div>
+      </div>
+
+      {children}
+    </div>
+  );
+}
+
 // Sortable service point component with drag handle
 function SortableServicePoint({
   point,
@@ -685,21 +843,21 @@ function SortableServicePoint({
     transform: CSS.Transform.toString(transform),
     transition,
     opacity: isDragging ? 0.5 : 1,
-    zIndex: isDragging ? 1 : 0,
+    zIndex: isDragging ? 2 : 0,
   };
 
   return (
     <div
       ref={setNodeRef}
       style={style}
-      className="group flex items-center gap-2 px-4 py-3 pl-10 border-t border-white/5 hover:bg-white/5 transition-colors"
+      className="group flex items-center gap-2 px-4 py-3 pl-12 border-t border-white/5 hover:bg-white/5 transition-colors bg-white/[0.01]"
     >
       {/* Drag handle - 64px touch target */}
       <button
         type="button"
         {...attributes}
         {...listeners}
-        className="flex items-center justify-center size-8 -ml-4 touch-none cursor-grab active:cursor-grabbing text-slate-500 hover:text-slate-300"
+        className="flex items-center justify-center size-8 -ml-4 touch-none cursor-grab active:cursor-grabbing text-slate-600 hover:text-slate-300"
       >
         <GripVertical className="size-4" />
       </button>

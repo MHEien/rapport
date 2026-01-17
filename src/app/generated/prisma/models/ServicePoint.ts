@@ -28,10 +28,12 @@ export type AggregateServicePoint = {
 
 export type ServicePointAvgAggregateOutputType = {
   sortOrder: number | null
+  categorySortOrder: number | null
 }
 
 export type ServicePointSumAggregateOutputType = {
   sortOrder: number | null
+  categorySortOrder: number | null
 }
 
 export type ServicePointMinAggregateOutputType = {
@@ -40,6 +42,7 @@ export type ServicePointMinAggregateOutputType = {
   category: string | null
   text: string | null
   sortOrder: number | null
+  categorySortOrder: number | null
   isForService: boolean | null
   isForCommissioning: boolean | null
   organizationId: string | null
@@ -51,6 +54,7 @@ export type ServicePointMaxAggregateOutputType = {
   category: string | null
   text: string | null
   sortOrder: number | null
+  categorySortOrder: number | null
   isForService: boolean | null
   isForCommissioning: boolean | null
   organizationId: string | null
@@ -62,6 +66,7 @@ export type ServicePointCountAggregateOutputType = {
   category: number
   text: number
   sortOrder: number
+  categorySortOrder: number
   isForService: number
   isForCommissioning: number
   organizationId: number
@@ -71,10 +76,12 @@ export type ServicePointCountAggregateOutputType = {
 
 export type ServicePointAvgAggregateInputType = {
   sortOrder?: true
+  categorySortOrder?: true
 }
 
 export type ServicePointSumAggregateInputType = {
   sortOrder?: true
+  categorySortOrder?: true
 }
 
 export type ServicePointMinAggregateInputType = {
@@ -83,6 +90,7 @@ export type ServicePointMinAggregateInputType = {
   category?: true
   text?: true
   sortOrder?: true
+  categorySortOrder?: true
   isForService?: true
   isForCommissioning?: true
   organizationId?: true
@@ -94,6 +102,7 @@ export type ServicePointMaxAggregateInputType = {
   category?: true
   text?: true
   sortOrder?: true
+  categorySortOrder?: true
   isForService?: true
   isForCommissioning?: true
   organizationId?: true
@@ -105,6 +114,7 @@ export type ServicePointCountAggregateInputType = {
   category?: true
   text?: true
   sortOrder?: true
+  categorySortOrder?: true
   isForService?: true
   isForCommissioning?: true
   organizationId?: true
@@ -203,6 +213,7 @@ export type ServicePointGroupByOutputType = {
   category: string
   text: string
   sortOrder: number
+  categorySortOrder: number
   isForService: boolean
   isForCommissioning: boolean
   organizationId: string
@@ -237,6 +248,7 @@ export type ServicePointWhereInput = {
   category?: Prisma.StringFilter<"ServicePoint"> | string
   text?: Prisma.StringFilter<"ServicePoint"> | string
   sortOrder?: Prisma.IntFilter<"ServicePoint"> | number
+  categorySortOrder?: Prisma.IntFilter<"ServicePoint"> | number
   isForService?: Prisma.BoolFilter<"ServicePoint"> | boolean
   isForCommissioning?: Prisma.BoolFilter<"ServicePoint"> | boolean
   organizationId?: Prisma.StringFilter<"ServicePoint"> | string
@@ -249,6 +261,7 @@ export type ServicePointOrderByWithRelationInput = {
   category?: Prisma.SortOrder
   text?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
+  categorySortOrder?: Prisma.SortOrder
   isForService?: Prisma.SortOrder
   isForCommissioning?: Prisma.SortOrder
   organizationId?: Prisma.SortOrder
@@ -265,6 +278,7 @@ export type ServicePointWhereUniqueInput = Prisma.AtLeast<{
   category?: Prisma.StringFilter<"ServicePoint"> | string
   text?: Prisma.StringFilter<"ServicePoint"> | string
   sortOrder?: Prisma.IntFilter<"ServicePoint"> | number
+  categorySortOrder?: Prisma.IntFilter<"ServicePoint"> | number
   isForService?: Prisma.BoolFilter<"ServicePoint"> | boolean
   isForCommissioning?: Prisma.BoolFilter<"ServicePoint"> | boolean
   organizationId?: Prisma.StringFilter<"ServicePoint"> | string
@@ -277,6 +291,7 @@ export type ServicePointOrderByWithAggregationInput = {
   category?: Prisma.SortOrder
   text?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
+  categorySortOrder?: Prisma.SortOrder
   isForService?: Prisma.SortOrder
   isForCommissioning?: Prisma.SortOrder
   organizationId?: Prisma.SortOrder
@@ -296,6 +311,7 @@ export type ServicePointScalarWhereWithAggregatesInput = {
   category?: Prisma.StringWithAggregatesFilter<"ServicePoint"> | string
   text?: Prisma.StringWithAggregatesFilter<"ServicePoint"> | string
   sortOrder?: Prisma.IntWithAggregatesFilter<"ServicePoint"> | number
+  categorySortOrder?: Prisma.IntWithAggregatesFilter<"ServicePoint"> | number
   isForService?: Prisma.BoolWithAggregatesFilter<"ServicePoint"> | boolean
   isForCommissioning?: Prisma.BoolWithAggregatesFilter<"ServicePoint"> | boolean
   organizationId?: Prisma.StringWithAggregatesFilter<"ServicePoint"> | string
@@ -307,6 +323,7 @@ export type ServicePointCreateInput = {
   category: string
   text: string
   sortOrder?: number
+  categorySortOrder?: number
   isForService?: boolean
   isForCommissioning?: boolean
   organization: Prisma.OrganizationCreateNestedOneWithoutServicePointsInput
@@ -318,6 +335,7 @@ export type ServicePointUncheckedCreateInput = {
   category: string
   text: string
   sortOrder?: number
+  categorySortOrder?: number
   isForService?: boolean
   isForCommissioning?: boolean
   organizationId: string
@@ -329,6 +347,7 @@ export type ServicePointUpdateInput = {
   category?: Prisma.StringFieldUpdateOperationsInput | string
   text?: Prisma.StringFieldUpdateOperationsInput | string
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
+  categorySortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isForService?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isForCommissioning?: Prisma.BoolFieldUpdateOperationsInput | boolean
   organization?: Prisma.OrganizationUpdateOneRequiredWithoutServicePointsNestedInput
@@ -340,6 +359,7 @@ export type ServicePointUncheckedUpdateInput = {
   category?: Prisma.StringFieldUpdateOperationsInput | string
   text?: Prisma.StringFieldUpdateOperationsInput | string
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
+  categorySortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isForService?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isForCommissioning?: Prisma.BoolFieldUpdateOperationsInput | boolean
   organizationId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -351,6 +371,7 @@ export type ServicePointCreateManyInput = {
   category: string
   text: string
   sortOrder?: number
+  categorySortOrder?: number
   isForService?: boolean
   isForCommissioning?: boolean
   organizationId: string
@@ -362,6 +383,7 @@ export type ServicePointUpdateManyMutationInput = {
   category?: Prisma.StringFieldUpdateOperationsInput | string
   text?: Prisma.StringFieldUpdateOperationsInput | string
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
+  categorySortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isForService?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isForCommissioning?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
@@ -372,6 +394,7 @@ export type ServicePointUncheckedUpdateManyInput = {
   category?: Prisma.StringFieldUpdateOperationsInput | string
   text?: Prisma.StringFieldUpdateOperationsInput | string
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
+  categorySortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isForService?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isForCommissioning?: Prisma.BoolFieldUpdateOperationsInput | boolean
   organizationId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -390,6 +413,7 @@ export type ServicePointCountOrderByAggregateInput = {
   category?: Prisma.SortOrder
   text?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
+  categorySortOrder?: Prisma.SortOrder
   isForService?: Prisma.SortOrder
   isForCommissioning?: Prisma.SortOrder
   organizationId?: Prisma.SortOrder
@@ -397,6 +421,7 @@ export type ServicePointCountOrderByAggregateInput = {
 
 export type ServicePointAvgOrderByAggregateInput = {
   sortOrder?: Prisma.SortOrder
+  categorySortOrder?: Prisma.SortOrder
 }
 
 export type ServicePointMaxOrderByAggregateInput = {
@@ -405,6 +430,7 @@ export type ServicePointMaxOrderByAggregateInput = {
   category?: Prisma.SortOrder
   text?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
+  categorySortOrder?: Prisma.SortOrder
   isForService?: Prisma.SortOrder
   isForCommissioning?: Prisma.SortOrder
   organizationId?: Prisma.SortOrder
@@ -416,6 +442,7 @@ export type ServicePointMinOrderByAggregateInput = {
   category?: Prisma.SortOrder
   text?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
+  categorySortOrder?: Prisma.SortOrder
   isForService?: Prisma.SortOrder
   isForCommissioning?: Prisma.SortOrder
   organizationId?: Prisma.SortOrder
@@ -423,6 +450,7 @@ export type ServicePointMinOrderByAggregateInput = {
 
 export type ServicePointSumOrderByAggregateInput = {
   sortOrder?: Prisma.SortOrder
+  categorySortOrder?: Prisma.SortOrder
 }
 
 export type ServicePointListRelationFilter = {
@@ -483,6 +511,7 @@ export type ServicePointCreateWithoutOrganizationInput = {
   category: string
   text: string
   sortOrder?: number
+  categorySortOrder?: number
   isForService?: boolean
   isForCommissioning?: boolean
 }
@@ -493,6 +522,7 @@ export type ServicePointUncheckedCreateWithoutOrganizationInput = {
   category: string
   text: string
   sortOrder?: number
+  categorySortOrder?: number
   isForService?: boolean
   isForCommissioning?: boolean
 }
@@ -532,6 +562,7 @@ export type ServicePointScalarWhereInput = {
   category?: Prisma.StringFilter<"ServicePoint"> | string
   text?: Prisma.StringFilter<"ServicePoint"> | string
   sortOrder?: Prisma.IntFilter<"ServicePoint"> | number
+  categorySortOrder?: Prisma.IntFilter<"ServicePoint"> | number
   isForService?: Prisma.BoolFilter<"ServicePoint"> | boolean
   isForCommissioning?: Prisma.BoolFilter<"ServicePoint"> | boolean
   organizationId?: Prisma.StringFilter<"ServicePoint"> | string
@@ -543,6 +574,7 @@ export type ServicePointCreateManyOrganizationInput = {
   category: string
   text: string
   sortOrder?: number
+  categorySortOrder?: number
   isForService?: boolean
   isForCommissioning?: boolean
 }
@@ -553,6 +585,7 @@ export type ServicePointUpdateWithoutOrganizationInput = {
   category?: Prisma.StringFieldUpdateOperationsInput | string
   text?: Prisma.StringFieldUpdateOperationsInput | string
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
+  categorySortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isForService?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isForCommissioning?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
@@ -563,6 +596,7 @@ export type ServicePointUncheckedUpdateWithoutOrganizationInput = {
   category?: Prisma.StringFieldUpdateOperationsInput | string
   text?: Prisma.StringFieldUpdateOperationsInput | string
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
+  categorySortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isForService?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isForCommissioning?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
@@ -573,6 +607,7 @@ export type ServicePointUncheckedUpdateManyWithoutOrganizationInput = {
   category?: Prisma.StringFieldUpdateOperationsInput | string
   text?: Prisma.StringFieldUpdateOperationsInput | string
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
+  categorySortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isForService?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isForCommissioning?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
@@ -585,6 +620,7 @@ export type ServicePointSelect<ExtArgs extends runtime.Types.Extensions.Internal
   category?: boolean
   text?: boolean
   sortOrder?: boolean
+  categorySortOrder?: boolean
   isForService?: boolean
   isForCommissioning?: boolean
   organizationId?: boolean
@@ -597,6 +633,7 @@ export type ServicePointSelectCreateManyAndReturn<ExtArgs extends runtime.Types.
   category?: boolean
   text?: boolean
   sortOrder?: boolean
+  categorySortOrder?: boolean
   isForService?: boolean
   isForCommissioning?: boolean
   organizationId?: boolean
@@ -609,6 +646,7 @@ export type ServicePointSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.
   category?: boolean
   text?: boolean
   sortOrder?: boolean
+  categorySortOrder?: boolean
   isForService?: boolean
   isForCommissioning?: boolean
   organizationId?: boolean
@@ -621,12 +659,13 @@ export type ServicePointSelectScalar = {
   category?: boolean
   text?: boolean
   sortOrder?: boolean
+  categorySortOrder?: boolean
   isForService?: boolean
   isForCommissioning?: boolean
   organizationId?: boolean
 }
 
-export type ServicePointOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "productType" | "category" | "text" | "sortOrder" | "isForService" | "isForCommissioning" | "organizationId", ExtArgs["result"]["servicePoint"]>
+export type ServicePointOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "productType" | "category" | "text" | "sortOrder" | "categorySortOrder" | "isForService" | "isForCommissioning" | "organizationId", ExtArgs["result"]["servicePoint"]>
 export type ServicePointInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
 }
@@ -648,6 +687,7 @@ export type $ServicePointPayload<ExtArgs extends runtime.Types.Extensions.Intern
     category: string
     text: string
     sortOrder: number
+    categorySortOrder: number
     isForService: boolean
     isForCommissioning: boolean
     organizationId: string
@@ -1080,6 +1120,7 @@ export interface ServicePointFieldRefs {
   readonly category: Prisma.FieldRef<"ServicePoint", 'String'>
   readonly text: Prisma.FieldRef<"ServicePoint", 'String'>
   readonly sortOrder: Prisma.FieldRef<"ServicePoint", 'Int'>
+  readonly categorySortOrder: Prisma.FieldRef<"ServicePoint", 'Int'>
   readonly isForService: Prisma.FieldRef<"ServicePoint", 'Boolean'>
   readonly isForCommissioning: Prisma.FieldRef<"ServicePoint", 'Boolean'>
   readonly organizationId: Prisma.FieldRef<"ServicePoint", 'String'>
