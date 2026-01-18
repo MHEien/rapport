@@ -113,6 +113,7 @@ export async function getReportWithChecklist(reportId: string) {
             | "BOR_UTBEDRES"
             | "MA_UTBEDRES"
             | "IKKE_AKTUELT",
+          value: null,
           comment: null,
           sortOrder: sp.sortOrder,
           photos: [],
