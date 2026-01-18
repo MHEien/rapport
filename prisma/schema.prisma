@@ -112,6 +112,7 @@ model Report {
   customer   Customer? @relation(fields: [customerId], references: [id])
 
   // Job Details
+  soNumber        String? // Service Order number
   serviceDate     DateTime @default(now())
   customerName    String
   customerAddress String?
@@ -186,6 +187,7 @@ model ChecklistResult {
 
   status  ChecklistStatus
   comment String?
+  value   String? // Measured value (e.g., "12.5 bar", "85°C")
 
   // Visual Evidence
   photos Media[]

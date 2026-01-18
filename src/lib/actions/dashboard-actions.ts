@@ -98,8 +98,7 @@ export async function getTeamStats() {
   }
 
   const isAdmin =
-    orgData.membership.role === "owner" ||
-    orgData.membership.role === "admin";
+    orgData.membership.role === "owner" || orgData.membership.role === "admin";
 
   // Get all members with their report counts
   const members = await prisma.member.findMany({

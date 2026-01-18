@@ -153,12 +153,12 @@ export function DataEditorClient({
       if (!newGrouped[productType]) newGrouped[productType] = {};
       newGrouped[productType] = { ...newGrouped[productType] };
       newGrouped[productType][category] = reordered;
-      
+
       // Also update the flat list to ensure consistency if we use it for anything else
       // (Though derived categories primarily use grouped or filtered list)
       // Ideally we'd update the flat list too, but for point ordering inside a cat,
       // grouped is the primary display source.
-      
+
       return { ...prev, grouped: newGrouped };
     });
 
@@ -187,19 +187,19 @@ export function DataEditorClient({
     // 2. Optimistically update data
     // We need to update the `data.servicePoints` array because `categoryNames` is derived from it.
     // We'll re-sort the service points for this product type based on the new category order.
-    
+
     setData((prev) => {
       // Create a map of category -> index
       const catIndexMap = new Map(reorderedCats.map((c, i) => [c, i]));
-      
+
       // Sort the flat list
       const newServicePoints = [...prev.servicePoints].sort((a, b) => {
         // Only affect items of this product type
         if (a.productType === productType && b.productType === productType) {
-           const idxA = catIndexMap.get(a.category) ?? 999;
-           const idxB = catIndexMap.get(b.category) ?? 999;
-           if (idxA !== idxB) return idxA - idxB;
-           return a.sortOrder - b.sortOrder; // Fallback to item sort
+          const idxA = catIndexMap.get(a.category) ?? 999;
+          const idxB = catIndexMap.get(b.category) ?? 999;
+          if (idxA !== idxB) return idxA - idxB;
+          return a.sortOrder - b.sortOrder; // Fallback to item sort
         }
         return 0; // Don't move items of other types relative to each other (stable sort ideally)
       });
@@ -214,7 +214,7 @@ export function DataEditorClient({
       category: cat,
       sortOrder: idx,
     }));
-    
+
     await updateCategoryOrder(updates);
   };
 
@@ -464,11 +464,13 @@ export function DataEditorClient({
           <div className="space-y-4">
             {productTypes.map((type) => {
               const isExpanded = expandedTypes.has(type);
-              
+
               // Key change: Derive categories based on current data state order
               // Only consider points of this product type
-              const typePoints = data.servicePoints.filter(p => p.productType === type);
-              
+              const typePoints = data.servicePoints.filter(
+                (p) => p.productType === type,
+              );
+
               // Get unique categories maintaining the order they appear in `typePoints`
               // Since `data.servicePoints` is sorted by `categorySortOrder`, this preserves that order.
               const categoryNames = typePoints.reduce((acc, p) => {
@@ -517,7 +519,9 @@ export function DataEditorClient({
                       <DndContext
                         sensors={sensors}
                         collisionDetection={closestCenter}
-                        onDragEnd={(e) => handleCategoryDragEnd(e, categoryNames, type)}
+                        onDragEnd={(e) =>
+                          handleCategoryDragEnd(e, categoryNames, type)
+                        }
                       >
                         <SortableContext
                           items={categoryNames} // Strings are valid IDs
@@ -525,7 +529,8 @@ export function DataEditorClient({
                         >
                           {categoryNames.map((category) => {
                             const catKey = `${type}:${category}`;
-                            const isCatExpanded = expandedCategories.has(catKey);
+                            const isCatExpanded =
+                              expandedCategories.has(catKey);
                             const points = categories[category] || [];
 
                             return (
@@ -542,7 +547,12 @@ export function DataEditorClient({
                                     sensors={sensors}
                                     collisionDetection={closestCenter}
                                     onDragEnd={(e) =>
-                                      handlePointDragEnd(e, points, type, category)
+                                      handlePointDragEnd(
+                                        e,
+                                        points,
+                                        type,
+                                        category,
+                                      )
                                     }
                                   >
                                     <div className="border-t border-white/5">
@@ -555,7 +565,9 @@ export function DataEditorClient({
                                             <SortableServicePoint
                                               key={point.id}
                                               point={point}
-                                              onEdit={() => openEditDialog(point)}
+                                              onEdit={() =>
+                                                openEditDialog(point)
+                                              }
                                               onDelete={() => {
                                                 setPointToDelete(point.id);
                                                 setDeleteDialogOpen(true);
@@ -788,41 +800,35 @@ function SortableCategory({
       className="border-b border-white/5 last:border-b-0"
     >
       {/* Category header */}
-      <div
-        className="w-full flex items-center justify-between h-auto py-3 px-4 hover:bg-white/5 transition-colors group"
-      >
+      <div className="w-full flex items-center justify-between h-auto py-3 px-4 hover:bg-white/5 transition-colors group">
         <div className="flex items-center gap-4 flex-1">
           {/* Drag Handle - only visible on hover (or if dragging) */}
-           <button
-             type="button"
-             aria-label="Dra for å endre rekkefølge på kategori"
-             {...attributes}
-             {...listeners}
-             className="flex items-center justify-center size-8 -ml-2 rounded text-slate-600 hover:text-slate-300 hover:bg-white/10 touch-none cursor-grab active:cursor-grabbing transition-colors"
-           >
-             <GripVertical className="size-4" />
-           </button>
-
-          <button 
-             type="button"
-             className="flex items-center gap-3 cursor-pointer select-none flex-1 text-left bg-transparent border-none p-0"
-             onClick={onToggle}
+          <button
+            type="button"
+            aria-label="Dra for å endre rekkefølge på kategori"
+            {...attributes}
+            {...listeners}
+            className="flex items-center justify-center size-8 -ml-2 rounded text-slate-600 hover:text-slate-300 hover:bg-white/10 touch-none cursor-grab active:cursor-grabbing transition-colors"
           >
-             <FileText className="size-4 text-slate-400" />
-             <span className="font-medium text-slate-200">
-               {categoryName}
-             </span>
+            <GripVertical className="size-4" />
+          </button>
+
+          <button
+            type="button"
+            className="flex items-center gap-3 cursor-pointer select-none flex-1 text-left bg-transparent border-none p-0"
+            onClick={onToggle}
+          >
+            <FileText className="size-4 text-slate-400" />
+            <span className="font-medium text-slate-200">{categoryName}</span>
           </button>
         </div>
-        
+
         <div className="flex items-center gap-4">
-          <span className="text-sm text-slate-500">
-            {pointCount} punkter
-          </span>
-          <button 
-            type="button" 
+          <span className="text-sm text-slate-500">{pointCount} punkter</span>
+          <button
+            type="button"
             aria-label={isExpanded ? "Skjul kategori" : "Vis kategori"}
-            onClick={onToggle} 
+            onClick={onToggle}
             className="p-1 hover:bg-white/10 rounded"
           >
             {isExpanded ? (
@@ -849,8 +855,14 @@ function SortableServicePoint({
   onEdit: () => void;
   onDelete: () => void;
 }) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
-    useSortable({ id: point.id });
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: point.id });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -889,7 +901,14 @@ function SortableServicePoint({
         )}
       </div>
       <div className="opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
-        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onEdit} type="button" aria-label="Rediger punkt">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-8 w-8"
+          onClick={onEdit}
+          type="button"
+          aria-label="Rediger punkt"
+        >
           <Pencil className="size-3.5" />
         </Button>
         <Button

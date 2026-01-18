@@ -2,6 +2,7 @@
 
 import { FileText, Package, Truck } from "lucide-react";
 import { useState } from "react";
+import { InventoryAddItem } from "@/components/inventory/inventory-add-item";
 import { InventoryList } from "@/components/inventory/inventory-list";
 import { InventoryUpload } from "@/components/inventory/inventory-upload";
 import type { ParsedPart } from "@/lib/actions/inventory-actions";
@@ -74,6 +75,9 @@ export function InventoryPageClient() {
 
       {/* Upload section */}
       <InventoryUpload onUploadComplete={handleUploadComplete} />
+
+      {/* Manual add section */}
+      <InventoryAddItem onItemAdded={() => setRefreshKey((prev) => prev + 1)} />
 
       {/* Current inventory */}
       <InventoryList

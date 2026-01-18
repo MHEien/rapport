@@ -17,6 +17,7 @@ import type {
   ReportEquipment,
 } from "@/app/generated/prisma/client";
 import { ChecklistTable } from "@/components/report/checklist-table";
+import { PartSelector } from "@/components/report/part-selector";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -249,10 +250,18 @@ interface ChecklistStepProps {
   onComplete: () => void;
 }
 
-function ChecklistStep({ equipment, organizationId, onComplete }: ChecklistStepProps) {
+function ChecklistStep({
+  equipment,
+  organizationId,
+  onComplete,
+}: ChecklistStepProps) {
   return (
     <div className="flex-1 flex flex-col">
-      <ChecklistTable equipment={equipment} organizationId={organizationId} onComplete={onComplete} />
+      <ChecklistTable
+        equipment={equipment}
+        organizationId={organizationId}
+        onComplete={onComplete}
+      />
     </div>
   );
 }
@@ -388,6 +397,9 @@ function SummaryStep({
             />
           </CardContent>
         </Card>
+
+        {/* Parts Selector */}
+        <PartSelector reportId={report.id} />
 
         {/* Signature Pad */}
         <Card>

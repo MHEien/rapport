@@ -137,9 +137,9 @@ export function CustomersPageClient() {
       const types = await getProductTypes();
       setProductTypes(types);
       if (types.length > 0) {
-        setNewEquipment(prev => ({ ...prev, productType: types[0] }));
+        setNewEquipment((prev) => ({ ...prev, productType: types[0] }));
       } else {
-        setNewEquipment(prev => ({ ...prev, productType: "Annet" }));
+        setNewEquipment((prev) => ({ ...prev, productType: "Annet" }));
       }
     } catch (error) {
       console.error("Failed to fetch product types:", error);

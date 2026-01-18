@@ -133,7 +133,9 @@ export function AdminDashboard({
             <div className="flex items-center gap-3">
               <CheckCircle2 className="size-5 text-emerald-400" />
               <div>
-                <p className="text-2xl font-bold text-white">{totalCompleted}</p>
+                <p className="text-2xl font-bold text-white">
+                  {totalCompleted}
+                </p>
                 <p className="text-xs text-slate-400">Fullførte</p>
               </div>
             </div>
@@ -167,7 +169,7 @@ export function AdminDashboard({
                 <ChevronDown
                   className={cn(
                     "size-5 text-slate-400 transition-transform",
-                    isTeamOpen && "rotate-180"
+                    isTeamOpen && "rotate-180",
                   )}
                 />
               </div>
@@ -182,7 +184,7 @@ export function AdminDashboard({
                   className={cn(
                     "w-full justify-start gap-3 h-auto py-3",
                     selectedMember === null &&
-                      "bg-purple-500/20 hover:bg-purple-500/30"
+                      "bg-purple-500/20 hover:bg-purple-500/30",
                   )}
                   onClick={() => setSelectedMember(null)}
                 >
@@ -205,7 +207,7 @@ export function AdminDashboard({
                     className={cn(
                       "w-full justify-start gap-3 h-auto py-3",
                       selectedMember === member.userId &&
-                        "bg-purple-500/20 hover:bg-purple-500/30"
+                        "bg-purple-500/20 hover:bg-purple-500/30",
                     )}
                     onClick={() => setSelectedMember(member.userId)}
                   >
