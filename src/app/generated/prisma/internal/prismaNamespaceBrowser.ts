@@ -61,6 +61,10 @@ export const ModelName = {
   Media: 'Media',
   ServicePoint: 'ServicePoint',
   Post: 'Post',
+  Customer: 'Customer',
+  CustomerEquipment: 'CustomerEquipment',
+  VanInventory: 'VanInventory',
+  ReportPart: 'ReportPart',
   Organization: 'Organization',
   Member: 'Member',
   Invitation: 'Invitation'
@@ -150,6 +154,7 @@ export const ReportScalarFieldEnum = {
   authorId: 'authorId',
   assignedToId: 'assignedToId',
   organizationId: 'organizationId',
+  customerId: 'customerId',
   serviceDate: 'serviceDate',
   customerName: 'customerName',
   customerAddress: 'customerAddress',
@@ -170,6 +175,7 @@ export type ReportScalarFieldEnum = (typeof ReportScalarFieldEnum)[keyof typeof 
 export const ReportEquipmentScalarFieldEnum = {
   id: 'id',
   reportId: 'reportId',
+  customerEquipmentId: 'customerEquipmentId',
   productType: 'productType',
   productName: 'productName',
   model: 'model',
@@ -231,6 +237,64 @@ export const PostScalarFieldEnum = {
 } as const
 
 export type PostScalarFieldEnum = (typeof PostScalarFieldEnum)[keyof typeof PostScalarFieldEnum]
+
+
+export const CustomerScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  address: 'address',
+  phone: 'phone',
+  email: 'email',
+  contact: 'contact',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  organizationId: 'organizationId'
+} as const
+
+export type CustomerScalarFieldEnum = (typeof CustomerScalarFieldEnum)[keyof typeof CustomerScalarFieldEnum]
+
+
+export const CustomerEquipmentScalarFieldEnum = {
+  id: 'id',
+  productType: 'productType',
+  productName: 'productName',
+  model: 'model',
+  serialNumber: 'serialNumber',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  customerId: 'customerId'
+} as const
+
+export type CustomerEquipmentScalarFieldEnum = (typeof CustomerEquipmentScalarFieldEnum)[keyof typeof CustomerEquipmentScalarFieldEnum]
+
+
+export const VanInventoryScalarFieldEnum = {
+  id: 'id',
+  sessionId: 'sessionId',
+  partNumber: 'partNumber',
+  description: 'description',
+  quantity: 'quantity',
+  remaining: 'remaining',
+  unit: 'unit',
+  createdAt: 'createdAt',
+  organizationId: 'organizationId',
+  userId: 'userId'
+} as const
+
+export type VanInventoryScalarFieldEnum = (typeof VanInventoryScalarFieldEnum)[keyof typeof VanInventoryScalarFieldEnum]
+
+
+export const ReportPartScalarFieldEnum = {
+  id: 'id',
+  reportId: 'reportId',
+  partNumber: 'partNumber',
+  description: 'description',
+  quantity: 'quantity',
+  unit: 'unit',
+  inventorySessionId: 'inventorySessionId'
+} as const
+
+export type ReportPartScalarFieldEnum = (typeof ReportPartScalarFieldEnum)[keyof typeof ReportPartScalarFieldEnum]
 
 
 export const OrganizationScalarFieldEnum = {

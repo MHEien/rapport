@@ -39,6 +39,7 @@ export type ReportEquipmentSumAggregateOutputType = {
 export type ReportEquipmentMinAggregateOutputType = {
   id: string | null
   reportId: string | null
+  customerEquipmentId: string | null
   productType: string | null
   productName: string | null
   model: string | null
@@ -52,6 +53,7 @@ export type ReportEquipmentMinAggregateOutputType = {
 export type ReportEquipmentMaxAggregateOutputType = {
   id: string | null
   reportId: string | null
+  customerEquipmentId: string | null
   productType: string | null
   productName: string | null
   model: string | null
@@ -65,6 +67,7 @@ export type ReportEquipmentMaxAggregateOutputType = {
 export type ReportEquipmentCountAggregateOutputType = {
   id: number
   reportId: number
+  customerEquipmentId: number
   productType: number
   productName: number
   model: number
@@ -90,6 +93,7 @@ export type ReportEquipmentSumAggregateInputType = {
 export type ReportEquipmentMinAggregateInputType = {
   id?: true
   reportId?: true
+  customerEquipmentId?: true
   productType?: true
   productName?: true
   model?: true
@@ -103,6 +107,7 @@ export type ReportEquipmentMinAggregateInputType = {
 export type ReportEquipmentMaxAggregateInputType = {
   id?: true
   reportId?: true
+  customerEquipmentId?: true
   productType?: true
   productName?: true
   model?: true
@@ -116,6 +121,7 @@ export type ReportEquipmentMaxAggregateInputType = {
 export type ReportEquipmentCountAggregateInputType = {
   id?: true
   reportId?: true
+  customerEquipmentId?: true
   productType?: true
   productName?: true
   model?: true
@@ -216,6 +222,7 @@ export type ReportEquipmentGroupByArgs<ExtArgs extends runtime.Types.Extensions.
 export type ReportEquipmentGroupByOutputType = {
   id: string
   reportId: string
+  customerEquipmentId: string | null
   productType: string
   productName: string
   model: string | null
@@ -252,6 +259,7 @@ export type ReportEquipmentWhereInput = {
   NOT?: Prisma.ReportEquipmentWhereInput | Prisma.ReportEquipmentWhereInput[]
   id?: Prisma.StringFilter<"ReportEquipment"> | string
   reportId?: Prisma.StringFilter<"ReportEquipment"> | string
+  customerEquipmentId?: Prisma.StringNullableFilter<"ReportEquipment"> | string | null
   productType?: Prisma.StringFilter<"ReportEquipment"> | string
   productName?: Prisma.StringFilter<"ReportEquipment"> | string
   model?: Prisma.StringNullableFilter<"ReportEquipment"> | string | null
@@ -261,12 +269,14 @@ export type ReportEquipmentWhereInput = {
   included?: Prisma.BoolFilter<"ReportEquipment"> | boolean
   sortOrder?: Prisma.IntFilter<"ReportEquipment"> | number
   report?: Prisma.XOR<Prisma.ReportScalarRelationFilter, Prisma.ReportWhereInput>
+  customerEquipment?: Prisma.XOR<Prisma.CustomerEquipmentNullableScalarRelationFilter, Prisma.CustomerEquipmentWhereInput> | null
   checklists?: Prisma.ChecklistResultListRelationFilter
 }
 
 export type ReportEquipmentOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   reportId?: Prisma.SortOrder
+  customerEquipmentId?: Prisma.SortOrderInput | Prisma.SortOrder
   productType?: Prisma.SortOrder
   productName?: Prisma.SortOrder
   model?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -276,6 +286,7 @@ export type ReportEquipmentOrderByWithRelationInput = {
   included?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
   report?: Prisma.ReportOrderByWithRelationInput
+  customerEquipment?: Prisma.CustomerEquipmentOrderByWithRelationInput
   checklists?: Prisma.ChecklistResultOrderByRelationAggregateInput
 }
 
@@ -285,6 +296,7 @@ export type ReportEquipmentWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.ReportEquipmentWhereInput[]
   NOT?: Prisma.ReportEquipmentWhereInput | Prisma.ReportEquipmentWhereInput[]
   reportId?: Prisma.StringFilter<"ReportEquipment"> | string
+  customerEquipmentId?: Prisma.StringNullableFilter<"ReportEquipment"> | string | null
   productType?: Prisma.StringFilter<"ReportEquipment"> | string
   productName?: Prisma.StringFilter<"ReportEquipment"> | string
   model?: Prisma.StringNullableFilter<"ReportEquipment"> | string | null
@@ -294,12 +306,14 @@ export type ReportEquipmentWhereUniqueInput = Prisma.AtLeast<{
   included?: Prisma.BoolFilter<"ReportEquipment"> | boolean
   sortOrder?: Prisma.IntFilter<"ReportEquipment"> | number
   report?: Prisma.XOR<Prisma.ReportScalarRelationFilter, Prisma.ReportWhereInput>
+  customerEquipment?: Prisma.XOR<Prisma.CustomerEquipmentNullableScalarRelationFilter, Prisma.CustomerEquipmentWhereInput> | null
   checklists?: Prisma.ChecklistResultListRelationFilter
 }, "id">
 
 export type ReportEquipmentOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   reportId?: Prisma.SortOrder
+  customerEquipmentId?: Prisma.SortOrderInput | Prisma.SortOrder
   productType?: Prisma.SortOrder
   productName?: Prisma.SortOrder
   model?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -321,6 +335,7 @@ export type ReportEquipmentScalarWhereWithAggregatesInput = {
   NOT?: Prisma.ReportEquipmentScalarWhereWithAggregatesInput | Prisma.ReportEquipmentScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"ReportEquipment"> | string
   reportId?: Prisma.StringWithAggregatesFilter<"ReportEquipment"> | string
+  customerEquipmentId?: Prisma.StringNullableWithAggregatesFilter<"ReportEquipment"> | string | null
   productType?: Prisma.StringWithAggregatesFilter<"ReportEquipment"> | string
   productName?: Prisma.StringWithAggregatesFilter<"ReportEquipment"> | string
   model?: Prisma.StringNullableWithAggregatesFilter<"ReportEquipment"> | string | null
@@ -342,12 +357,14 @@ export type ReportEquipmentCreateInput = {
   included?: boolean
   sortOrder?: number
   report: Prisma.ReportCreateNestedOneWithoutEquipmentInput
+  customerEquipment?: Prisma.CustomerEquipmentCreateNestedOneWithoutReportEquipmentInput
   checklists?: Prisma.ChecklistResultCreateNestedManyWithoutEquipmentInput
 }
 
 export type ReportEquipmentUncheckedCreateInput = {
   id?: string
   reportId: string
+  customerEquipmentId?: string | null
   productType: string
   productName: string
   model?: string | null
@@ -370,12 +387,14 @@ export type ReportEquipmentUpdateInput = {
   included?: Prisma.BoolFieldUpdateOperationsInput | boolean
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   report?: Prisma.ReportUpdateOneRequiredWithoutEquipmentNestedInput
+  customerEquipment?: Prisma.CustomerEquipmentUpdateOneWithoutReportEquipmentNestedInput
   checklists?: Prisma.ChecklistResultUpdateManyWithoutEquipmentNestedInput
 }
 
 export type ReportEquipmentUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   reportId?: Prisma.StringFieldUpdateOperationsInput | string
+  customerEquipmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   productType?: Prisma.StringFieldUpdateOperationsInput | string
   productName?: Prisma.StringFieldUpdateOperationsInput | string
   model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -390,6 +409,7 @@ export type ReportEquipmentUncheckedUpdateInput = {
 export type ReportEquipmentCreateManyInput = {
   id?: string
   reportId: string
+  customerEquipmentId?: string | null
   productType: string
   productName: string
   model?: string | null
@@ -415,6 +435,7 @@ export type ReportEquipmentUpdateManyMutationInput = {
 export type ReportEquipmentUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   reportId?: Prisma.StringFieldUpdateOperationsInput | string
+  customerEquipmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   productType?: Prisma.StringFieldUpdateOperationsInput | string
   productName?: Prisma.StringFieldUpdateOperationsInput | string
   model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -438,6 +459,7 @@ export type ReportEquipmentOrderByRelationAggregateInput = {
 export type ReportEquipmentCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   reportId?: Prisma.SortOrder
+  customerEquipmentId?: Prisma.SortOrder
   productType?: Prisma.SortOrder
   productName?: Prisma.SortOrder
   model?: Prisma.SortOrder
@@ -456,6 +478,7 @@ export type ReportEquipmentAvgOrderByAggregateInput = {
 export type ReportEquipmentMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   reportId?: Prisma.SortOrder
+  customerEquipmentId?: Prisma.SortOrder
   productType?: Prisma.SortOrder
   productName?: Prisma.SortOrder
   model?: Prisma.SortOrder
@@ -469,6 +492,7 @@ export type ReportEquipmentMaxOrderByAggregateInput = {
 export type ReportEquipmentMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   reportId?: Prisma.SortOrder
+  customerEquipmentId?: Prisma.SortOrder
   productType?: Prisma.SortOrder
   productName?: Prisma.SortOrder
   model?: Prisma.SortOrder
@@ -547,6 +571,48 @@ export type ReportEquipmentUpdateOneWithoutChecklistsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.ReportEquipmentUpdateToOneWithWhereWithoutChecklistsInput, Prisma.ReportEquipmentUpdateWithoutChecklistsInput>, Prisma.ReportEquipmentUncheckedUpdateWithoutChecklistsInput>
 }
 
+export type ReportEquipmentCreateNestedManyWithoutCustomerEquipmentInput = {
+  create?: Prisma.XOR<Prisma.ReportEquipmentCreateWithoutCustomerEquipmentInput, Prisma.ReportEquipmentUncheckedCreateWithoutCustomerEquipmentInput> | Prisma.ReportEquipmentCreateWithoutCustomerEquipmentInput[] | Prisma.ReportEquipmentUncheckedCreateWithoutCustomerEquipmentInput[]
+  connectOrCreate?: Prisma.ReportEquipmentCreateOrConnectWithoutCustomerEquipmentInput | Prisma.ReportEquipmentCreateOrConnectWithoutCustomerEquipmentInput[]
+  createMany?: Prisma.ReportEquipmentCreateManyCustomerEquipmentInputEnvelope
+  connect?: Prisma.ReportEquipmentWhereUniqueInput | Prisma.ReportEquipmentWhereUniqueInput[]
+}
+
+export type ReportEquipmentUncheckedCreateNestedManyWithoutCustomerEquipmentInput = {
+  create?: Prisma.XOR<Prisma.ReportEquipmentCreateWithoutCustomerEquipmentInput, Prisma.ReportEquipmentUncheckedCreateWithoutCustomerEquipmentInput> | Prisma.ReportEquipmentCreateWithoutCustomerEquipmentInput[] | Prisma.ReportEquipmentUncheckedCreateWithoutCustomerEquipmentInput[]
+  connectOrCreate?: Prisma.ReportEquipmentCreateOrConnectWithoutCustomerEquipmentInput | Prisma.ReportEquipmentCreateOrConnectWithoutCustomerEquipmentInput[]
+  createMany?: Prisma.ReportEquipmentCreateManyCustomerEquipmentInputEnvelope
+  connect?: Prisma.ReportEquipmentWhereUniqueInput | Prisma.ReportEquipmentWhereUniqueInput[]
+}
+
+export type ReportEquipmentUpdateManyWithoutCustomerEquipmentNestedInput = {
+  create?: Prisma.XOR<Prisma.ReportEquipmentCreateWithoutCustomerEquipmentInput, Prisma.ReportEquipmentUncheckedCreateWithoutCustomerEquipmentInput> | Prisma.ReportEquipmentCreateWithoutCustomerEquipmentInput[] | Prisma.ReportEquipmentUncheckedCreateWithoutCustomerEquipmentInput[]
+  connectOrCreate?: Prisma.ReportEquipmentCreateOrConnectWithoutCustomerEquipmentInput | Prisma.ReportEquipmentCreateOrConnectWithoutCustomerEquipmentInput[]
+  upsert?: Prisma.ReportEquipmentUpsertWithWhereUniqueWithoutCustomerEquipmentInput | Prisma.ReportEquipmentUpsertWithWhereUniqueWithoutCustomerEquipmentInput[]
+  createMany?: Prisma.ReportEquipmentCreateManyCustomerEquipmentInputEnvelope
+  set?: Prisma.ReportEquipmentWhereUniqueInput | Prisma.ReportEquipmentWhereUniqueInput[]
+  disconnect?: Prisma.ReportEquipmentWhereUniqueInput | Prisma.ReportEquipmentWhereUniqueInput[]
+  delete?: Prisma.ReportEquipmentWhereUniqueInput | Prisma.ReportEquipmentWhereUniqueInput[]
+  connect?: Prisma.ReportEquipmentWhereUniqueInput | Prisma.ReportEquipmentWhereUniqueInput[]
+  update?: Prisma.ReportEquipmentUpdateWithWhereUniqueWithoutCustomerEquipmentInput | Prisma.ReportEquipmentUpdateWithWhereUniqueWithoutCustomerEquipmentInput[]
+  updateMany?: Prisma.ReportEquipmentUpdateManyWithWhereWithoutCustomerEquipmentInput | Prisma.ReportEquipmentUpdateManyWithWhereWithoutCustomerEquipmentInput[]
+  deleteMany?: Prisma.ReportEquipmentScalarWhereInput | Prisma.ReportEquipmentScalarWhereInput[]
+}
+
+export type ReportEquipmentUncheckedUpdateManyWithoutCustomerEquipmentNestedInput = {
+  create?: Prisma.XOR<Prisma.ReportEquipmentCreateWithoutCustomerEquipmentInput, Prisma.ReportEquipmentUncheckedCreateWithoutCustomerEquipmentInput> | Prisma.ReportEquipmentCreateWithoutCustomerEquipmentInput[] | Prisma.ReportEquipmentUncheckedCreateWithoutCustomerEquipmentInput[]
+  connectOrCreate?: Prisma.ReportEquipmentCreateOrConnectWithoutCustomerEquipmentInput | Prisma.ReportEquipmentCreateOrConnectWithoutCustomerEquipmentInput[]
+  upsert?: Prisma.ReportEquipmentUpsertWithWhereUniqueWithoutCustomerEquipmentInput | Prisma.ReportEquipmentUpsertWithWhereUniqueWithoutCustomerEquipmentInput[]
+  createMany?: Prisma.ReportEquipmentCreateManyCustomerEquipmentInputEnvelope
+  set?: Prisma.ReportEquipmentWhereUniqueInput | Prisma.ReportEquipmentWhereUniqueInput[]
+  disconnect?: Prisma.ReportEquipmentWhereUniqueInput | Prisma.ReportEquipmentWhereUniqueInput[]
+  delete?: Prisma.ReportEquipmentWhereUniqueInput | Prisma.ReportEquipmentWhereUniqueInput[]
+  connect?: Prisma.ReportEquipmentWhereUniqueInput | Prisma.ReportEquipmentWhereUniqueInput[]
+  update?: Prisma.ReportEquipmentUpdateWithWhereUniqueWithoutCustomerEquipmentInput | Prisma.ReportEquipmentUpdateWithWhereUniqueWithoutCustomerEquipmentInput[]
+  updateMany?: Prisma.ReportEquipmentUpdateManyWithWhereWithoutCustomerEquipmentInput | Prisma.ReportEquipmentUpdateManyWithWhereWithoutCustomerEquipmentInput[]
+  deleteMany?: Prisma.ReportEquipmentScalarWhereInput | Prisma.ReportEquipmentScalarWhereInput[]
+}
+
 export type ReportEquipmentCreateWithoutReportInput = {
   id?: string
   productType: string
@@ -557,11 +623,13 @@ export type ReportEquipmentCreateWithoutReportInput = {
   jobType?: $Enums.ReportType
   included?: boolean
   sortOrder?: number
+  customerEquipment?: Prisma.CustomerEquipmentCreateNestedOneWithoutReportEquipmentInput
   checklists?: Prisma.ChecklistResultCreateNestedManyWithoutEquipmentInput
 }
 
 export type ReportEquipmentUncheckedCreateWithoutReportInput = {
   id?: string
+  customerEquipmentId?: string | null
   productType: string
   productName: string
   model?: string | null
@@ -605,6 +673,7 @@ export type ReportEquipmentScalarWhereInput = {
   NOT?: Prisma.ReportEquipmentScalarWhereInput | Prisma.ReportEquipmentScalarWhereInput[]
   id?: Prisma.StringFilter<"ReportEquipment"> | string
   reportId?: Prisma.StringFilter<"ReportEquipment"> | string
+  customerEquipmentId?: Prisma.StringNullableFilter<"ReportEquipment"> | string | null
   productType?: Prisma.StringFilter<"ReportEquipment"> | string
   productName?: Prisma.StringFilter<"ReportEquipment"> | string
   model?: Prisma.StringNullableFilter<"ReportEquipment"> | string | null
@@ -626,11 +695,13 @@ export type ReportEquipmentCreateWithoutChecklistsInput = {
   included?: boolean
   sortOrder?: number
   report: Prisma.ReportCreateNestedOneWithoutEquipmentInput
+  customerEquipment?: Prisma.CustomerEquipmentCreateNestedOneWithoutReportEquipmentInput
 }
 
 export type ReportEquipmentUncheckedCreateWithoutChecklistsInput = {
   id?: string
   reportId: string
+  customerEquipmentId?: string | null
   productType: string
   productName: string
   model?: string | null
@@ -668,11 +739,13 @@ export type ReportEquipmentUpdateWithoutChecklistsInput = {
   included?: Prisma.BoolFieldUpdateOperationsInput | boolean
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   report?: Prisma.ReportUpdateOneRequiredWithoutEquipmentNestedInput
+  customerEquipment?: Prisma.CustomerEquipmentUpdateOneWithoutReportEquipmentNestedInput
 }
 
 export type ReportEquipmentUncheckedUpdateWithoutChecklistsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   reportId?: Prisma.StringFieldUpdateOperationsInput | string
+  customerEquipmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   productType?: Prisma.StringFieldUpdateOperationsInput | string
   productName?: Prisma.StringFieldUpdateOperationsInput | string
   model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -683,8 +756,63 @@ export type ReportEquipmentUncheckedUpdateWithoutChecklistsInput = {
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
+export type ReportEquipmentCreateWithoutCustomerEquipmentInput = {
+  id?: string
+  productType: string
+  productName: string
+  model?: string | null
+  serialNumber?: string | null
+  runningHours?: number | null
+  jobType?: $Enums.ReportType
+  included?: boolean
+  sortOrder?: number
+  report: Prisma.ReportCreateNestedOneWithoutEquipmentInput
+  checklists?: Prisma.ChecklistResultCreateNestedManyWithoutEquipmentInput
+}
+
+export type ReportEquipmentUncheckedCreateWithoutCustomerEquipmentInput = {
+  id?: string
+  reportId: string
+  productType: string
+  productName: string
+  model?: string | null
+  serialNumber?: string | null
+  runningHours?: number | null
+  jobType?: $Enums.ReportType
+  included?: boolean
+  sortOrder?: number
+  checklists?: Prisma.ChecklistResultUncheckedCreateNestedManyWithoutEquipmentInput
+}
+
+export type ReportEquipmentCreateOrConnectWithoutCustomerEquipmentInput = {
+  where: Prisma.ReportEquipmentWhereUniqueInput
+  create: Prisma.XOR<Prisma.ReportEquipmentCreateWithoutCustomerEquipmentInput, Prisma.ReportEquipmentUncheckedCreateWithoutCustomerEquipmentInput>
+}
+
+export type ReportEquipmentCreateManyCustomerEquipmentInputEnvelope = {
+  data: Prisma.ReportEquipmentCreateManyCustomerEquipmentInput | Prisma.ReportEquipmentCreateManyCustomerEquipmentInput[]
+  skipDuplicates?: boolean
+}
+
+export type ReportEquipmentUpsertWithWhereUniqueWithoutCustomerEquipmentInput = {
+  where: Prisma.ReportEquipmentWhereUniqueInput
+  update: Prisma.XOR<Prisma.ReportEquipmentUpdateWithoutCustomerEquipmentInput, Prisma.ReportEquipmentUncheckedUpdateWithoutCustomerEquipmentInput>
+  create: Prisma.XOR<Prisma.ReportEquipmentCreateWithoutCustomerEquipmentInput, Prisma.ReportEquipmentUncheckedCreateWithoutCustomerEquipmentInput>
+}
+
+export type ReportEquipmentUpdateWithWhereUniqueWithoutCustomerEquipmentInput = {
+  where: Prisma.ReportEquipmentWhereUniqueInput
+  data: Prisma.XOR<Prisma.ReportEquipmentUpdateWithoutCustomerEquipmentInput, Prisma.ReportEquipmentUncheckedUpdateWithoutCustomerEquipmentInput>
+}
+
+export type ReportEquipmentUpdateManyWithWhereWithoutCustomerEquipmentInput = {
+  where: Prisma.ReportEquipmentScalarWhereInput
+  data: Prisma.XOR<Prisma.ReportEquipmentUpdateManyMutationInput, Prisma.ReportEquipmentUncheckedUpdateManyWithoutCustomerEquipmentInput>
+}
+
 export type ReportEquipmentCreateManyReportInput = {
   id?: string
+  customerEquipmentId?: string | null
   productType: string
   productName: string
   model?: string | null
@@ -705,11 +833,13 @@ export type ReportEquipmentUpdateWithoutReportInput = {
   jobType?: Prisma.EnumReportTypeFieldUpdateOperationsInput | $Enums.ReportType
   included?: Prisma.BoolFieldUpdateOperationsInput | boolean
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
+  customerEquipment?: Prisma.CustomerEquipmentUpdateOneWithoutReportEquipmentNestedInput
   checklists?: Prisma.ChecklistResultUpdateManyWithoutEquipmentNestedInput
 }
 
 export type ReportEquipmentUncheckedUpdateWithoutReportInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  customerEquipmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   productType?: Prisma.StringFieldUpdateOperationsInput | string
   productName?: Prisma.StringFieldUpdateOperationsInput | string
   model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -723,6 +853,61 @@ export type ReportEquipmentUncheckedUpdateWithoutReportInput = {
 
 export type ReportEquipmentUncheckedUpdateManyWithoutReportInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  customerEquipmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  productType?: Prisma.StringFieldUpdateOperationsInput | string
+  productName?: Prisma.StringFieldUpdateOperationsInput | string
+  model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  serialNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  runningHours?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  jobType?: Prisma.EnumReportTypeFieldUpdateOperationsInput | $Enums.ReportType
+  included?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
+}
+
+export type ReportEquipmentCreateManyCustomerEquipmentInput = {
+  id?: string
+  reportId: string
+  productType: string
+  productName: string
+  model?: string | null
+  serialNumber?: string | null
+  runningHours?: number | null
+  jobType?: $Enums.ReportType
+  included?: boolean
+  sortOrder?: number
+}
+
+export type ReportEquipmentUpdateWithoutCustomerEquipmentInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  productType?: Prisma.StringFieldUpdateOperationsInput | string
+  productName?: Prisma.StringFieldUpdateOperationsInput | string
+  model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  serialNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  runningHours?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  jobType?: Prisma.EnumReportTypeFieldUpdateOperationsInput | $Enums.ReportType
+  included?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
+  report?: Prisma.ReportUpdateOneRequiredWithoutEquipmentNestedInput
+  checklists?: Prisma.ChecklistResultUpdateManyWithoutEquipmentNestedInput
+}
+
+export type ReportEquipmentUncheckedUpdateWithoutCustomerEquipmentInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  reportId?: Prisma.StringFieldUpdateOperationsInput | string
+  productType?: Prisma.StringFieldUpdateOperationsInput | string
+  productName?: Prisma.StringFieldUpdateOperationsInput | string
+  model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  serialNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  runningHours?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  jobType?: Prisma.EnumReportTypeFieldUpdateOperationsInput | $Enums.ReportType
+  included?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
+  checklists?: Prisma.ChecklistResultUncheckedUpdateManyWithoutEquipmentNestedInput
+}
+
+export type ReportEquipmentUncheckedUpdateManyWithoutCustomerEquipmentInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  reportId?: Prisma.StringFieldUpdateOperationsInput | string
   productType?: Prisma.StringFieldUpdateOperationsInput | string
   productName?: Prisma.StringFieldUpdateOperationsInput | string
   model?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -767,6 +952,7 @@ export type ReportEquipmentCountOutputTypeCountChecklistsArgs<ExtArgs extends ru
 export type ReportEquipmentSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   reportId?: boolean
+  customerEquipmentId?: boolean
   productType?: boolean
   productName?: boolean
   model?: boolean
@@ -776,6 +962,7 @@ export type ReportEquipmentSelect<ExtArgs extends runtime.Types.Extensions.Inter
   included?: boolean
   sortOrder?: boolean
   report?: boolean | Prisma.ReportDefaultArgs<ExtArgs>
+  customerEquipment?: boolean | Prisma.ReportEquipment$customerEquipmentArgs<ExtArgs>
   checklists?: boolean | Prisma.ReportEquipment$checklistsArgs<ExtArgs>
   _count?: boolean | Prisma.ReportEquipmentCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["reportEquipment"]>
@@ -783,6 +970,7 @@ export type ReportEquipmentSelect<ExtArgs extends runtime.Types.Extensions.Inter
 export type ReportEquipmentSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   reportId?: boolean
+  customerEquipmentId?: boolean
   productType?: boolean
   productName?: boolean
   model?: boolean
@@ -792,11 +980,13 @@ export type ReportEquipmentSelectCreateManyAndReturn<ExtArgs extends runtime.Typ
   included?: boolean
   sortOrder?: boolean
   report?: boolean | Prisma.ReportDefaultArgs<ExtArgs>
+  customerEquipment?: boolean | Prisma.ReportEquipment$customerEquipmentArgs<ExtArgs>
 }, ExtArgs["result"]["reportEquipment"]>
 
 export type ReportEquipmentSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   reportId?: boolean
+  customerEquipmentId?: boolean
   productType?: boolean
   productName?: boolean
   model?: boolean
@@ -806,11 +996,13 @@ export type ReportEquipmentSelectUpdateManyAndReturn<ExtArgs extends runtime.Typ
   included?: boolean
   sortOrder?: boolean
   report?: boolean | Prisma.ReportDefaultArgs<ExtArgs>
+  customerEquipment?: boolean | Prisma.ReportEquipment$customerEquipmentArgs<ExtArgs>
 }, ExtArgs["result"]["reportEquipment"]>
 
 export type ReportEquipmentSelectScalar = {
   id?: boolean
   reportId?: boolean
+  customerEquipmentId?: boolean
   productType?: boolean
   productName?: boolean
   model?: boolean
@@ -821,28 +1013,33 @@ export type ReportEquipmentSelectScalar = {
   sortOrder?: boolean
 }
 
-export type ReportEquipmentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "reportId" | "productType" | "productName" | "model" | "serialNumber" | "runningHours" | "jobType" | "included" | "sortOrder", ExtArgs["result"]["reportEquipment"]>
+export type ReportEquipmentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "reportId" | "customerEquipmentId" | "productType" | "productName" | "model" | "serialNumber" | "runningHours" | "jobType" | "included" | "sortOrder", ExtArgs["result"]["reportEquipment"]>
 export type ReportEquipmentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   report?: boolean | Prisma.ReportDefaultArgs<ExtArgs>
+  customerEquipment?: boolean | Prisma.ReportEquipment$customerEquipmentArgs<ExtArgs>
   checklists?: boolean | Prisma.ReportEquipment$checklistsArgs<ExtArgs>
   _count?: boolean | Prisma.ReportEquipmentCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ReportEquipmentIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   report?: boolean | Prisma.ReportDefaultArgs<ExtArgs>
+  customerEquipment?: boolean | Prisma.ReportEquipment$customerEquipmentArgs<ExtArgs>
 }
 export type ReportEquipmentIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   report?: boolean | Prisma.ReportDefaultArgs<ExtArgs>
+  customerEquipment?: boolean | Prisma.ReportEquipment$customerEquipmentArgs<ExtArgs>
 }
 
 export type $ReportEquipmentPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "ReportEquipment"
   objects: {
     report: Prisma.$ReportPayload<ExtArgs>
+    customerEquipment: Prisma.$CustomerEquipmentPayload<ExtArgs> | null
     checklists: Prisma.$ChecklistResultPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     reportId: string
+    customerEquipmentId: string | null
     productType: string
     productName: string
     model: string | null
@@ -1246,6 +1443,7 @@ readonly fields: ReportEquipmentFieldRefs;
 export interface Prisma__ReportEquipmentClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   report<T extends Prisma.ReportDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ReportDefaultArgs<ExtArgs>>): Prisma.Prisma__ReportClient<runtime.Types.Result.GetResult<Prisma.$ReportPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  customerEquipment<T extends Prisma.ReportEquipment$customerEquipmentArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ReportEquipment$customerEquipmentArgs<ExtArgs>>): Prisma.Prisma__CustomerEquipmentClient<runtime.Types.Result.GetResult<Prisma.$CustomerEquipmentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   checklists<T extends Prisma.ReportEquipment$checklistsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ReportEquipment$checklistsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ChecklistResultPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -1278,6 +1476,7 @@ export interface Prisma__ReportEquipmentClient<T, Null = never, ExtArgs extends 
 export interface ReportEquipmentFieldRefs {
   readonly id: Prisma.FieldRef<"ReportEquipment", 'String'>
   readonly reportId: Prisma.FieldRef<"ReportEquipment", 'String'>
+  readonly customerEquipmentId: Prisma.FieldRef<"ReportEquipment", 'String'>
   readonly productType: Prisma.FieldRef<"ReportEquipment", 'String'>
   readonly productName: Prisma.FieldRef<"ReportEquipment", 'String'>
   readonly model: Prisma.FieldRef<"ReportEquipment", 'String'>
@@ -1679,6 +1878,25 @@ export type ReportEquipmentDeleteManyArgs<ExtArgs extends runtime.Types.Extensio
    * Limit how many ReportEquipments to delete.
    */
   limit?: number
+}
+
+/**
+ * ReportEquipment.customerEquipment
+ */
+export type ReportEquipment$customerEquipmentArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the CustomerEquipment
+   */
+  select?: Prisma.CustomerEquipmentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the CustomerEquipment
+   */
+  omit?: Prisma.CustomerEquipmentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.CustomerEquipmentInclude<ExtArgs> | null
+  where?: Prisma.CustomerEquipmentWhereInput
 }
 
 /**

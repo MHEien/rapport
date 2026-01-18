@@ -94,7 +94,20 @@ export async function createServicePoint(input: {
     },
     select: { categorySortOrder: true },
   });
-  const categorySortOrder = existingCategoryPoint?.categorySortOrder ?? 0;
+  let categorySortOrder: number;
+  if (existingCategoryPoint) {
+    categorySortOrder = existingCategoryPoint.categorySortOrder;
+  } else {
+    // New category, append to end
+    const maxCatSort = await prisma.servicePoint.aggregate({
+      where: {
+        organizationId: orgData.organization.id,
+        productType: input.productType,
+      },
+      _max: { categorySortOrder: true },
+    });
+    categorySortOrder = (maxCatSort._max.categorySortOrder ?? -1) + 1;
+  }
 
   const point = await prisma.servicePoint.create({
     data: {

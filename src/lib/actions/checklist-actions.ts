@@ -21,7 +21,11 @@ export async function getServicePointsByProductType(
         ? { isForService: true }
         : { isForCommissioning: true }),
     },
-    orderBy: [{ category: "asc" }, { sortOrder: "asc" }],
+    orderBy: [
+      { categorySortOrder: "asc" },
+      { category: "asc" },
+      { sortOrder: "asc" },
+    ],
   });
 
   return servicePoints;
@@ -69,7 +73,11 @@ export async function getReportWithChecklist(reportId: string) {
           organizationId: report.organizationId,
           isForService: true, // Default to service mode (commissioning support can be added later)
         },
-        orderBy: [{ category: "asc" }, { sortOrder: "asc" }],
+        orderBy: [
+          { categorySortOrder: "asc" },
+          { category: "asc" },
+          { sortOrder: "asc" },
+        ],
       });
       
       console.log(`[getReportWithChecklist] Found ${allServicePoints.length} service points for ${eq.productType}`);

@@ -107,6 +107,10 @@ model Report {
   organizationId String
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
+  // Customer Link (optional - for equipment history tracking)
+  customerId String?
+  customer   Customer? @relation(fields: [customerId], references: [id])
+
   // Job Details
   serviceDate     DateTime @default(now())
   customerName    String
@@ -123,6 +127,9 @@ model Report {
   // Multi-Equipment Support
   equipment ReportEquipment[]
 
+  // Parts consumed in this report
+  parts ReportPart[]
+
   // AI & Formatting
   aiSummary      String? @db.Text // The AI generated "Professional Conclusion"
   overallComment String? @db.Text
@@ -132,6 +139,7 @@ model Report {
   @@index([assignedToId])
   @@index([organizationId])
   @@index([customerName])
+  @@index([customerId])
 }
 
 model ReportEquipment {
@@ -139,6 +147,10 @@ model ReportEquipment {
 
   reportId String
   report   Report @relation(fields: [reportId], references: [id], onDelete: Cascade)
+
+  // Link to persistent customer equipment (optional)
+  customerEquipmentId String?
+  customerEquipment   CustomerEquipment? @relation(fields: [customerEquipmentId], references: [id])
 
   // Equipment Details
   productType  String // Links to ServicePoint productType
@@ -158,6 +170,7 @@ model ReportEquipment {
   checklists ChecklistResult[]
 
   @@index([reportId])
+  @@index([customerEquipmentId])
 }
 
 model ChecklistResult {
@@ -227,6 +240,86 @@ model Post {
 }
 
 // ---------------------------------------------------------
+// 5. CUSTOMER & EQUIPMENT PERSISTENCE
+// ---------------------------------------------------------
+
+model Customer {
+  id        String   @id @default(cuid())
+  name      String
+  address   String?
+  phone     String?
+  email     String?
+  contact   String? // Primary contact person
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  equipment CustomerEquipment[]
+  reports   Report[]
+
+  @@unique([organizationId, name])
+  @@index([organizationId])
+}
+
+model CustomerEquipment {
+  id           String   @id @default(cuid())
+  productType  String // Links to ServicePoint productType
+  productName  String // Display name/marking
+  model        String?
+  serialNumber String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  customerId String
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  reportEquipment ReportEquipment[] // Links to report instances
+
+  @@index([customerId])
+  @@index([serialNumber])
+}
+
+// ---------------------------------------------------------
+// 6. VAN INVENTORY & PARTS
+// ---------------------------------------------------------
+
+model VanInventory {
+  id          String   @id @default(cuid())
+  sessionId   String // Groups parts from same import session
+  partNumber  String
+  description String
+  quantity    Int // Imported quantity
+  remaining   Int // After consumption
+  unit        String? // e.g., "stk", "liter"
+  createdAt   DateTime @default(now())
+
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  userId         String // Technician who imported
+
+  @@index([organizationId, userId])
+  @@index([sessionId])
+}
+
+model ReportPart {
+  id       String @id @default(cuid())
+  reportId String
+  report   Report @relation(fields: [reportId], references: [id], onDelete: Cascade)
+
+  partNumber  String
+  description String
+  quantity    Int // Quantity used
+  unit        String?
+
+  // Link to inventory session (for tracking)
+  inventorySessionId String?
+
+  @@index([reportId])
+}
+
+// ---------------------------------------------------------
 // ENUMS
 // ---------------------------------------------------------
 
@@ -267,6 +360,8 @@ model Organization {
   // App Relations
   reports       Report[]
   servicePoints ServicePoint[]
+  customers     Customer[]
+  vanInventory  VanInventory[]
 
   @@map("organization")
 }

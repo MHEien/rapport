@@ -112,6 +112,7 @@ function EquipmentStep({ equipment, onNext }: EquipmentStepProps) {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [serialNumber, setSerialNumber] = useState("");
   const [runningHours, setRunningHours] = useState("");
+  const router = useRouter();
 
   const mutation = useMutation({
     mutationFn: updateReportEquipment,
@@ -130,6 +131,7 @@ function EquipmentStep({ equipment, onNext }: EquipmentStepProps) {
       serialNumber: serialNumber || undefined,
       runningHours: runningHours ? parseFloat(runningHours) : undefined,
     });
+    router.refresh();
     setEditingId(null);
   };
 

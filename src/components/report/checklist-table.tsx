@@ -307,17 +307,20 @@ function EquipmentTabContent({ equipment, organizationId }: EquipmentTabContentP
     },
   );
 
-  // Group service points by category
-  const groupedPoints = useMemo(() => {
+  // Group service points by category and preserve order
+  const { groupedPoints, categories } = useMemo(() => {
     const groups: Record<string, typeof servicePoints> = {};
+    const cats: string[] = [];
+
     for (const point of servicePoints) {
-      if (!groups[point.category]) groups[point.category] = [];
+      if (!groups[point.category]) {
+        groups[point.category] = [];
+        cats.push(point.category);
+      }
       groups[point.category].push(point);
     }
-    return groups;
+    return { groupedPoints: groups, categories: cats };
   }, [servicePoints]);
-
-  const categories = Object.keys(groupedPoints).sort();
 
   const handleSave = useCallback(
     (input: SaveChecklistInput) => {
