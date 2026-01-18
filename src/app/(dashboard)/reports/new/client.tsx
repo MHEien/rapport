@@ -12,6 +12,14 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import {
+  type CustomerOption,
+  CustomerSelect,
+} from "@/components/report/customer-select";
+import {
+  type CustomerEquipmentWithHistory,
+  EquipmentSelector,
+} from "@/components/report/equipment-selector";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -45,28 +53,46 @@ export function NewReportClient({ productTypes }: NewReportClientProps) {
   const [step, setStep] = useState(1);
 
   // Form state - Step 1: Customer
+  const [selectedCustomer, setSelectedCustomer] =
+    useState<CustomerOption | null>(null);
   const [customerName, setCustomerName] = useState("");
   const [contactPerson, setContactPerson] = useState("");
 
-  // Form state - Step 2: Equipment list
-  const [equipment, setEquipment] = useState<EquipmentItem[]>([
-    {
-      id: generateId(),
-      productType: productTypes[0] ?? "Generator",
-      productName: "",
-      model: "",
-      serialNumber: "",
-      jobType: "SERVICE",
-      included: true,
-    },
-  ]);
+  // Customer equipment from EquipmentSelector
+  const [customerEquipment, setCustomerEquipment] = useState<
+    (CustomerEquipmentWithHistory & {
+      selected: boolean;
+      currentRunningHours?: number;
+    })[]
+  >([]);
+
+  // Form state - Step 2: Equipment list (manual entries)
+  const [equipment, setEquipment] = useState<EquipmentItem[]>([]);
 
   const mutation = useMutation({
     mutationFn: async () => {
+      // Combine customer equipment and manual equipment
+      const selectedCustomerEquipment = customerEquipment
+        .filter((eq) => eq.selected)
+        .map((eq) => ({
+          productType: eq.productType,
+          productName: eq.productName,
+          model: eq.model || "",
+          serialNumber: eq.serialNumber || "",
+          jobType: "SERVICE" as const,
+          included: true,
+          runningHours: eq.currentRunningHours,
+          customerEquipmentId: eq.id,
+        }));
+
+      const manualEquipment = equipment.filter((eq) => eq.included);
+      const allEquipment = [...selectedCustomerEquipment, ...manualEquipment];
+
       return createReportWithEquipment({
-        customerName,
+        customerName: selectedCustomer?.name || customerName,
         contactPerson: contactPerson || undefined,
-        equipment: equipment.filter((eq) => eq.included),
+        customerId: selectedCustomer?.id,
+        equipment: allEquipment,
       });
     },
     onSuccess: (report) => {
@@ -109,13 +135,16 @@ export function NewReportClient({ productTypes }: NewReportClientProps) {
     );
   };
 
-  const canProceedStep1 = customerName.trim().length > 0;
-  const canProceedStep2 = equipment.some(
+  const canProceedStep1 =
+    selectedCustomer !== null || customerName.trim().length > 0;
+  const hasSelectedEquipment = customerEquipment.some((eq) => eq.selected);
+  const hasManualEquipment = equipment.some(
     (eq) =>
       eq.included &&
       eq.productName.trim().length > 0 &&
       eq.productType.length > 0,
   );
+  const canProceedStep2 = hasSelectedEquipment || hasManualEquipment;
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -147,39 +176,59 @@ export function NewReportClient({ productTypes }: NewReportClientProps) {
       {/* Content */}
       <main className="flex-1 px-4 py-6 overflow-y-auto">
         {step === 1 && (
-          <Card className="border-white/5 bg-white/[0.02]">
-            <CardHeader>
-              <div className="size-12 rounded-xl bg-gradient-to-br from-blue-500/20 to-indigo-500/10 flex items-center justify-center mb-2">
-                <User className="size-6 text-blue-400" />
-              </div>
-              <CardTitle className="text-xl text-white">
-                Kundeinformasjon
-              </CardTitle>
-              <CardDescription>Hvem utfører du service for?</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-2">
-                <Label htmlFor="customerName">Kundenavn *</Label>
-                <Input
-                  id="customerName"
-                  value={customerName}
-                  onChange={(e) => setCustomerName(e.target.value)}
-                  placeholder="F.eks. Statoil ASA"
-                  className="h-14 text-lg bg-white/5 border-white/10"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="contactPerson">Kontaktperson</Label>
-                <Input
-                  id="contactPerson"
-                  value={contactPerson}
-                  onChange={(e) => setContactPerson(e.target.value)}
-                  placeholder="Navn på kontaktperson"
-                  className="h-14 text-lg bg-white/5 border-white/10"
-                />
-              </div>
-            </CardContent>
-          </Card>
+          <div className="space-y-6">
+            <Card className="border-white/5 bg-white/[0.02]">
+              <CardHeader>
+                <div className="size-12 rounded-xl bg-gradient-to-br from-blue-500/20 to-indigo-500/10 flex items-center justify-center mb-2">
+                  <User className="size-6 text-blue-400" />
+                </div>
+                <CardTitle className="text-xl text-white">
+                  Kundeinformasjon
+                </CardTitle>
+                <CardDescription>Hvem utfører du service for?</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="space-y-2">
+                  <Label>Velg kunde *</Label>
+                  <CustomerSelect
+                    value={selectedCustomer?.id}
+                    customerName={customerName}
+                    onSelect={(customer) => {
+                      setSelectedCustomer(customer);
+                      if (customer) {
+                        setCustomerName(customer.name);
+                        setContactPerson(customer.contact || "");
+                      }
+                    }}
+                  />
+                  {!selectedCustomer && (
+                    <p className="text-xs text-slate-400 mt-1">
+                      Søk etter eksisterende kunde eller opprett ny
+                    </p>
+                  )}
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="contactPerson">Kontaktperson</Label>
+                  <Input
+                    id="contactPerson"
+                    value={contactPerson}
+                    onChange={(e) => setContactPerson(e.target.value)}
+                    placeholder="Navn på kontaktperson"
+                    className="h-14 text-lg bg-white/5 border-white/10"
+                  />
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Equipment Selector - shows when customer is selected */}
+            {selectedCustomer && (
+              <EquipmentSelector
+                customerId={selectedCustomer.id}
+                productTypes={productTypes}
+                onEquipmentChange={setCustomerEquipment}
+              />
+            )}
+          </div>
         )}
 
         {step === 2 && (

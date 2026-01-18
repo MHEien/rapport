@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import type { ReportType } from "@/app/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/server";
@@ -54,11 +55,13 @@ export interface BulkEquipmentInput {
   runningHours?: number;
   jobType?: ReportType;
   included?: boolean;
+  customerEquipmentId?: string; // Links to CustomerEquipment for persistence
 }
 
 export async function createReportWithEquipment(input: {
   customerName: string;
   contactPerson?: string;
+  customerId?: string; // Optional link to Customer record
   equipment: BulkEquipmentInput[];
 }) {
   const session = await getSession();
@@ -78,6 +81,7 @@ export async function createReportWithEquipment(input: {
       organizationId: orgData.organization.id,
       customerName: input.customerName,
       contactPerson: input.contactPerson,
+      customerId: input.customerId, // Link to Customer if provided
       status: "DRAFT",
       equipment: {
         create: input.equipment
@@ -90,6 +94,7 @@ export async function createReportWithEquipment(input: {
             runningHours: eq.runningHours,
             jobType: eq.jobType ?? "SERVICE",
             sortOrder: index,
+            customerEquipmentId: eq.customerEquipmentId, // Link to CustomerEquipment if provided
           })),
       },
     },
@@ -136,6 +141,7 @@ export async function updateReportEquipment(input: UpdateEquipmentInput) {
     },
   });
 
+  revalidatePath("/reports/[id]/edit", "page");
   return { success: true, equipment };
 }
 

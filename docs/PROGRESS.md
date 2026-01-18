@@ -4,6 +4,74 @@ A chronological log of development progress on the Field Service PWA.
 
 ---
 
+## 2026-01-18: Service Report Workflow Implementation
+
+**Objective:** Implement comprehensive service workflow with customer/equipment persistence, PDF-based van inventory, and part consumption tracking.
+
+### Completed
+
+1. **Database Schema Changes** (`prisma/schema.prisma`)
+   - Added `Customer` model with organization scoping
+   - Added `CustomerEquipment` model linked to Customer
+   - Added `VanInventory` model for session-based inventory
+   - Added `ReportPart` model for parts consumed in reports
+   - Updated `Report` → optional `customerId` relation
+   - Updated `ReportEquipment` → optional `customerEquipmentId` relation
+
+2. **Customer Management**
+   - Server actions: `customer-actions.ts` (CRUD, search, equipment management)
+   - Page: `/customers` with full customer/equipment CRUD UI
+   - Component: `CustomerSelect` (searchable combobox with inline creation)
+   - Component: `EquipmentSelector` (shows last running hours, selection)
+
+3. **Van Inventory (PDF Ingestion)**
+   - Installed `pdf-parse` + `@types/pdf-parse`
+   - Server actions: `inventory-actions.ts` (parse PDF, session management, consumption)
+   - Page: `/inventory` with upload and list management
+   - Components: `InventoryUpload`, `InventoryList`
+
+4. **Report Part Consumption**
+   - Server actions: `parts-actions.ts` (add/remove parts, consume from inventory)
+   - Component: `PartSelector` (select inventory parts for report)
+   - Component: `TechnicianPanel` (internal remaining inventory view)
+
+5. **Report Form Integration** (`/reports/new`)
+   - Replaced text input with `CustomerSelect` component
+   - Added `EquipmentSelector` to show customer's saved equipment
+   - Updated `createReportWithEquipment` to accept `customerId` and `customerEquipmentId`
+   - Equipment now linked to persistent `CustomerEquipment` records
+
+6. **Navigation**
+   - Added "Kunder" (`/customers`) to sidebar
+   - Added "Varebeholdning" (`/inventory`) to sidebar
+
+### Files Created/Modified
+| File | Type | Description |
+|------|------|-------------|
+| `prisma/schema.prisma` | Modified | Added 4 new models, updated relations |
+| `customer-actions.ts` | New | Customer CRUD + equipment management |
+| `inventory-actions.ts` | New | PDF parsing + session management |
+| `parts-actions.ts` | New | Report part consumption |
+| `equipment-actions.ts` | Modified | Added customerId/customerEquipmentId support |
+| `CustomerSelect` | New | Customer search/create combobox |
+| `EquipmentSelector` | New | Equipment selection with history |
+| `InventoryUpload` | New | PDF upload with drag-drop |
+| `InventoryList` | New | Session inventory display |
+| `PartSelector` | New | Part selection from inventory |
+| `TechnicianPanel` | New | Internal remaining inventory |
+| `/customers/client.tsx` | New | Customer management page |
+| `/inventory/client.tsx` | New | Inventory management page |
+| `/reports/new/client.tsx` | Modified | Integrated CustomerSelect + EquipmentSelector |
+
+### Remaining Work
+- Test end-to-end customer → equipment → report flow
+- Update PDF export to include consumed parts
+- Add PartSelector to report edit page
+- Tune PDF parsing for specific supplier formats
+
+---
+
+
 ## 2026-01-17: Service Point Ordering & Full Display
 
 **Objective:** Custom ordering in Data Editor + show ALL service points in report/PDF.
@@ -225,4 +293,16 @@ Key features:
 - Value + Comment fields per checkpoint
 - PDF generation
 - Local storage + DB sync indicators
-- Excel import for service points
+
+---
+
+## Known Issues
+
+### ~~PDF Layout Overlap~~ ✅ RESOLVED (2026-01-18)
+- **Issue:** Text and headers in the generated PDF report occasionally overlapped across pages.
+- **Solution Applied:**
+  - Added `minPresenceAhead: 50` to `sectionHeader` style to keep headers with following content
+  - Removed `wrap={false}` from category `<View>` containers to allow natural page breaks
+  - Added `wrap: false` to individual `tableRow` style to keep each row together
+  - Replaced fixed spacers with `marginTop` on section headers
+- **Status:** Resolved. PDF now generates cleanly with proper page breaks.

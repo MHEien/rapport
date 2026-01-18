@@ -399,6 +399,7 @@ export function DataEditorClient({
                 onChange={handleImport}
               />
               <Button
+                type="button"
                 variant="outline"
                 className="flex-1 sm:flex-none border-white/10 hover:bg-white/5"
                 onClick={() => handleDownloadTemplate()}
@@ -407,6 +408,7 @@ export function DataEditorClient({
                 Last ned mal
               </Button>
               <Button
+                type="button"
                 variant="outline"
                 className="flex-1 sm:flex-none border-white/10 hover:bg-white/5"
                 onClick={() => fileInputRef.current?.click()}
@@ -420,6 +422,7 @@ export function DataEditorClient({
                 Importer Excel
               </Button>
               <Button
+                type="button"
                 onClick={() => openAddDialog()}
                 className="flex-1 sm:flex-none bg-gradient-to-r from-blue-500 to-indigo-600 shadow-lg shadow-blue-500/20"
               >
@@ -443,11 +446,12 @@ export function DataEditorClient({
               Legg til servicepunkter manuelt eller importer fra Excel.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Button onClick={() => openAddDialog()}>
+              <Button type="button" onClick={() => openAddDialog()}>
                 <Plus className="size-4 mr-2" />
                 Legg til første punkt
               </Button>
               <Button
+                type="button"
                 variant="outline"
                 onClick={() => fileInputRef.current?.click()}
               >
@@ -482,6 +486,7 @@ export function DataEditorClient({
                 >
                   {/* Product type header */}
                   <Button
+                    type="button"
                     onClick={() => toggleType(type)}
                     variant="ghost"
                     className="w-full justify-between h-auto py-4 px-4 hover:bg-white/5 rounded-none"
@@ -559,6 +564,7 @@ export function DataEditorClient({
                                           ))}
                                           {/* Add to category button */}
                                           <Button
+                                            type="button"
                                             variant="ghost"
                                             onClick={() =>
                                               openAddDialog(type, category)
@@ -581,6 +587,7 @@ export function DataEditorClient({
 
                       {/* Add category button (outside sortable) */}
                       <Button
+                        type="button"
                         variant="ghost"
                         onClick={() => openAddDialog(type)}
                         className="w-full justify-start gap-2 px-4 py-3 pl-8 text-sm text-slate-500 hover:text-blue-400 hover:bg-white/5 rounded-none h-12 border-t border-white/5"
@@ -788,6 +795,7 @@ function SortableCategory({
           {/* Drag Handle - only visible on hover (or if dragging) */}
            <button
              type="button"
+             aria-label="Dra for å endre rekkefølge på kategori"
              {...attributes}
              {...listeners}
              className="flex items-center justify-center size-8 -ml-2 rounded text-slate-600 hover:text-slate-300 hover:bg-white/10 touch-none cursor-grab active:cursor-grabbing transition-colors"
@@ -811,7 +819,12 @@ function SortableCategory({
           <span className="text-sm text-slate-500">
             {pointCount} punkter
           </span>
-          <button type="button" onClick={onToggle} className="p-1 hover:bg-white/10 rounded">
+          <button 
+            type="button" 
+            aria-label={isExpanded ? "Skjul kategori" : "Vis kategori"}
+            onClick={onToggle} 
+            className="p-1 hover:bg-white/10 rounded"
+          >
             {isExpanded ? (
               <ChevronDown className="size-4 text-slate-500" />
             ) : (
@@ -855,6 +868,7 @@ function SortableServicePoint({
       {/* Drag handle - 64px touch target */}
       <button
         type="button"
+        aria-label="Dra for å endre rekkefølge"
         {...attributes}
         {...listeners}
         className="flex items-center justify-center size-8 -ml-4 touch-none cursor-grab active:cursor-grabbing text-slate-600 hover:text-slate-300"
@@ -875,7 +889,7 @@ function SortableServicePoint({
         )}
       </div>
       <div className="opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
-        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onEdit}>
+        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onEdit} type="button" aria-label="Rediger punkt">
           <Pencil className="size-3.5" />
         </Button>
         <Button
@@ -883,6 +897,8 @@ function SortableServicePoint({
           size="icon"
           className="h-8 w-8 text-red-400 hover:text-red-300 hover:bg-red-500/10"
           onClick={onDelete}
+          type="button"
+          aria-label="Slett punkt"
         >
           <Trash2 className="size-3.5" />
         </Button>

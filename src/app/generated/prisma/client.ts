@@ -90,6 +90,26 @@ export type ServicePoint = Prisma.ServicePointModel
  */
 export type Post = Prisma.PostModel
 /**
+ * Model Customer
+ * 
+ */
+export type Customer = Prisma.CustomerModel
+/**
+ * Model CustomerEquipment
+ * 
+ */
+export type CustomerEquipment = Prisma.CustomerEquipmentModel
+/**
+ * Model VanInventory
+ * 
+ */
+export type VanInventory = Prisma.VanInventoryModel
+/**
+ * Model ReportPart
+ * 
+ */
+export type ReportPart = Prisma.ReportPartModel
+/**
  * Model Organization
  * 
  */

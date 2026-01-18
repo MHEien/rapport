@@ -194,6 +194,8 @@ export type OrganizationWhereInput = {
   invitations?: Prisma.InvitationListRelationFilter
   reports?: Prisma.ReportListRelationFilter
   servicePoints?: Prisma.ServicePointListRelationFilter
+  customers?: Prisma.CustomerListRelationFilter
+  vanInventory?: Prisma.VanInventoryListRelationFilter
 }
 
 export type OrganizationOrderByWithRelationInput = {
@@ -207,6 +209,8 @@ export type OrganizationOrderByWithRelationInput = {
   invitations?: Prisma.InvitationOrderByRelationAggregateInput
   reports?: Prisma.ReportOrderByRelationAggregateInput
   servicePoints?: Prisma.ServicePointOrderByRelationAggregateInput
+  customers?: Prisma.CustomerOrderByRelationAggregateInput
+  vanInventory?: Prisma.VanInventoryOrderByRelationAggregateInput
 }
 
 export type OrganizationWhereUniqueInput = Prisma.AtLeast<{
@@ -223,6 +227,8 @@ export type OrganizationWhereUniqueInput = Prisma.AtLeast<{
   invitations?: Prisma.InvitationListRelationFilter
   reports?: Prisma.ReportListRelationFilter
   servicePoints?: Prisma.ServicePointListRelationFilter
+  customers?: Prisma.CustomerListRelationFilter
+  vanInventory?: Prisma.VanInventoryListRelationFilter
 }, "id" | "slug">
 
 export type OrganizationOrderByWithAggregationInput = {
@@ -260,6 +266,8 @@ export type OrganizationCreateInput = {
   invitations?: Prisma.InvitationCreateNestedManyWithoutOrganizationInput
   reports?: Prisma.ReportCreateNestedManyWithoutOrganizationInput
   servicePoints?: Prisma.ServicePointCreateNestedManyWithoutOrganizationInput
+  customers?: Prisma.CustomerCreateNestedManyWithoutOrganizationInput
+  vanInventory?: Prisma.VanInventoryCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateInput = {
@@ -273,6 +281,8 @@ export type OrganizationUncheckedCreateInput = {
   invitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutOrganizationInput
   reports?: Prisma.ReportUncheckedCreateNestedManyWithoutOrganizationInput
   servicePoints?: Prisma.ServicePointUncheckedCreateNestedManyWithoutOrganizationInput
+  customers?: Prisma.CustomerUncheckedCreateNestedManyWithoutOrganizationInput
+  vanInventory?: Prisma.VanInventoryUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUpdateInput = {
@@ -286,6 +296,8 @@ export type OrganizationUpdateInput = {
   invitations?: Prisma.InvitationUpdateManyWithoutOrganizationNestedInput
   reports?: Prisma.ReportUpdateManyWithoutOrganizationNestedInput
   servicePoints?: Prisma.ServicePointUpdateManyWithoutOrganizationNestedInput
+  customers?: Prisma.CustomerUpdateManyWithoutOrganizationNestedInput
+  vanInventory?: Prisma.VanInventoryUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateInput = {
@@ -299,6 +311,8 @@ export type OrganizationUncheckedUpdateInput = {
   invitations?: Prisma.InvitationUncheckedUpdateManyWithoutOrganizationNestedInput
   reports?: Prisma.ReportUncheckedUpdateManyWithoutOrganizationNestedInput
   servicePoints?: Prisma.ServicePointUncheckedUpdateManyWithoutOrganizationNestedInput
+  customers?: Prisma.CustomerUncheckedUpdateManyWithoutOrganizationNestedInput
+  vanInventory?: Prisma.VanInventoryUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateManyInput = {
@@ -388,6 +402,34 @@ export type OrganizationUpdateOneRequiredWithoutServicePointsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.OrganizationUpdateToOneWithWhereWithoutServicePointsInput, Prisma.OrganizationUpdateWithoutServicePointsInput>, Prisma.OrganizationUncheckedUpdateWithoutServicePointsInput>
 }
 
+export type OrganizationCreateNestedOneWithoutCustomersInput = {
+  create?: Prisma.XOR<Prisma.OrganizationCreateWithoutCustomersInput, Prisma.OrganizationUncheckedCreateWithoutCustomersInput>
+  connectOrCreate?: Prisma.OrganizationCreateOrConnectWithoutCustomersInput
+  connect?: Prisma.OrganizationWhereUniqueInput
+}
+
+export type OrganizationUpdateOneRequiredWithoutCustomersNestedInput = {
+  create?: Prisma.XOR<Prisma.OrganizationCreateWithoutCustomersInput, Prisma.OrganizationUncheckedCreateWithoutCustomersInput>
+  connectOrCreate?: Prisma.OrganizationCreateOrConnectWithoutCustomersInput
+  upsert?: Prisma.OrganizationUpsertWithoutCustomersInput
+  connect?: Prisma.OrganizationWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.OrganizationUpdateToOneWithWhereWithoutCustomersInput, Prisma.OrganizationUpdateWithoutCustomersInput>, Prisma.OrganizationUncheckedUpdateWithoutCustomersInput>
+}
+
+export type OrganizationCreateNestedOneWithoutVanInventoryInput = {
+  create?: Prisma.XOR<Prisma.OrganizationCreateWithoutVanInventoryInput, Prisma.OrganizationUncheckedCreateWithoutVanInventoryInput>
+  connectOrCreate?: Prisma.OrganizationCreateOrConnectWithoutVanInventoryInput
+  connect?: Prisma.OrganizationWhereUniqueInput
+}
+
+export type OrganizationUpdateOneRequiredWithoutVanInventoryNestedInput = {
+  create?: Prisma.XOR<Prisma.OrganizationCreateWithoutVanInventoryInput, Prisma.OrganizationUncheckedCreateWithoutVanInventoryInput>
+  connectOrCreate?: Prisma.OrganizationCreateOrConnectWithoutVanInventoryInput
+  upsert?: Prisma.OrganizationUpsertWithoutVanInventoryInput
+  connect?: Prisma.OrganizationWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.OrganizationUpdateToOneWithWhereWithoutVanInventoryInput, Prisma.OrganizationUpdateWithoutVanInventoryInput>, Prisma.OrganizationUncheckedUpdateWithoutVanInventoryInput>
+}
+
 export type OrganizationCreateNestedOneWithoutMembersInput = {
   create?: Prisma.XOR<Prisma.OrganizationCreateWithoutMembersInput, Prisma.OrganizationUncheckedCreateWithoutMembersInput>
   connectOrCreate?: Prisma.OrganizationCreateOrConnectWithoutMembersInput
@@ -426,6 +468,8 @@ export type OrganizationCreateWithoutReportsInput = {
   members?: Prisma.MemberCreateNestedManyWithoutOrganizationInput
   invitations?: Prisma.InvitationCreateNestedManyWithoutOrganizationInput
   servicePoints?: Prisma.ServicePointCreateNestedManyWithoutOrganizationInput
+  customers?: Prisma.CustomerCreateNestedManyWithoutOrganizationInput
+  vanInventory?: Prisma.VanInventoryCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutReportsInput = {
@@ -438,6 +482,8 @@ export type OrganizationUncheckedCreateWithoutReportsInput = {
   members?: Prisma.MemberUncheckedCreateNestedManyWithoutOrganizationInput
   invitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutOrganizationInput
   servicePoints?: Prisma.ServicePointUncheckedCreateNestedManyWithoutOrganizationInput
+  customers?: Prisma.CustomerUncheckedCreateNestedManyWithoutOrganizationInput
+  vanInventory?: Prisma.VanInventoryUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutReportsInput = {
@@ -466,6 +512,8 @@ export type OrganizationUpdateWithoutReportsInput = {
   members?: Prisma.MemberUpdateManyWithoutOrganizationNestedInput
   invitations?: Prisma.InvitationUpdateManyWithoutOrganizationNestedInput
   servicePoints?: Prisma.ServicePointUpdateManyWithoutOrganizationNestedInput
+  customers?: Prisma.CustomerUpdateManyWithoutOrganizationNestedInput
+  vanInventory?: Prisma.VanInventoryUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutReportsInput = {
@@ -478,6 +526,8 @@ export type OrganizationUncheckedUpdateWithoutReportsInput = {
   members?: Prisma.MemberUncheckedUpdateManyWithoutOrganizationNestedInput
   invitations?: Prisma.InvitationUncheckedUpdateManyWithoutOrganizationNestedInput
   servicePoints?: Prisma.ServicePointUncheckedUpdateManyWithoutOrganizationNestedInput
+  customers?: Prisma.CustomerUncheckedUpdateManyWithoutOrganizationNestedInput
+  vanInventory?: Prisma.VanInventoryUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutServicePointsInput = {
@@ -490,6 +540,8 @@ export type OrganizationCreateWithoutServicePointsInput = {
   members?: Prisma.MemberCreateNestedManyWithoutOrganizationInput
   invitations?: Prisma.InvitationCreateNestedManyWithoutOrganizationInput
   reports?: Prisma.ReportCreateNestedManyWithoutOrganizationInput
+  customers?: Prisma.CustomerCreateNestedManyWithoutOrganizationInput
+  vanInventory?: Prisma.VanInventoryCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutServicePointsInput = {
@@ -502,6 +554,8 @@ export type OrganizationUncheckedCreateWithoutServicePointsInput = {
   members?: Prisma.MemberUncheckedCreateNestedManyWithoutOrganizationInput
   invitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutOrganizationInput
   reports?: Prisma.ReportUncheckedCreateNestedManyWithoutOrganizationInput
+  customers?: Prisma.CustomerUncheckedCreateNestedManyWithoutOrganizationInput
+  vanInventory?: Prisma.VanInventoryUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutServicePointsInput = {
@@ -530,6 +584,8 @@ export type OrganizationUpdateWithoutServicePointsInput = {
   members?: Prisma.MemberUpdateManyWithoutOrganizationNestedInput
   invitations?: Prisma.InvitationUpdateManyWithoutOrganizationNestedInput
   reports?: Prisma.ReportUpdateManyWithoutOrganizationNestedInput
+  customers?: Prisma.CustomerUpdateManyWithoutOrganizationNestedInput
+  vanInventory?: Prisma.VanInventoryUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutServicePointsInput = {
@@ -542,6 +598,152 @@ export type OrganizationUncheckedUpdateWithoutServicePointsInput = {
   members?: Prisma.MemberUncheckedUpdateManyWithoutOrganizationNestedInput
   invitations?: Prisma.InvitationUncheckedUpdateManyWithoutOrganizationNestedInput
   reports?: Prisma.ReportUncheckedUpdateManyWithoutOrganizationNestedInput
+  customers?: Prisma.CustomerUncheckedUpdateManyWithoutOrganizationNestedInput
+  vanInventory?: Prisma.VanInventoryUncheckedUpdateManyWithoutOrganizationNestedInput
+}
+
+export type OrganizationCreateWithoutCustomersInput = {
+  id?: string
+  name: string
+  slug?: string | null
+  logo?: string | null
+  metadata?: string | null
+  createdAt?: Date | string
+  members?: Prisma.MemberCreateNestedManyWithoutOrganizationInput
+  invitations?: Prisma.InvitationCreateNestedManyWithoutOrganizationInput
+  reports?: Prisma.ReportCreateNestedManyWithoutOrganizationInput
+  servicePoints?: Prisma.ServicePointCreateNestedManyWithoutOrganizationInput
+  vanInventory?: Prisma.VanInventoryCreateNestedManyWithoutOrganizationInput
+}
+
+export type OrganizationUncheckedCreateWithoutCustomersInput = {
+  id?: string
+  name: string
+  slug?: string | null
+  logo?: string | null
+  metadata?: string | null
+  createdAt?: Date | string
+  members?: Prisma.MemberUncheckedCreateNestedManyWithoutOrganizationInput
+  invitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutOrganizationInput
+  reports?: Prisma.ReportUncheckedCreateNestedManyWithoutOrganizationInput
+  servicePoints?: Prisma.ServicePointUncheckedCreateNestedManyWithoutOrganizationInput
+  vanInventory?: Prisma.VanInventoryUncheckedCreateNestedManyWithoutOrganizationInput
+}
+
+export type OrganizationCreateOrConnectWithoutCustomersInput = {
+  where: Prisma.OrganizationWhereUniqueInput
+  create: Prisma.XOR<Prisma.OrganizationCreateWithoutCustomersInput, Prisma.OrganizationUncheckedCreateWithoutCustomersInput>
+}
+
+export type OrganizationUpsertWithoutCustomersInput = {
+  update: Prisma.XOR<Prisma.OrganizationUpdateWithoutCustomersInput, Prisma.OrganizationUncheckedUpdateWithoutCustomersInput>
+  create: Prisma.XOR<Prisma.OrganizationCreateWithoutCustomersInput, Prisma.OrganizationUncheckedCreateWithoutCustomersInput>
+  where?: Prisma.OrganizationWhereInput
+}
+
+export type OrganizationUpdateToOneWithWhereWithoutCustomersInput = {
+  where?: Prisma.OrganizationWhereInput
+  data: Prisma.XOR<Prisma.OrganizationUpdateWithoutCustomersInput, Prisma.OrganizationUncheckedUpdateWithoutCustomersInput>
+}
+
+export type OrganizationUpdateWithoutCustomersInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  metadata?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  members?: Prisma.MemberUpdateManyWithoutOrganizationNestedInput
+  invitations?: Prisma.InvitationUpdateManyWithoutOrganizationNestedInput
+  reports?: Prisma.ReportUpdateManyWithoutOrganizationNestedInput
+  servicePoints?: Prisma.ServicePointUpdateManyWithoutOrganizationNestedInput
+  vanInventory?: Prisma.VanInventoryUpdateManyWithoutOrganizationNestedInput
+}
+
+export type OrganizationUncheckedUpdateWithoutCustomersInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  metadata?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  members?: Prisma.MemberUncheckedUpdateManyWithoutOrganizationNestedInput
+  invitations?: Prisma.InvitationUncheckedUpdateManyWithoutOrganizationNestedInput
+  reports?: Prisma.ReportUncheckedUpdateManyWithoutOrganizationNestedInput
+  servicePoints?: Prisma.ServicePointUncheckedUpdateManyWithoutOrganizationNestedInput
+  vanInventory?: Prisma.VanInventoryUncheckedUpdateManyWithoutOrganizationNestedInput
+}
+
+export type OrganizationCreateWithoutVanInventoryInput = {
+  id?: string
+  name: string
+  slug?: string | null
+  logo?: string | null
+  metadata?: string | null
+  createdAt?: Date | string
+  members?: Prisma.MemberCreateNestedManyWithoutOrganizationInput
+  invitations?: Prisma.InvitationCreateNestedManyWithoutOrganizationInput
+  reports?: Prisma.ReportCreateNestedManyWithoutOrganizationInput
+  servicePoints?: Prisma.ServicePointCreateNestedManyWithoutOrganizationInput
+  customers?: Prisma.CustomerCreateNestedManyWithoutOrganizationInput
+}
+
+export type OrganizationUncheckedCreateWithoutVanInventoryInput = {
+  id?: string
+  name: string
+  slug?: string | null
+  logo?: string | null
+  metadata?: string | null
+  createdAt?: Date | string
+  members?: Prisma.MemberUncheckedCreateNestedManyWithoutOrganizationInput
+  invitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutOrganizationInput
+  reports?: Prisma.ReportUncheckedCreateNestedManyWithoutOrganizationInput
+  servicePoints?: Prisma.ServicePointUncheckedCreateNestedManyWithoutOrganizationInput
+  customers?: Prisma.CustomerUncheckedCreateNestedManyWithoutOrganizationInput
+}
+
+export type OrganizationCreateOrConnectWithoutVanInventoryInput = {
+  where: Prisma.OrganizationWhereUniqueInput
+  create: Prisma.XOR<Prisma.OrganizationCreateWithoutVanInventoryInput, Prisma.OrganizationUncheckedCreateWithoutVanInventoryInput>
+}
+
+export type OrganizationUpsertWithoutVanInventoryInput = {
+  update: Prisma.XOR<Prisma.OrganizationUpdateWithoutVanInventoryInput, Prisma.OrganizationUncheckedUpdateWithoutVanInventoryInput>
+  create: Prisma.XOR<Prisma.OrganizationCreateWithoutVanInventoryInput, Prisma.OrganizationUncheckedCreateWithoutVanInventoryInput>
+  where?: Prisma.OrganizationWhereInput
+}
+
+export type OrganizationUpdateToOneWithWhereWithoutVanInventoryInput = {
+  where?: Prisma.OrganizationWhereInput
+  data: Prisma.XOR<Prisma.OrganizationUpdateWithoutVanInventoryInput, Prisma.OrganizationUncheckedUpdateWithoutVanInventoryInput>
+}
+
+export type OrganizationUpdateWithoutVanInventoryInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  metadata?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  members?: Prisma.MemberUpdateManyWithoutOrganizationNestedInput
+  invitations?: Prisma.InvitationUpdateManyWithoutOrganizationNestedInput
+  reports?: Prisma.ReportUpdateManyWithoutOrganizationNestedInput
+  servicePoints?: Prisma.ServicePointUpdateManyWithoutOrganizationNestedInput
+  customers?: Prisma.CustomerUpdateManyWithoutOrganizationNestedInput
+}
+
+export type OrganizationUncheckedUpdateWithoutVanInventoryInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  metadata?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  members?: Prisma.MemberUncheckedUpdateManyWithoutOrganizationNestedInput
+  invitations?: Prisma.InvitationUncheckedUpdateManyWithoutOrganizationNestedInput
+  reports?: Prisma.ReportUncheckedUpdateManyWithoutOrganizationNestedInput
+  servicePoints?: Prisma.ServicePointUncheckedUpdateManyWithoutOrganizationNestedInput
+  customers?: Prisma.CustomerUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutMembersInput = {
@@ -554,6 +756,8 @@ export type OrganizationCreateWithoutMembersInput = {
   invitations?: Prisma.InvitationCreateNestedManyWithoutOrganizationInput
   reports?: Prisma.ReportCreateNestedManyWithoutOrganizationInput
   servicePoints?: Prisma.ServicePointCreateNestedManyWithoutOrganizationInput
+  customers?: Prisma.CustomerCreateNestedManyWithoutOrganizationInput
+  vanInventory?: Prisma.VanInventoryCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutMembersInput = {
@@ -566,6 +770,8 @@ export type OrganizationUncheckedCreateWithoutMembersInput = {
   invitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutOrganizationInput
   reports?: Prisma.ReportUncheckedCreateNestedManyWithoutOrganizationInput
   servicePoints?: Prisma.ServicePointUncheckedCreateNestedManyWithoutOrganizationInput
+  customers?: Prisma.CustomerUncheckedCreateNestedManyWithoutOrganizationInput
+  vanInventory?: Prisma.VanInventoryUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutMembersInput = {
@@ -594,6 +800,8 @@ export type OrganizationUpdateWithoutMembersInput = {
   invitations?: Prisma.InvitationUpdateManyWithoutOrganizationNestedInput
   reports?: Prisma.ReportUpdateManyWithoutOrganizationNestedInput
   servicePoints?: Prisma.ServicePointUpdateManyWithoutOrganizationNestedInput
+  customers?: Prisma.CustomerUpdateManyWithoutOrganizationNestedInput
+  vanInventory?: Prisma.VanInventoryUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutMembersInput = {
@@ -606,6 +814,8 @@ export type OrganizationUncheckedUpdateWithoutMembersInput = {
   invitations?: Prisma.InvitationUncheckedUpdateManyWithoutOrganizationNestedInput
   reports?: Prisma.ReportUncheckedUpdateManyWithoutOrganizationNestedInput
   servicePoints?: Prisma.ServicePointUncheckedUpdateManyWithoutOrganizationNestedInput
+  customers?: Prisma.CustomerUncheckedUpdateManyWithoutOrganizationNestedInput
+  vanInventory?: Prisma.VanInventoryUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutInvitationsInput = {
@@ -618,6 +828,8 @@ export type OrganizationCreateWithoutInvitationsInput = {
   members?: Prisma.MemberCreateNestedManyWithoutOrganizationInput
   reports?: Prisma.ReportCreateNestedManyWithoutOrganizationInput
   servicePoints?: Prisma.ServicePointCreateNestedManyWithoutOrganizationInput
+  customers?: Prisma.CustomerCreateNestedManyWithoutOrganizationInput
+  vanInventory?: Prisma.VanInventoryCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutInvitationsInput = {
@@ -630,6 +842,8 @@ export type OrganizationUncheckedCreateWithoutInvitationsInput = {
   members?: Prisma.MemberUncheckedCreateNestedManyWithoutOrganizationInput
   reports?: Prisma.ReportUncheckedCreateNestedManyWithoutOrganizationInput
   servicePoints?: Prisma.ServicePointUncheckedCreateNestedManyWithoutOrganizationInput
+  customers?: Prisma.CustomerUncheckedCreateNestedManyWithoutOrganizationInput
+  vanInventory?: Prisma.VanInventoryUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutInvitationsInput = {
@@ -658,6 +872,8 @@ export type OrganizationUpdateWithoutInvitationsInput = {
   members?: Prisma.MemberUpdateManyWithoutOrganizationNestedInput
   reports?: Prisma.ReportUpdateManyWithoutOrganizationNestedInput
   servicePoints?: Prisma.ServicePointUpdateManyWithoutOrganizationNestedInput
+  customers?: Prisma.CustomerUpdateManyWithoutOrganizationNestedInput
+  vanInventory?: Prisma.VanInventoryUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutInvitationsInput = {
@@ -670,6 +886,8 @@ export type OrganizationUncheckedUpdateWithoutInvitationsInput = {
   members?: Prisma.MemberUncheckedUpdateManyWithoutOrganizationNestedInput
   reports?: Prisma.ReportUncheckedUpdateManyWithoutOrganizationNestedInput
   servicePoints?: Prisma.ServicePointUncheckedUpdateManyWithoutOrganizationNestedInput
+  customers?: Prisma.CustomerUncheckedUpdateManyWithoutOrganizationNestedInput
+  vanInventory?: Prisma.VanInventoryUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 
@@ -682,6 +900,8 @@ export type OrganizationCountOutputType = {
   invitations: number
   reports: number
   servicePoints: number
+  customers: number
+  vanInventory: number
 }
 
 export type OrganizationCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -689,6 +909,8 @@ export type OrganizationCountOutputTypeSelect<ExtArgs extends runtime.Types.Exte
   invitations?: boolean | OrganizationCountOutputTypeCountInvitationsArgs
   reports?: boolean | OrganizationCountOutputTypeCountReportsArgs
   servicePoints?: boolean | OrganizationCountOutputTypeCountServicePointsArgs
+  customers?: boolean | OrganizationCountOutputTypeCountCustomersArgs
+  vanInventory?: boolean | OrganizationCountOutputTypeCountVanInventoryArgs
 }
 
 /**
@@ -729,6 +951,20 @@ export type OrganizationCountOutputTypeCountServicePointsArgs<ExtArgs extends ru
   where?: Prisma.ServicePointWhereInput
 }
 
+/**
+ * OrganizationCountOutputType without action
+ */
+export type OrganizationCountOutputTypeCountCustomersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.CustomerWhereInput
+}
+
+/**
+ * OrganizationCountOutputType without action
+ */
+export type OrganizationCountOutputTypeCountVanInventoryArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.VanInventoryWhereInput
+}
+
 
 export type OrganizationSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -741,6 +977,8 @@ export type OrganizationSelect<ExtArgs extends runtime.Types.Extensions.Internal
   invitations?: boolean | Prisma.Organization$invitationsArgs<ExtArgs>
   reports?: boolean | Prisma.Organization$reportsArgs<ExtArgs>
   servicePoints?: boolean | Prisma.Organization$servicePointsArgs<ExtArgs>
+  customers?: boolean | Prisma.Organization$customersArgs<ExtArgs>
+  vanInventory?: boolean | Prisma.Organization$vanInventoryArgs<ExtArgs>
   _count?: boolean | Prisma.OrganizationCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["organization"]>
 
@@ -777,6 +1015,8 @@ export type OrganizationInclude<ExtArgs extends runtime.Types.Extensions.Interna
   invitations?: boolean | Prisma.Organization$invitationsArgs<ExtArgs>
   reports?: boolean | Prisma.Organization$reportsArgs<ExtArgs>
   servicePoints?: boolean | Prisma.Organization$servicePointsArgs<ExtArgs>
+  customers?: boolean | Prisma.Organization$customersArgs<ExtArgs>
+  vanInventory?: boolean | Prisma.Organization$vanInventoryArgs<ExtArgs>
   _count?: boolean | Prisma.OrganizationCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type OrganizationIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -789,6 +1029,8 @@ export type $OrganizationPayload<ExtArgs extends runtime.Types.Extensions.Intern
     invitations: Prisma.$InvitationPayload<ExtArgs>[]
     reports: Prisma.$ReportPayload<ExtArgs>[]
     servicePoints: Prisma.$ServicePointPayload<ExtArgs>[]
+    customers: Prisma.$CustomerPayload<ExtArgs>[]
+    vanInventory: Prisma.$VanInventoryPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1195,6 +1437,8 @@ export interface Prisma__OrganizationClient<T, Null = never, ExtArgs extends run
   invitations<T extends Prisma.Organization$invitationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Organization$invitationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$InvitationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   reports<T extends Prisma.Organization$reportsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Organization$reportsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReportPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   servicePoints<T extends Prisma.Organization$servicePointsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Organization$servicePointsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ServicePointPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  customers<T extends Prisma.Organization$customersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Organization$customersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CustomerPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  vanInventory<T extends Prisma.Organization$vanInventoryArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Organization$vanInventoryArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$VanInventoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1711,6 +1955,54 @@ export type Organization$servicePointsArgs<ExtArgs extends runtime.Types.Extensi
   take?: number
   skip?: number
   distinct?: Prisma.ServicePointScalarFieldEnum | Prisma.ServicePointScalarFieldEnum[]
+}
+
+/**
+ * Organization.customers
+ */
+export type Organization$customersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Customer
+   */
+  select?: Prisma.CustomerSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Customer
+   */
+  omit?: Prisma.CustomerOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.CustomerInclude<ExtArgs> | null
+  where?: Prisma.CustomerWhereInput
+  orderBy?: Prisma.CustomerOrderByWithRelationInput | Prisma.CustomerOrderByWithRelationInput[]
+  cursor?: Prisma.CustomerWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.CustomerScalarFieldEnum | Prisma.CustomerScalarFieldEnum[]
+}
+
+/**
+ * Organization.vanInventory
+ */
+export type Organization$vanInventoryArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the VanInventory
+   */
+  select?: Prisma.VanInventorySelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the VanInventory
+   */
+  omit?: Prisma.VanInventoryOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.VanInventoryInclude<ExtArgs> | null
+  where?: Prisma.VanInventoryWhereInput
+  orderBy?: Prisma.VanInventoryOrderByWithRelationInput | Prisma.VanInventoryOrderByWithRelationInput[]
+  cursor?: Prisma.VanInventoryWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.VanInventoryScalarFieldEnum | Prisma.VanInventoryScalarFieldEnum[]
 }
 
 /**

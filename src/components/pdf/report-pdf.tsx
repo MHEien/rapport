@@ -38,10 +38,10 @@ const styles = StyleSheet.create({
   page: {
     fontFamily: "Helvetica",
     fontSize: 9, // Slightly smaller to fit table data
-    paddingTop: 30,
+    paddingTop: 80,
     paddingLeft: 30,
     paddingRight: 30,
-    paddingBottom: 30,
+    paddingBottom: 80,
     color: "#000000",
     lineHeight: 1.2,
   },
@@ -55,14 +55,13 @@ const styles = StyleSheet.create({
   logoPlaceholder: {
     width: 100,
     height: 40,
-    backgroundColor: "#EEE", // Placeholder for Sterner logo
     justifyContent: "center",
     alignItems: "center",
   },
   logoText: {
     fontSize: 10,
     fontWeight: "bold",
-    color: "#333",
+    color: "#002E5D", // Sterner Blue
   },
   headerTitle: {
     fontSize: 16,
@@ -70,13 +69,14 @@ const styles = StyleSheet.create({
     textTransform: "uppercase",
     textAlign: "right",
     marginBottom: 10,
+    color: "#002E5D", // Sterner Blue
   },
   metaGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
     width: "100%",
     borderBottomWidth: 1,
-    borderBottomColor: "#000",
+    borderBottomColor: "#002E5D",
     paddingBottom: 10,
     marginBottom: 20,
   },
@@ -88,9 +88,11 @@ const styles = StyleSheet.create({
     fontSize: 8,
     fontWeight: "bold",
     marginBottom: 1,
+    color: "#666",
   },
   metaValue: {
     fontSize: 10,
+    color: "#000",
   },
 
   // Table Styles
@@ -102,32 +104,37 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     borderBottomWidth: 1,
     borderTopWidth: 1,
-    borderColor: "#000",
-    backgroundColor: "#f3f3f3",
+    borderColor: "#002E5D",
+    backgroundColor: "#002E5D", // Sterner Blue background
     alignItems: "center",
     minHeight: 20,
     marginTop: 10,
+    marginBottom: 10,
+    color: "#FFF", // White text
   },
   tableRow: {
     flexDirection: "row",
     borderBottomWidth: 0.5,
-    borderColor: "#ccc",
+    borderColor: "#ddd",
     minHeight: 18,
     alignItems: "center",
     paddingVertical: 2,
+    wrap: false, // Keep each row together on same page
   },
   sectionHeader: {
     flexDirection: "row",
-    backgroundColor: "#e6e6e6",
-    paddingVertical: 4,
-    paddingHorizontal: 2,
-    marginTop: 8,
+    backgroundColor: "#F0F7FF", // Very light blue tint
+    paddingVertical: 6,
+    paddingHorizontal: 4,
+    marginTop: 15,
+    minHeight: 24,
     borderBottomWidth: 1,
-    borderColor: "#999",
+    borderColor: "#B0D4F1",
   },
   sectionTitle: {
     fontWeight: "bold",
     fontSize: 10,
+    color: "#002E5D",
   },
 
   // Column Widths - Tuned to match PDF
@@ -190,24 +197,80 @@ const styles = StyleSheet.create({
     objectFit: "cover",
     backgroundColor: "#eee",
   },
+  // Footer Styles
+  footer: {
+    position: "absolute",
+    bottom: 30,
+    left: 30,
+    right: 30,
+    borderTopWidth: 1,
+    borderColor: "#002E5D",
+    paddingTop: 10,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    fontSize: 8,
+    color: "#666",
+  },
+  footerCol: {
+    flexDirection: "column",
+  },
+  logoImage: {
+    width: 120,
+    height: 40,
+    objectFit: 'contain'
+  }
 });
 
 export const ReportPDF = ({ report }: { report: ReportPDFData }) => {
   return (
     <Document>
       <Page size="A4" style={styles.page}>
-        {/* --- Header Section  --- */}
-        <View style={styles.headerContainer}>
-          {/* Replace with actual Logo Image if available */}
+        {/* --- Fixed Header --- */}
+        <View style={styles.headerContainer} fixed>
+          {/* Logo */}
           <View style={styles.logoPlaceholder}>
-            <Text style={styles.logoText}>STERNER</Text>
+            {/* Ideally replace with actual Image component if logo URL is available */}
+            {/* <Image src="/sterner-logo.png" style={styles.logoImage} /> */}
+            <Text style={[styles.logoText, { fontSize: 24 }]}>STERNER</Text>
           </View>
           <View>
             <Text style={styles.headerTitle}>KONSOLIDERT SERVICERAPPORT</Text>
           </View>
         </View>
 
-        {/* --- Meta Data Grid  --- */}
+        {/* --- Fixed Footer --- */}
+        <View style={styles.footer} fixed>
+          <View style={styles.footerCol}>
+            <Text style={{ fontWeight: "bold", color: "#002E5D" }}>
+              Hovedkontor
+            </Text>
+            <Text>Sterner AS</Text>
+            <Text>Anolitveien 16</Text>
+            <Text>1400 Ski</Text>
+          </View>
+          <View style={styles.footerCol}>
+            <Text style={{ fontWeight: "bold", color: "#002E5D" }}>Kontakt</Text>
+            <Text>Tlf: 64 85 94 20</Text>
+            <Text>E-post: post@sterneras.no</Text>
+            <Text>Web: www.sterneras.no</Text>
+          </View>
+          <View style={[styles.footerCol, { alignItems: "flex-end" }]}>
+             <Text
+              render={({ pageNumber, totalPages }) =>
+                `Side ${pageNumber} av ${totalPages}`
+              }
+            />
+          </View>
+        </View>
+
+        {/* --- Main Content (Padded for Header/Footer) --- */}
+        {/* React-PDF fixed elements overlay, so we need top/bottom margin on the content container doesn't fully work for flow. 
+            Instead, we rely on page padding which we set in styles.page. 
+            However, for the start of the document we might need a spacer or just rely on the first element's margin.
+            Let's keep the meta grid as the first flow element.
+        */}
+        
+        {/* Date/Meta Grid */}
         <View style={styles.metaGrid}>
           <View style={styles.metaCol}>
             <Text style={styles.metaLabel}>Kunde:</Text>
@@ -237,9 +300,8 @@ export const ReportPDF = ({ report }: { report: ReportPDFData }) => {
           </View>
         </View>
 
-        {/* --- Equipment Loop --- */}
+        {/* Equipment Loop */}
         {report.equipment.map((eq, _index) => {
-          // Group checklists by category (e.g., "Visuell Kontroll", "Lampebytte")
           const groupedChecklists = eq.checklists.reduce(
             (acc, item) => {
               const cat = item.category || "Generelt";
@@ -250,24 +312,25 @@ export const ReportPDF = ({ report }: { report: ReportPDFData }) => {
             {} as Record<string, typeof eq.checklists>,
           );
 
-          const categories = Object.keys(groupedChecklists).sort();
+          const categories = Array.from(
+            new Set(eq.checklists.map((c) => c.category || "Generelt")),
+          );
 
           return (
-            <View key={eq.id} wrap={false} style={styles.tableContainer}>
-              {/* Equipment Header acting as main section */}
+            <View key={eq.id} style={styles.tableContainer}>
               <View
                 style={[
                   styles.sectionHeader,
-                  { backgroundColor: "#ccc", marginTop: 15 },
+                  { backgroundColor: "#ccc", marginTop: 15, marginBottom: 8 },
                 ]}
               >
                 <Text style={[styles.sectionTitle, { fontSize: 12 }]}>
                   {eq.productType}: {eq.productName} (
                   {eq.serialNumber || "No SN"})
+                  {eq.runningHours ? ` — ${eq.runningHours} timer` : ""}
                 </Text>
               </View>
 
-              {/* Table Column Headers  */}
               <View style={styles.tableHeader}>
                 <Text style={[styles.colNr, styles.boldText]}>Nr</Text>
                 <Text style={[styles.colDesc, styles.boldText]}>
@@ -282,16 +345,13 @@ export const ReportPDF = ({ report }: { report: ReportPDFData }) => {
                 </Text>
               </View>
 
-              {/* Categories and Rows */}
               {categories.map((category) => (
                 <View key={category}>
-                  {/* Sub-header for Category (e.g., Visuell Kontroll) */}
-                  <View style={styles.sectionHeader}>
+                  <View style={styles.sectionHeader} minPresenceAhead={60}>
                     <Text style={styles.sectionTitle}>{category}</Text>
                   </View>
 
                   {groupedChecklists[category].map((item, idx) => {
-                    // Logic to place "X" in correct column
                     const isOK = item.status === "OK";
                     const isAvvik =
                       item.status === "BOR_UTBEDRES" ||
@@ -302,18 +362,12 @@ export const ReportPDF = ({ report }: { report: ReportPDFData }) => {
                       <View key={item.id} style={styles.tableRow}>
                         <Text style={styles.colNr}>{idx + 1}</Text>
                         <Text style={styles.colDesc}>{item.question}</Text>
-
-                        {/* Status Columns  */}
                         <Text style={styles.colCheck}>
                           {isAvvik ? "X" : ""}
                         </Text>
                         <Text style={styles.colCheck}>{isOK ? "X" : ""}</Text>
                         <Text style={styles.colCheck}>{isNA ? "X" : ""}</Text>
-
-                        {/* Value Column (Placeholder logic, adapt if you have a value field) */}
                         <Text style={styles.colValue}>-</Text>
-
-                        {/* Comment Column */}
                         <Text style={styles.colComment}>
                           {item.comment || ""}
                         </Text>
@@ -326,20 +380,15 @@ export const ReportPDF = ({ report }: { report: ReportPDFData }) => {
           );
         })}
 
-        {/* --- Conclusion / Notes Section  --- */}
         <View style={styles.noteSection} break={false}>
           <Text style={styles.noteTitle}>
             Konklusjon/Notater (Felles for alle enheter):
           </Text>
-          {/* Using summary or conclusion from report object if available */}
           <Text style={styles.noteText}>
-            {/* If you have a general report comment field, put it here. 
-                 Otherwise, listing specific critical comments is a good fallback. */}
             See comments in table above.
           </Text>
         </View>
 
-        {/* --- Signatures --- */}
         <View
           style={[styles.metaGrid, { borderBottomWidth: 0, marginTop: 40 }]}
           break={false}

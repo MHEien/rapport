@@ -1,6 +1,6 @@
 "use client";
 
-import { Database, FileText, Home, Menu, Settings, X } from "lucide-react";
+import { Database, FileText, Home, Menu, Package, Settings, Users, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
@@ -13,6 +13,8 @@ import { SyncIndicator } from "./sync-indicator";
 const navItems = [
   { href: "/", label: "Hjem", icon: Home },
   { href: "/reports", label: "Rapporter", icon: FileText },
+  { href: "/customers", label: "Kunder", icon: Users },
+  { href: "/inventory", label: "Varebeholdning", icon: Package },
   { href: "/data-editor", label: "Dataredigering", icon: Database },
   { href: "/settings", label: "Innstillinger", icon: Settings },
 ];
