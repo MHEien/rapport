@@ -300,3 +300,17 @@ export async function updateReportSignature(formData: FormData) {
     return { success: false, error: "Signature save failed" };
   }
 }
+
+// ============================================================================
+// UPDATE REPORT COMMENT
+// ============================================================================
+
+export async function updateReportComment(reportId: string, comment: string) {
+  const updated = await prisma.report.update({
+    where: { id: reportId },
+    data: {
+      overallComment: comment,
+    },
+  });
+  return { success: true, report: updated };
+}

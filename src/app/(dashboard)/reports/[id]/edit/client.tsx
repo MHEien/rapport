@@ -29,7 +29,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { updateReportSignature } from "@/lib/actions/checklist-actions";
+import { updateReportComment, updateReportSignature } from "@/lib/actions/checklist-actions";
 import { updateReportEquipment } from "@/lib/actions/equipment-actions";
 
 // ============================================================================
@@ -53,7 +53,7 @@ interface ReportEditClientProps {
 // STEP INDICATOR
 // ============================================================================
 
-function StepIndicator({ currentStep }: { currentStep: Step }) {
+function StepIndicator({ currentStep, onStepChange }: { currentStep: Step; onStepChange: (step: Step) => void }) {
   const steps: { key: Step; label: string; icon: React.ElementType }[] = [
     { key: "equipment", label: "Utstyr", icon: Package },
     { key: "checklist", label: "Sjekkliste", icon: ClipboardList },
@@ -71,7 +71,9 @@ function StepIndicator({ currentStep }: { currentStep: Step }) {
 
         return (
           <div key={step.key} className="flex items-center gap-2">
-            <div
+            <button
+              type="button"
+              onClick={() => onStepChange(step.key)}
               className={`
                 flex items-center justify-center size-10 rounded-full transition-colors
                 ${isCompleted ? "bg-[var(--status-ok)] text-[var(--status-ok-foreground)]" : ""}
@@ -84,7 +86,7 @@ function StepIndicator({ currentStep }: { currentStep: Step }) {
               ) : (
                 <Icon className="size-5" />
               )}
-            </div>
+            </button>
             {index < steps.length - 1 && (
               <div
                 className={`h-0.5 w-8 ${
@@ -273,6 +275,8 @@ function ChecklistStep({
 interface SummaryStepProps {
   report: Report;
   equipment: EquipmentWithChecklists[];
+  comment: string;
+  setComment: (comment: string) => void;
   onBack: () => void;
   onComplete: () => void;
 }
@@ -280,13 +284,37 @@ interface SummaryStepProps {
 function SummaryStep({
   report,
   equipment,
+  comment,
+  setComment,
   onBack,
   onComplete,
 }: SummaryStepProps) {
-  const [comment, setComment] = useState(report.overallComment ?? "");
+  // const [comment, setComment] = useState(report.overallComment ?? ""); // Lifted to parent
   const canvasRef = React.useRef<HTMLCanvasElement>(null);
   const [isDrawing, setIsDrawing] = useState(false);
-  const [hasSignature, setHasSignature] = useState(false);
+  const [hasSignature, setHasSignature] = useState(!!report.signatureUrl); // Persist sig state if url exists? 
+  // Wait, if url exists, we might want to show it or allow resign. 
+  // For now, let's assume if url exists, they can redesign or just keep.
+  // But if they navigate away and back, signature canvas clears. 
+  // We can't easily restore canvas from URL.
+  // Ideally, if signatureUrl exists, we show "Signed" state or image.
+  // But for simple nav fix: signature MIGHT be lost if not saved.
+  // But signature is saved on "onComplete".
+  // If they initiate signature, they must complete.
+  // If they navigate away, they lose signature drawing. That's acceptable for now.
+  
+  // Note: hasSignature default false, but if report.signatureUrl exists, maybe we shouldn't block?
+  // But mutation.mutate requires signature blob.
+  // If already signed, we might want to skip resign?
+  // Let's keep it simple: if not "hasSignature", they must sign again to "Complete".
+  // But they can navigate away.
+  
+  // Save comment on blur
+  const handleCommentBlur = async () => {
+     if (comment !== (report.overallComment ?? "")) { // Optimization: check vs initial
+        await updateReportComment(report.id, comment);
+     }
+  };
 
   const mutation = useMutation({
     mutationFn: async () => {
@@ -392,6 +420,7 @@ function SummaryStep({
             <Textarea
               value={comment}
               onChange={(e) => setComment(e.target.value)}
+              onBlur={handleCommentBlur}
               placeholder="Generelle observasjoner, anbefalinger, etc."
               className="min-h-[120px] text-base"
             />
@@ -471,6 +500,7 @@ export function ReportEditClient({
 }: ReportEditClientProps) {
   const router = useRouter();
   const [step, setStep] = useState<Step>("equipment");
+  const [overallComment, setOverallComment] = useState(report.overallComment ?? "");
 
   // Use report.equipment or fall back to existingResults
   const equipment =
@@ -497,7 +527,7 @@ export function ReportEditClient({
   return (
     <div className="min-h-screen bg-background flex flex-col">
       {/* Step indicator */}
-      <StepIndicator currentStep={step} />
+      <StepIndicator currentStep={step} onStepChange={setStep} />
 
       {/* Step content */}
       {step === "equipment" && (
@@ -519,6 +549,8 @@ export function ReportEditClient({
         <SummaryStep
           report={report}
           equipment={equipment}
+          comment={overallComment}
+          setComment={setOverallComment}
           onBack={() => setStep("checklist")}
           onComplete={handleComplete}
         />

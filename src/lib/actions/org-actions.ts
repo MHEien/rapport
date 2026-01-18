@@ -289,6 +289,40 @@ export async function cancelInvitation(invitationId: string) {
  * Update a member's role
  */
 export async function updateMemberRole(memberId: string, role: string) {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session?.user) {
+    return { success: false, error: "Ikke autentisert" };
+  }
+
+  // Check target member
+  const targetMember = await prisma.member.findUnique({
+    where: { id: memberId },
+  });
+
+  if (!targetMember) {
+    return { success: false, error: "Medlem ikke funnet" };
+  }
+
+  // Prevent modifying owners unless you are an owner
+  if (targetMember.role === "owner") {
+    const currentMember = await prisma.member.findFirst({
+      where: {
+        userId: session.user.id,
+        organizationId: targetMember.organizationId,
+      },
+    });
+
+    if (currentMember?.role !== "owner") {
+      return {
+        success: false,
+        error: "Kun eiere kan endre rettigheter for en eier",
+      };
+    }
+  }
+
   try {
     await auth.api.updateMemberRole({
       headers: await headers(),
@@ -307,6 +341,40 @@ export async function updateMemberRole(memberId: string, role: string) {
  * Remove a member from the organization
  */
 export async function removeMember(memberId: string) {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session?.user) {
+    return { success: false, error: "Ikke autentisert" };
+  }
+
+  // Check target member
+  const targetMember = await prisma.member.findUnique({
+    where: { id: memberId },
+  });
+
+  if (!targetMember) {
+    return { success: false, error: "Medlem ikke funnet" };
+  }
+
+  // Prevent removing owners unless you are an owner
+  if (targetMember.role === "owner") {
+    const currentMember = await prisma.member.findFirst({
+      where: {
+        userId: session.user.id,
+        organizationId: targetMember.organizationId,
+      },
+    });
+
+    if (currentMember?.role !== "owner") {
+      return {
+        success: false,
+        error: "Kun eiere kan fjerne en eier",
+      };
+    }
+  }
+
   try {
     await auth.api.removeMember({
       headers: await headers(),
