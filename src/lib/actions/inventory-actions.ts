@@ -42,7 +42,8 @@ export async function parseAndSaveInventoryPdf(formData: FormData) {
 
     // Dynamic import of pdf-parse (server-side only)
     const pdfParseModule = await import("pdf-parse");
-    const pdfParse = pdfParseModule.default ?? pdfParseModule;
+    // biome-ignore lint/suspicious/noExplicitAny: type definition mismatch for dynamic import
+    const pdfParse = (pdfParseModule as any).default ?? pdfParseModule;
     const pdfData = await pdfParse(buffer);
 
     // Parse the PDF text into parts
