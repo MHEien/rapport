@@ -71,8 +71,14 @@ export function AcceptInvitationClient({
   };
 
   const handleSignOutputAndRedirect = async () => {
-    await authClient.signOut();
-    router.push(`/auth/signin?callbackUrl=/accept-invitation/${invitation.id}`);
+    await authClient.signOut({
+      fetchOptions: {
+        onSuccess: () => {
+          // Redirect to signin with callback to this invitation page
+          router.push(`/auth/signin?callbackUrl=/accept-invitation/${invitation.id}`);
+        },
+      },
+    });
   };
 
   // Determine avatar text securely
@@ -162,7 +168,7 @@ export function AcceptInvitationClient({
                 className="w-full h-12 text-base bg-blue-600 hover:bg-blue-500"
               >
                 <Link
-                  href={`/auth/signup?email=${encodeURIComponent(invitation.email)}&callbackUrl=/accept-invitation/${invitation.id}`}
+                  href={`/signup?email=${encodeURIComponent(invitation.email)}&callbackUrl=/accept-invitation/${invitation.id}`}
                 >
                   Opprett bruker for å delta
                 </Link>
@@ -170,7 +176,7 @@ export function AcceptInvitationClient({
               <div className="text-center text-sm text-slate-500">
                 Har du allerede en bruker?{" "}
                 <Link
-                  href={`/auth/signin?email=${encodeURIComponent(invitation.email)}&callbackUrl=/accept-invitation/${invitation.id}`}
+                  href={`/login?email=${encodeURIComponent(invitation.email)}&callbackUrl=/accept-invitation/${invitation.id}`}
                   className="text-blue-400 hover:underline"
                 >
                   Logg inn

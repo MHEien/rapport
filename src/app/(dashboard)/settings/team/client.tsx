@@ -103,10 +103,37 @@ export function TeamSettingsClient({
   const handleCopyLink = async (invitationId: string) => {
     const link = getInviteLink(invitationId);
     try {
-      await navigator.clipboard.writeText(link);
-      toast.success("Invitasjonslenke kopiert!");
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(link);
+        toast.success("Invitasjonslenke kopiert!");
+      } else {
+        // Fallback for non-secure contexts (like HTTP IP in dev)
+        const textArea = document.createElement("textarea");
+        textArea.value = link;
+        textArea.style.position = "fixed";
+        textArea.style.left = "-9999px";
+        textArea.style.top = "0";
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        
+        try {
+          const successful = document.execCommand('copy');
+          if (successful) {
+            toast.success("Invitasjonslenke kopiert!");
+          } else {
+             // If legacy copy fails, show prompt
+             window.prompt("Kopier lenken manuelt:", link);
+          }
+        } catch (_err) {
+          window.prompt("Kopier lenken manuelt:", link);
+        }
+        
+        document.body.removeChild(textArea);
+      }
     } catch (_error) {
-      toast.error("Kunne ikke kopiere lenke");
+      // Last resort fallback
+      window.prompt("Kopier lenken manuelt:", link);
     }
   };
 
@@ -376,8 +403,13 @@ export function TeamSettingsClient({
                       {member.role}
                     </Badge>
 
-                    {/* Only allow actions if current user is owner/admin AND targeting someone else (or lower rank) */}
-                    {member.userId !== currentUserId && (
+                    {/* Only allow actions if:
+                        1. Not self (already checked)
+                        2. I am an owner
+                        3. OR the target is NOT an owner (Admins can edit others, but not owners)
+                     */}
+                    {member.userId !== currentUserId &&
+                      (currentUserRole === "owner" || member.role !== "owner") && (
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button

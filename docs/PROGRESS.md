@@ -4,6 +4,45 @@ A chronological log of development progress on the Field Service PWA.
 
 ---
 
+## 2026-01-18: Logout, User Admin & PDF Polish
+
+**Objective:** Fix authentication issues (logout, invite links), verify user administration, and polish PDF visuals.
+
+### Completed
+
+1. **Logout & User Administration**
+   - Implemented "Logg ut" button in Sidebar
+   - Fixed "Logg ut" on invitation page
+   - Verified Invitation -> Signup flow
+   - Fixed "Failed to fetch" on logout (Auth API location fix)
+   - Fixed "Copy Link" for HTTP/IP dev environments (Clipboard fallback)
+
+2. **Authentication Flow Fixes**
+   - Corrected Invitation page links to point to `/signup` and `/login`
+   - Implemented `callbackUrl` support in Signup and Login to redirect back to invitation
+   - Added email pre-filling from URL parameters in Signup and Login
+
+3. **PDF Visual Improvements**
+   - Added Sterner AS logo to header
+   - Added multi-column footer with office addresses (Ski, Bergen, Porsgrunn, Lofoten)
+   - Updated footer contact info
+
+4. **Mobile/Dev Environment**
+   - Configured `next.config.ts` to allow local IP access for mobile testing
+   - Updated `.env` to use local IP for `BETTER_AUTH_URL`
+
+### Files Modified
+| File | Change |
+|------|--------|
+| `sidebar.tsx` | Added Logout button |
+| `accept-invitation/[id]/client.tsx` | Fixed links, logout logic |
+| `signup/client.tsx`, `login/client.tsx` | Added callbackUrl/pre-fill support |
+| `pdf/report-pdf.tsx` | Added logo, footer addresses |
+| `next.config.ts` | Allowed local IP origins |
+| `.env` | Updated Base URL to local IP |
+
+---
+
 ## 2026-01-18: Service Report Workflow Implementation
 
 **Objective:** Implement comprehensive service workflow with customer/equipment persistence, PDF-based van inventory, and part consumption tracking.
@@ -65,9 +104,8 @@ A chronological log of development progress on the Field Service PWA.
 
 ### Remaining Work
 - Test end-to-end customer → equipment → report flow
-- Update PDF export to include consumed parts
-- Add PartSelector to report edit page
-- Tune PDF parsing for specific supplier formats
+- Tune PDF parsing for specific supplier formats (strategies implemented)
+- Implement assignment dropdown in reports list page
 
 ---
 

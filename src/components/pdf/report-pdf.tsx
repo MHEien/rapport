@@ -202,7 +202,7 @@ const styles = StyleSheet.create({
   // Footer Styles
   footer: {
     position: "absolute",
-    bottom: 30,
+    bottom: 20,
     left: 30,
     right: 30,
     borderTopWidth: 1,
@@ -210,11 +210,13 @@ const styles = StyleSheet.create({
     paddingTop: 10,
     flexDirection: "row",
     justifyContent: "space-between",
-    fontSize: 8,
+    fontSize: 7, // Smaller font to fit all addresses
     color: "#666",
+    gap: 10,
   },
   footerCol: {
     flexDirection: "column",
+    flex: 1, // Distribute space
   },
   logoImage: {
     width: 120,
@@ -231,9 +233,13 @@ export const ReportPDF = ({ report }: { report: ReportPDFData }) => {
         <View style={styles.headerContainer} fixed>
           {/* Logo */}
           <View style={styles.logoPlaceholder}>
-            {/* Ideally replace with actual Image component if logo URL is available */}
-            {/* <Image src="/sterner-logo.png" style={styles.logoImage} /> */}
-            <Text style={[styles.logoText, { fontSize: 24 }]}>STERNER</Text>
+            {/* Logo image - make sure sterner-logo.png is in public folder */}
+             {/* eslint-disable-next-line jsx-a11y/alt-text */}
+             <Image 
+               src="/sterner-logo.png" 
+               style={{ width: "100%", height: "100%", objectFit: "contain" }} 
+             />
+             {/* Fallback text if image fails is tricky in PDF, but we keep text hidden or removed */}
           </View>
           <View>
             <Text style={styles.headerTitle}>KONSOLIDERT SERVICERAPPORT</Text>
@@ -243,22 +249,33 @@ export const ReportPDF = ({ report }: { report: ReportPDFData }) => {
         {/* --- Fixed Footer --- */}
         <View style={styles.footer} fixed>
           <View style={styles.footerCol}>
-            <Text style={{ fontWeight: "bold", color: "#002E5D" }}>
-              Hovedkontor
-            </Text>
+            <Text style={{ fontWeight: "bold", color: "#002E5D" }}>Hovedkontor</Text>
             <Text>Sterner AS</Text>
             <Text>Anolitveien 16</Text>
             <Text>1400 Ski</Text>
           </View>
           <View style={styles.footerCol}>
-            <Text style={{ fontWeight: "bold", color: "#002E5D" }}>
-              Kontakt
-            </Text>
-            <Text>Tlf: 64 85 94 20</Text>
-            <Text>E-post: post@sterneras.no</Text>
-            <Text>Web: www.sterneras.no</Text>
+            <Text style={{ fontWeight: "bold", color: "#002E5D" }}>Bergen</Text>
+            <Text>Sandslimarka 63</Text>
+            <Text>5254 Sandsli</Text>
           </View>
-          <View style={[styles.footerCol, { alignItems: "flex-end" }]}>
+          <View style={styles.footerCol}>
+            <Text style={{ fontWeight: "bold", color: "#002E5D" }}>Porsgrunn</Text>
+            <Text>Vipevegen 51</Text>
+            <Text>3917 Porsgrunn</Text>
+          </View>
+          <View style={styles.footerCol}>
+            <Text style={{ fontWeight: "bold", color: "#002E5D" }}>Lofoten</Text>
+            <Text>Lufthavnveien 16</Text>
+            <Text>8370 Leknes</Text>
+          </View>
+          <View style={styles.footerCol}>
+            <Text style={{ fontWeight: "bold", color: "#002E5D" }}>Kontakt</Text>
+            <Text>Tlf: 64 85 94 20</Text>
+            <Text>post@sterneras.no</Text>
+            <Text>www.sterneras.no</Text>
+          </View>
+          <View style={[styles.footerCol, { alignItems: "flex-end", justifyContent: "flex-end" }]}>
             <Text
               render={({ pageNumber, totalPages }) =>
                 `Side ${pageNumber} av ${totalPages}`

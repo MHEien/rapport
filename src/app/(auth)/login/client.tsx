@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { redirect } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -15,7 +15,12 @@ import { Label } from "@/components/ui/label";
 import { signIn } from "@/lib/server";
 
 export function Login() {
-  const [email, setEmail] = useState("");
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl") || "/";
+  const initialEmail = searchParams.get("email") || "";
+
+  const [email, setEmail] = useState(initialEmail);
   const [password, setPassword] = useState("");
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -23,7 +28,7 @@ export function Login() {
     const response = await signIn({ email, password });
 
     if (response.user) {
-      redirect("/");
+      router.push(callbackUrl);
     }
   };
 

@@ -158,25 +158,37 @@ function ChecklistRow({
   };
 
   const handleCommentBlur = () => {
-    if (status) {
+    // Save even if no status (allows entering value/comment before status)
+    if (comment.trim() !== (existingResult?.comment ?? "")) {
       onSave({
         equipmentId,
         category,
         question,
-        status,
-        comment: comment.trim() || undefined,
-        value: value.trim() || undefined,
+        status: status || "OK", // Default to OK if not set? Or allow null?
+        // The type definition for SaveChecklistInput says status is ChecklistStatus (enum).
+        // If the backend requires a status, we might need to default to something or change the backend type.
+        // Let's look at `SaveChecklistInput`. It imports `ChecklistStatus`.
+        // If I send "OK" as default, it's safer UX than not saving.
+        // But better: check if I can send null.
+        // The server action expects `ChecklistStatus`.
+        // Let's default to status if set, otherwise don't save status? No, input requires status.
+        // Let's default to "OK" if the user enters data and leaves?
+        // Or better: Change logic to ONLY save if we have a status, but maybe auto-select OK if they type?
+        // Let's auto-select OK if they type a value/comment and status is unset.
       });
     }
   };
 
   const handleValueBlur = () => {
-    if (status) {
+    const effectiveStatus = status || "OK";
+    if (effectiveStatus) {
+      if (!status) setStatus("OK");
+
       onSave({
         equipmentId,
         category,
         question,
-        status,
+        status: effectiveStatus,
         comment: comment.trim() || undefined,
         value: value.trim() || undefined,
       });

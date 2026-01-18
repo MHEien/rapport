@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -18,7 +18,11 @@ import { signUp } from "@/lib/server";
 
 export function Signup() {
   const router = useRouter();
-  const [email, setEmail] = useState("");
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl") || "/";
+  const initialEmail = searchParams.get("email") || "";
+
+  const [email, setEmail] = useState(initialEmail);
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
@@ -28,7 +32,7 @@ export function Signup() {
     const response = await signUp({ email, password, name, rememberMe });
     if (response.user) {
       toast.success("Registrering fullført");
-      router.push("/");
+      router.push(callbackUrl);
     } else {
       toast.error("Noe gikk galt");
     }

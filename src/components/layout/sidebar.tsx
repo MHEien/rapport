@@ -4,6 +4,7 @@ import {
   Database,
   FileText,
   Home,
+  LogOut,
   Menu,
   Package,
   Settings,
@@ -11,11 +12,12 @@ import {
   X,
 } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { authClient } from "@/lib/auth-client";
 import { Card } from "../ui/card";
 import { SyncIndicator } from "./sync-indicator";
 
@@ -54,7 +56,18 @@ export function Sidebar({
   collapsed = false,
 }: SidebarProps) {
   const pathname = usePathname();
+  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
+
+  const handleSignOut = async () => {
+    await authClient.signOut({
+      fetchOptions: {
+        onSuccess: () => {
+          router.push("/login");
+        },
+      },
+    });
+  };
 
   const _isOwnerOrAdmin =
     membership?.role === "owner" || membership?.role === "admin";
@@ -168,8 +181,8 @@ export function Sidebar({
           >
             <div
               className={cn(
-                "flex items-center gap-3 p-2 rounded-xl",
-                "bg-white/5 hover:bg-white/10 transition-colors cursor-pointer",
+                "flex items-center gap-3 p-2 rounded-xl mb-2",
+                "bg-white/5",
                 collapsed && "justify-center p-2",
               )}
             >
@@ -190,6 +203,18 @@ export function Sidebar({
                 </div>
               )}
             </div>
+            
+            <Button
+              variant="ghost" 
+              onClick={handleSignOut}
+              className={cn(
+                "w-full flex items-center gap-3 rounded-xl text-slate-400 hover:text-red-400 hover:bg-red-500/10",
+                collapsed ? "justify-center px-2" : "justify-start px-3"
+              )}
+            >
+              <LogOut className="size-5 shrink-0" />
+              {!collapsed && <span>Logg ut</span>}
+            </Button>
           </div>
         )}
       </aside>

@@ -17,11 +17,13 @@ import {
   Plus,
   Search,
   Trash2,
+  User as UserIcon,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import type { ReportStatus } from "@/app/generated/prisma/client";
+import { AssignmentDialog } from "@/components/report/assignment-dialog";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -60,6 +62,7 @@ interface Report {
   serviceDate: Date;
   createdAt: Date;
   updatedAt: Date;
+  assignedTo?: { id: string; name: string | null } | null;
   equipment: Equipment[];
   _count: { equipment: number };
 }
@@ -111,13 +114,14 @@ const statusFilters: { value: ReportStatus | "ALL"; label: string }[] = [
   { value: "ARCHIVED", label: "Arkivert" },
 ];
 
+
 export function ReportsClient({
   initialReports,
   initialPagination,
 }: ReportsClientProps) {
   const router = useRouter();
   const [_isPending, startTransition] = useTransition();
-
+  
   // State
   const [reports, setReports] = useState(initialReports);
   const [pagination, setPagination] = useState(initialPagination);
@@ -125,11 +129,15 @@ export function ReportsClient({
   const [statusFilter, setStatusFilter] = useState<ReportStatus | "ALL">("ALL");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [reportToDelete, setReportToDelete] = useState<string | null>(null);
+  
+  // Assignment State
+  const [assignmentDialogOpen, setAssignmentDialogOpen] = useState(false);
+  const [reportToAssign, setReportToAssign] = useState<string | null>(null);
+  const [currentAssigneeId, setCurrentAssigneeId] = useState<string | null>(null);
 
   // Handlers
   const handleSearch = (value: string) => {
     setSearch(value);
-    // Debounced search would be better, but keeping simple for now
     startTransition(() => {
       const params = new URLSearchParams();
       if (value) params.set("search", value);
@@ -165,6 +173,12 @@ export function ReportsClient({
     if (result.success && result.report) {
       router.push(`/reports/${result.report.id}/edit`);
     }
+  };
+
+  const handleAssign = (reportId: string, assigneeId?: string) => {
+    setReportToAssign(reportId);
+    setCurrentAssigneeId(assigneeId || null);
+    setAssignmentDialogOpen(true);
   };
 
   return (
@@ -225,8 +239,10 @@ export function ReportsClient({
       {/* Reports List */}
       <main className="px-4 lg:px-6 py-6">
         {reports.length === 0 ? (
-          <div className="rounded-2xl border border-white/5 bg-white/[0.02] p-12 text-center">
-            <FileText className="size-16 text-slate-600 mx-auto mb-4" />
+          // ... existing empty state ...
+           <div className="rounded-2xl border border-white/5 bg-white/[0.02] p-12 text-center">
+            {/* ... same content ... */}
+             <FileText className="size-16 text-slate-600 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-white mb-2">
               {search || statusFilter !== "ALL"
                 ? "Ingen resultater"
@@ -245,7 +261,7 @@ export function ReportsClient({
                 </Link>
               </Button>
             )}
-          </div>
+           </div>
         ) : (
           <div className="rounded-2xl border border-white/5 overflow-hidden bg-white/[0.02]">
             {/* Table header - hidden on mobile */}
@@ -317,6 +333,15 @@ export function ReportsClient({
                         <StatusIcon className="size-3" />
                         {config.label}
                       </Badge>
+                       {/* Show assignee if exists */}
+                       {report.assignedTo && (
+                        <div className="mt-1 flex items-center gap-1 text-xs text-slate-500">
+                            <span className="size-4 rounded-full bg-blue-500/20 text-blue-300 flex items-center justify-center text-[10px]">
+                                {report.assignedTo.name?.substring(0, 1) || "?"}
+                            </span>
+                            <span className="truncate max-w-[80px]">{report.assignedTo.name?.split(" ")[0]}</span>
+                        </div>
+                       )}
                     </div>
                     <div>
                       <ReportActions
@@ -324,9 +349,10 @@ export function ReportsClient({
                         onEdit={() => router.push(`/reports/${report.id}/edit`)}
                         onDuplicate={() => handleDuplicate(report.id)}
                         onDelete={() => {
-                          setReportToDelete(report.id);
-                          setDeleteDialogOpen(true);
+                            setReportToDelete(report.id);
+                            setDeleteDialogOpen(true);
                         }}
+                        onAssign={() => handleAssign(report.id, report.assignedTo?.id)}
                       />
                     </div>
                   </div>
@@ -340,6 +366,7 @@ export function ReportsClient({
                     }
                     className="flex lg:hidden items-center gap-4 px-4 py-4 hover:bg-white/5 transition-colors cursor-pointer"
                   >
+                   {/* ... existing mobile row content ... */}
                     <div className="size-12 rounded-xl bg-gradient-to-br from-blue-500/20 to-indigo-500/10 flex items-center justify-center shrink-0">
                       <FileText className="size-6 text-blue-400" />
                     </div>
@@ -360,6 +387,12 @@ export function ReportsClient({
                           <StatusIcon className="size-2.5" />
                           {config.label}
                         </Badge>
+                         {/* Show assignee mobile */}
+                        {report.assignedTo && (
+                           <span className="text-xs text-slate-500 flex items-center gap-1">
+                              • {report.assignedTo.name?.split(" ")[0]}
+                           </span>
+                        )}
                         <span className="text-xs text-slate-500">
                           {formatDistanceToNow(new Date(report.updatedAt), {
                             addSuffix: true,
@@ -420,6 +453,14 @@ export function ReportsClient({
         )}
       </main>
 
+      {/* Assignment Dialog */}
+      <AssignmentDialog 
+        open={assignmentDialogOpen} 
+        onOpenChange={setAssignmentDialogOpen}
+        reportId={reportToAssign}
+        currentAssigneeId={currentAssigneeId}
+      />
+
       {/* Delete confirmation dialog */}
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent className="bg-slate-900 border-white/10">
@@ -453,11 +494,13 @@ function ReportActions({
   onEdit,
   onDuplicate,
   onDelete,
+  onAssign,
 }: {
   onView: () => void;
   onEdit: () => void;
   onDuplicate: () => void;
   onDelete: () => void;
+  onAssign: () => void;
 }) {
   return (
     <DropdownMenu>
@@ -471,6 +514,10 @@ function ReportActions({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="bg-slate-900 border-white/10">
+        <DropdownMenuItem onClick={onAssign} className="gap-2">
+          <UserIcon className="size-4" />
+          Tildel tekniker
+        </DropdownMenuItem>
         <DropdownMenuItem onClick={onView} className="gap-2">
           {/* We need to import Eye icon if not imported, but it is imported at top */}
           <Eye className="size-4" />
