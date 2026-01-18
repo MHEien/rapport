@@ -151,7 +151,7 @@ export async function bulkCreateServicePoints(
       isForService: input.isForService ?? true,
       isForCommissioning: input.isForCommissioning ?? true,
       // Default to 0 for bulk import; user can reorder later
-      categorySortOrder: 0, 
+      categorySortOrder: 0,
     })),
   });
   revalidatePath("/data-editor");

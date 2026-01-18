@@ -187,7 +187,10 @@ export async function assignReport(reportId: string, userId: string) {
     orgData.membership.role !== "owner" &&
     orgData.membership.role !== "admin"
   ) {
-    return { success: false, error: "Kun administratorer kan tildele rapporter" };
+    return {
+      success: false,
+      error: "Kun administratorer kan tildele rapporter",
+    };
   }
 
   // Verify report belongs to org

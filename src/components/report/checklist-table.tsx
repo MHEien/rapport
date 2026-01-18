@@ -142,6 +142,7 @@ function ChecklistRow({
     existingResult?.status,
   );
   const [comment, setComment] = useState(existingResult?.comment ?? "");
+  const [value, setValue] = useState(existingResult?.value ?? "");
   const [showComment, setShowComment] = useState(!!existingResult?.comment);
 
   const handleStatusSelect = (newStatus: ChecklistStatus) => {
@@ -152,6 +153,7 @@ function ChecklistRow({
       question,
       status: newStatus,
       comment: comment.trim() || undefined,
+      value: value.trim() || undefined,
     });
   };
 
@@ -163,6 +165,20 @@ function ChecklistRow({
         question,
         status,
         comment: comment.trim() || undefined,
+        value: value.trim() || undefined,
+      });
+    }
+  };
+
+  const handleValueBlur = () => {
+    if (status) {
+      onSave({
+        equipmentId,
+        category,
+        question,
+        status,
+        comment: comment.trim() || undefined,
+        value: value.trim() || undefined,
       });
     }
   };
@@ -183,12 +199,14 @@ function ChecklistRow({
         />
       </div>
 
-      {/* Value Input - 2 columns (placeholder for now) */}
+      {/* Value Input - 2 columns */}
       <div className="col-span-3 lg:col-span-1">
         <Input
           placeholder="-"
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+          onBlur={handleValueBlur}
           className="h-12 text-center bg-white/5 border-white/10"
-          disabled
         />
       </div>
 
@@ -290,13 +308,26 @@ interface EquipmentTabContentProps {
   organizationId: string;
 }
 
-function EquipmentTabContent({ equipment, organizationId }: EquipmentTabContentProps) {
+function EquipmentTabContent({
+  equipment,
+  organizationId,
+}: EquipmentTabContentProps) {
   // Fetch service points for this equipment's product type
-  const reportType = equipment.jobType === "COMMISSIONING" ? "COMMISSIONING" : "SERVICE";
+  const reportType =
+    equipment.jobType === "COMMISSIONING" ? "COMMISSIONING" : "SERVICE";
   const { data: servicePoints = [], isLoading } = useQuery({
-    queryKey: ["servicePoints", equipment.productType, organizationId, reportType],
+    queryKey: [
+      "servicePoints",
+      equipment.productType,
+      organizationId,
+      reportType,
+    ],
     queryFn: () =>
-      getServicePointsByProductType(equipment.productType, organizationId, reportType),
+      getServicePointsByProductType(
+        equipment.productType,
+        organizationId,
+        reportType,
+      ),
   });
 
   // Offline-aware mutation for saving results
@@ -383,7 +414,11 @@ function EquipmentTabContent({ equipment, organizationId }: EquipmentTabContentP
 // MAIN CHECKLIST TABLE
 // ============================================================================
 
-export function ChecklistTable({ equipment, organizationId, onComplete }: ChecklistTableProps) {
+export function ChecklistTable({
+  equipment,
+  organizationId,
+  onComplete,
+}: ChecklistTableProps) {
   const [activeTab, setActiveTab] = useState(equipment[0]?.id ?? "");
 
   // Track sync status across all equipment
@@ -450,7 +485,10 @@ export function ChecklistTable({ equipment, organizationId, onComplete }: Checkl
             value={eq.id}
             className="flex-1 mt-0 overflow-auto"
           >
-            <EquipmentTabContent equipment={eq} organizationId={organizationId} />
+            <EquipmentTabContent
+              equipment={eq}
+              organizationId={organizationId}
+            />
           </TabsContent>
         ))}
       </Tabs>

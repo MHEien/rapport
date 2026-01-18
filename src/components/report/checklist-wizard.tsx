@@ -120,7 +120,8 @@ export function ChecklistWizard({
   // Fetch service points for this product type
   const { data: servicePoints = [], isLoading } = useQuery({
     queryKey: ["servicePoints", productType, reportType],
-    queryFn: () => getServicePointsByProductType(productType, organizationId, reportType),
+    queryFn: () =>
+      getServicePointsByProductType(productType, organizationId, reportType),
   });
 
   // Offline-aware mutation for saving results

@@ -15,6 +15,7 @@ import type {
   Media,
   Report,
   ReportEquipment,
+  ReportPart,
 } from "@/app/generated/prisma/client";
 
 // Define the shape of data we expect
@@ -31,6 +32,7 @@ export interface ReportPDFData extends Report {
     email: string;
   };
   equipment: EquipmentWithChecklists[];
+  parts?: ReportPart[]; // Consumed parts from van inventory
 }
 
 // Styles matching the "Sterner" PDF layout
@@ -217,8 +219,8 @@ const styles = StyleSheet.create({
   logoImage: {
     width: 120,
     height: 40,
-    objectFit: 'contain'
-  }
+    objectFit: "contain",
+  },
 });
 
 export const ReportPDF = ({ report }: { report: ReportPDFData }) => {
@@ -249,13 +251,15 @@ export const ReportPDF = ({ report }: { report: ReportPDFData }) => {
             <Text>1400 Ski</Text>
           </View>
           <View style={styles.footerCol}>
-            <Text style={{ fontWeight: "bold", color: "#002E5D" }}>Kontakt</Text>
+            <Text style={{ fontWeight: "bold", color: "#002E5D" }}>
+              Kontakt
+            </Text>
             <Text>Tlf: 64 85 94 20</Text>
             <Text>E-post: post@sterneras.no</Text>
             <Text>Web: www.sterneras.no</Text>
           </View>
           <View style={[styles.footerCol, { alignItems: "flex-end" }]}>
-             <Text
+            <Text
               render={({ pageNumber, totalPages }) =>
                 `Side ${pageNumber} av ${totalPages}`
               }
@@ -269,7 +273,7 @@ export const ReportPDF = ({ report }: { report: ReportPDFData }) => {
             However, for the start of the document we might need a spacer or just rely on the first element's margin.
             Let's keep the meta grid as the first flow element.
         */}
-        
+
         {/* Date/Meta Grid */}
         <View style={styles.metaGrid}>
           <View style={styles.metaCol}>
@@ -277,8 +281,8 @@ export const ReportPDF = ({ report }: { report: ReportPDFData }) => {
             <Text style={styles.metaValue}>{report.customerName}</Text>
           </View>
           <View style={styles.metaCol}>
-            <Text style={styles.metaLabel}>SO:</Text>
-            <Text style={styles.metaValue}>{report.reportNumber}</Text>
+            <Text style={styles.metaLabel}>SO-nummer:</Text>
+            <Text style={styles.metaValue}>{report.soNumber || "-"}</Text>
           </View>
           <View style={styles.metaCol}>
             <Text style={styles.metaLabel}>Dato:</Text>
@@ -367,7 +371,7 @@ export const ReportPDF = ({ report }: { report: ReportPDFData }) => {
                         </Text>
                         <Text style={styles.colCheck}>{isOK ? "X" : ""}</Text>
                         <Text style={styles.colCheck}>{isNA ? "X" : ""}</Text>
-                        <Text style={styles.colValue}>-</Text>
+                        <Text style={styles.colValue}>{item.value || "-"}</Text>
                         <Text style={styles.colComment}>
                           {item.comment || ""}
                         </Text>
@@ -380,13 +384,70 @@ export const ReportPDF = ({ report }: { report: ReportPDFData }) => {
           );
         })}
 
+        {/* Parts Section */}
+        {report.parts && report.parts.length > 0 && (
+          <View style={styles.tableContainer}>
+            <View
+              style={[
+                styles.sectionHeader,
+                { backgroundColor: "#E8F5E9", marginTop: 15, marginBottom: 8 },
+              ]}
+            >
+              <Text
+                style={[
+                  styles.sectionTitle,
+                  { fontSize: 12, color: "#2E7D32" },
+                ]}
+              >
+                Deler brukt
+              </Text>
+            </View>
+
+            <View style={[styles.tableHeader, { backgroundColor: "#2E7D32" }]}>
+              <Text style={[{ width: "25%", paddingLeft: 5 }, styles.boldText]}>
+                Artikkelnr.
+              </Text>
+              <Text style={[{ width: "45%", paddingLeft: 5 }, styles.boldText]}>
+                Beskrivelse
+              </Text>
+              <Text
+                style={[{ width: "15%", textAlign: "center" }, styles.boldText]}
+              >
+                Antall
+              </Text>
+              <Text
+                style={[{ width: "15%", textAlign: "center" }, styles.boldText]}
+              >
+                Enhet
+              </Text>
+            </View>
+
+            {report.parts.map((part) => (
+              <View key={part.id} style={styles.tableRow}>
+                <Text style={{ width: "25%", paddingLeft: 5, fontSize: 8 }}>
+                  {part.partNumber}
+                </Text>
+                <Text style={{ width: "45%", paddingLeft: 5 }}>
+                  {part.description}
+                </Text>
+                <Text style={{ width: "15%", textAlign: "center" }}>
+                  {part.quantity}
+                </Text>
+                <Text
+                  style={{ width: "15%", textAlign: "center", fontSize: 8 }}
+                >
+                  {part.unit || "stk"}
+                </Text>
+              </View>
+            ))}
+          </View>
+        )}
+
         <View style={styles.noteSection} break={false}>
           <Text style={styles.noteTitle}>
             Konklusjon/Notater (Felles for alle enheter):
           </Text>
-          <Text style={styles.noteText}>
-            See comments in table above.
-          </Text>
+          <Text style={styles.noteText}>See comments in table above.</Text>
         </View>
 
         <View

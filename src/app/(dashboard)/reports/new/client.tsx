@@ -57,6 +57,7 @@ export function NewReportClient({ productTypes }: NewReportClientProps) {
     useState<CustomerOption | null>(null);
   const [customerName, setCustomerName] = useState("");
   const [contactPerson, setContactPerson] = useState("");
+  const [soNumber, setSoNumber] = useState("");
 
   // Customer equipment from EquipmentSelector
   const [customerEquipment, setCustomerEquipment] = useState<
@@ -92,6 +93,7 @@ export function NewReportClient({ productTypes }: NewReportClientProps) {
         customerName: selectedCustomer?.name || customerName,
         contactPerson: contactPerson || undefined,
         customerId: selectedCustomer?.id,
+        soNumber: soNumber || undefined,
         equipment: allEquipment,
       });
     },
@@ -214,6 +216,16 @@ export function NewReportClient({ productTypes }: NewReportClientProps) {
                     value={contactPerson}
                     onChange={(e) => setContactPerson(e.target.value)}
                     placeholder="Navn på kontaktperson"
+                    className="h-14 text-lg bg-white/5 border-white/10"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="soNumber">SO-nummer</Label>
+                  <Input
+                    id="soNumber"
+                    value={soNumber}
+                    onChange={(e) => setSoNumber(e.target.value)}
+                    placeholder="Service Order nummer"
                     className="h-14 text-lg bg-white/5 border-white/10"
                   />
                 </div>

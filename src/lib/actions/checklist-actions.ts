@@ -56,6 +56,7 @@ export async function getReportWithChecklist(reportId: string) {
           email: true,
         },
       },
+      parts: true, // Include consumed parts for PDF
     },
   });
 
@@ -65,8 +66,10 @@ export async function getReportWithChecklist(reportId: string) {
   const equipmentWithAllPoints = await Promise.all(
     report.equipment.map(async (eq) => {
       // Fetch master service points for this product type
-      console.log(`[getReportWithChecklist] Fetching service points for productType: ${eq.productType}, orgId: ${report.organizationId}`);
-      
+      console.log(
+        `[getReportWithChecklist] Fetching service points for productType: ${eq.productType}, orgId: ${report.organizationId}`,
+      );
+
       const allServicePoints = await prisma.servicePoint.findMany({
         where: {
           productType: eq.productType,
@@ -79,8 +82,10 @@ export async function getReportWithChecklist(reportId: string) {
           { sortOrder: "asc" },
         ],
       });
-      
-      console.log(`[getReportWithChecklist] Found ${allServicePoints.length} service points for ${eq.productType}`);
+
+      console.log(
+        `[getReportWithChecklist] Found ${allServicePoints.length} service points for ${eq.productType}`,
+      );
 
       // Create a lookup map of existing checklist answers by question
       const existingAnswers = new Map(
@@ -103,7 +108,11 @@ export async function getReportWithChecklist(reportId: string) {
           equipmentId: eq.id,
           category: sp.category,
           question: sp.text,
-          status: null as unknown as "OK" | "BOR_UTBEDRES" | "MA_UTBEDRES" | "IKKE_AKTUELT",
+          status: null as unknown as
+            | "OK"
+            | "BOR_UTBEDRES"
+            | "MA_UTBEDRES"
+            | "IKKE_AKTUELT",
           comment: null,
           sortOrder: sp.sortOrder,
           photos: [],
@@ -133,10 +142,11 @@ export type SaveChecklistInput = {
   question: string;
   status: ChecklistStatus;
   comment?: string;
+  value?: string;
 };
 
 export async function saveChecklistResult(input: SaveChecklistInput) {
-  const { equipmentId, category, question, status, comment } = input;
+  const { equipmentId, category, question, status, comment, value } = input;
 
   // First, check if a result already exists for this question
   const existing = await prisma.checklistResult.findFirst({
@@ -154,6 +164,7 @@ export async function saveChecklistResult(input: SaveChecklistInput) {
       data: {
         status,
         comment,
+        value,
       },
     });
     return { success: true, result: updated, action: "updated" as const };
@@ -167,6 +178,7 @@ export async function saveChecklistResult(input: SaveChecklistInput) {
       question,
       status,
       comment,
+      value,
     },
   });
 

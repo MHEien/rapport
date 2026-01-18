@@ -62,6 +62,7 @@ export async function createReportWithEquipment(input: {
   customerName: string;
   contactPerson?: string;
   customerId?: string; // Optional link to Customer record
+  soNumber?: string; // Service Order number
   equipment: BulkEquipmentInput[];
 }) {
   const session = await getSession();
@@ -82,6 +83,7 @@ export async function createReportWithEquipment(input: {
       customerName: input.customerName,
       contactPerson: input.contactPerson,
       customerId: input.customerId, // Link to Customer if provided
+      soNumber: input.soNumber, // Service Order number
       status: "DRAFT",
       equipment: {
         create: input.equipment
