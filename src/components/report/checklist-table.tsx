@@ -152,8 +152,8 @@ function ChecklistRow({
       category,
       question,
       status: newStatus,
-      comment: comment.trim() || undefined,
-      value: value.trim() || undefined,
+      comment: comment.trim() || null,
+      value: value.trim() || null,
     });
   };
 
@@ -175,6 +175,8 @@ function ChecklistRow({
         // Let's default to "OK" if the user enters data and leaves?
         // Or better: Change logic to ONLY save if we have a status, but maybe auto-select OK if they type?
         // Let's auto-select OK if they type a value/comment and status is unset.
+        comment: comment.trim() || null,
+        value: value.trim() || null,
       });
     }
   };
@@ -189,8 +191,8 @@ function ChecklistRow({
         category,
         question,
         status: effectiveStatus,
-        comment: comment.trim() || undefined,
-        value: value.trim() || undefined,
+        comment: comment.trim() || null,
+        value: value.trim() || null,
       });
     }
   };

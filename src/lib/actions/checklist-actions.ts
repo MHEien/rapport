@@ -142,8 +142,8 @@ export type SaveChecklistInput = {
   category: string;
   question: string;
   status: ChecklistStatus;
-  comment?: string;
-  value?: string;
+  comment?: string | null;
+  value?: string | null;
 };
 
 export async function saveChecklistResult(input: SaveChecklistInput) {
