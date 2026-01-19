@@ -9,7 +9,8 @@ import {
 } from "@react-pdf/renderer";
 import { format } from "date-fns";
 
-// Types from Prisma
+// Types from Prisma (Mocked or imported from your actual path)
+// Ensure these match your actual import paths
 import type {
   ChecklistResult,
   Media,
@@ -39,15 +40,15 @@ export interface ReportPDFData extends Report {
 const styles = StyleSheet.create({
   page: {
     fontFamily: "Helvetica",
-    fontSize: 9, // Slightly smaller to fit table data
-    paddingTop: 80,
+    fontSize: 9,
+    paddingTop: 80, // Space for Header
     paddingLeft: 30,
     paddingRight: 30,
-    paddingBottom: 80,
+    paddingBottom: 80, // Space for Footer
     color: "#000000",
     lineHeight: 1.2,
   },
-  // Header Section [cite: 1-9]
+  // Header Section
   headerContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -59,11 +60,6 @@ const styles = StyleSheet.create({
     height: 40,
     justifyContent: "center",
     alignItems: "center",
-  },
-  logoText: {
-    fontSize: 10,
-    fontWeight: "bold",
-    color: "#002E5D", // Sterner Blue
   },
   headerTitle: {
     fontSize: 16,
@@ -117,7 +113,7 @@ const styles = StyleSheet.create({
   tableRow: {
     flexDirection: "row",
     borderBottomWidth: 0.5,
-    borderColor: "#ddd",
+    borderColor: "#ccc",
     minHeight: 18,
     alignItems: "center",
     paddingVertical: 2,
@@ -182,24 +178,7 @@ const styles = StyleSheet.create({
     marginBottom: 3,
   },
 
-  // Photos
-  photoGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 10,
-    marginTop: 10,
-  },
-  photoContainer: {
-    width: "30%",
-    marginBottom: 10,
-  },
-  photo: {
-    width: "100%",
-    height: 100,
-    objectFit: "cover",
-    backgroundColor: "#eee",
-  },
-  // Footer Styles
+  // Footer Styles - Critical for positioning
   footer: {
     position: "absolute",
     bottom: 20,
@@ -210,36 +189,35 @@ const styles = StyleSheet.create({
     paddingTop: 10,
     flexDirection: "row",
     justifyContent: "space-between",
-    fontSize: 7, // Smaller font to fit all addresses
+    fontSize: 7,
     color: "#666",
     gap: 10,
+    zIndex: 10, // Ensure footer sits ON TOP of any content backgrounds
   },
   footerCol: {
     flexDirection: "column",
     flex: 1, // Distribute space
-  },
-  logoImage: {
-    width: 120,
-    height: 40,
-    objectFit: "contain",
   },
 });
 
 export const ReportPDF = ({ report }: { report: ReportPDFData }) => {
   return (
     <Document>
-      <Page size="A4" style={styles.page}>
+      <Page size="A4" style={styles.page} wrap>
+        {/* CRITICAL ORDERING:
+          1. Fixed Header
+          2. Fixed Footer (Must be at top + zIndex to appear on all pages and above content)
+          3. Flowing Content
+        */}
+
         {/* --- Fixed Header --- */}
         <View style={styles.headerContainer} fixed>
-          {/* Logo */}
           <View style={styles.logoPlaceholder}>
-            {/* Logo image - make sure sterner-logo.png is in public folder */}
-             {/* eslint-disable-next-line jsx-a11y/alt-text */}
-             <Image 
-               src="/sterner-logo.png" 
-               style={{ width: "100%", height: "100%", objectFit: "contain" }} 
-             />
-             {/* Fallback text if image fails is tricky in PDF, but we keep text hidden or removed */}
+            {/* eslint-disable-next-line jsx-a11y/alt-text */}
+            <Image
+              src="/sterner-logo.png"
+              style={{ width: "100%", height: "100%", objectFit: "contain" }}
+            />
           </View>
           <View>
             <Text style={styles.headerTitle}>KONSOLIDERT SERVICERAPPORT</Text>
@@ -249,7 +227,9 @@ export const ReportPDF = ({ report }: { report: ReportPDFData }) => {
         {/* --- Fixed Footer --- */}
         <View style={styles.footer} fixed>
           <View style={styles.footerCol}>
-            <Text style={{ fontWeight: "bold", color: "#002E5D" }}>Hovedkontor</Text>
+            <Text style={{ fontWeight: "bold", color: "#002E5D" }}>
+              Hovedkontor
+            </Text>
             <Text>Sterner AS</Text>
             <Text>Anolitveien 16</Text>
             <Text>1400 Ski</Text>
@@ -260,7 +240,9 @@ export const ReportPDF = ({ report }: { report: ReportPDFData }) => {
             <Text>5254 Sandsli</Text>
           </View>
           <View style={styles.footerCol}>
-            <Text style={{ fontWeight: "bold", color: "#002E5D" }}>Porsgrunn</Text>
+            <Text style={{ fontWeight: "bold", color: "#002E5D" }}>
+              Porsgrunn
+            </Text>
             <Text>Vipevegen 51</Text>
             <Text>3917 Porsgrunn</Text>
           </View>
@@ -275,7 +257,12 @@ export const ReportPDF = ({ report }: { report: ReportPDFData }) => {
             <Text>post@sterneras.no</Text>
             <Text>www.sterneras.no</Text>
           </View>
-          <View style={[styles.footerCol, { alignItems: "flex-end", justifyContent: "flex-end" }]}>
+          <View
+            style={[
+              styles.footerCol,
+              { alignItems: "flex-end", justifyContent: "flex-end" },
+            ]}
+          >
             <Text
               render={({ pageNumber, totalPages }) =>
                 `Side ${pageNumber} av ${totalPages}`
@@ -284,12 +271,7 @@ export const ReportPDF = ({ report }: { report: ReportPDFData }) => {
           </View>
         </View>
 
-        {/* --- Main Content (Padded for Header/Footer) --- */}
-        {/* React-PDF fixed elements overlay, so we need top/bottom margin on the content container doesn't fully work for flow. 
-            Instead, we rely on page padding which we set in styles.page. 
-            However, for the start of the document we might need a spacer or just rely on the first element's margin.
-            Let's keep the meta grid as the first flow element.
-        */}
+        {/* --- Main Content --- */}
 
         {/* Date/Meta Grid */}
         <View style={styles.metaGrid}>
@@ -322,7 +304,7 @@ export const ReportPDF = ({ report }: { report: ReportPDFData }) => {
         </View>
 
         {/* Equipment Loop */}
-        {report.equipment.map((eq, _index) => {
+        {report.equipment.map((eq, index) => {
           const groupedChecklists = eq.checklists.reduce(
             (acc, item) => {
               const cat = item.category || "Generelt";
@@ -338,7 +320,7 @@ export const ReportPDF = ({ report }: { report: ReportPDFData }) => {
           );
 
           return (
-            <View key={eq.id} style={styles.tableContainer}>
+            <View key={eq.id} style={styles.tableContainer} break={index > 0}>
               <View
                 style={[
                   styles.sectionHeader,
@@ -380,7 +362,16 @@ export const ReportPDF = ({ report }: { report: ReportPDFData }) => {
                     const isNA = item.status === "IKKE_AKTUELT";
 
                     return (
-                      <View key={item.id} style={styles.tableRow}>
+                      <View
+                        key={item.id}
+                        style={{
+                          ...styles.tableRow,
+                          ...(idx % 2 === 0
+                            ? { backgroundColor: "#F5F5F5" }
+                            : {}),
+                        }}
+                        minPresenceAhead={50}
+                      >
                         <Text style={styles.colNr}>{idx + 1}</Text>
                         <Text style={styles.colDesc}>{item.question}</Text>
                         <Text style={styles.colCheck}>
@@ -428,12 +419,18 @@ export const ReportPDF = ({ report }: { report: ReportPDFData }) => {
                 Beskrivelse
               </Text>
               <Text
-                style={[{ width: "15%", textAlign: "center" }, styles.boldText]}
+                style={[
+                  { width: "15%", textAlign: "center" },
+                  styles.boldText,
+                ]}
               >
                 Antall
               </Text>
               <Text
-                style={[{ width: "15%", textAlign: "center" }, styles.boldText]}
+                style={[
+                  { width: "15%", textAlign: "center" },
+                  styles.boldText,
+                ]}
               >
                 Enhet
               </Text>
@@ -460,30 +457,32 @@ export const ReportPDF = ({ report }: { report: ReportPDFData }) => {
           </View>
         )}
 
-        <View style={styles.noteSection} break={false}>
-          <Text style={styles.noteTitle}>
-            Konklusjon/Notater (Felles for alle enheter):
-          </Text>
-          <Text style={styles.noteText}>See comments in table above.</Text>
-        </View>
-
-        <View
-          style={[styles.metaGrid, { borderBottomWidth: 0, marginTop: 40 }]}
-          break={false}
-        >
-          <View style={{ width: "50%" }}>
-            <Text style={styles.metaLabel}>Utført av:</Text>
-            <Text style={styles.metaValue}>{report.author.name}</Text>
+        {/* Conclusion section - always start on a new page to avoid awkward placement */}
+        <View break>
+          <View style={styles.noteSection}>
+            <Text style={styles.noteTitle}>
+              Konklusjon/Notater (Felles for alle enheter):
+            </Text>
+            <Text style={styles.noteText}>See comments in table above.</Text>
           </View>
-          {report.signatureUrl && (
+
+          <View
+            style={[styles.metaGrid, { borderBottomWidth: 0, marginTop: 40 }]}
+          >
             <View style={{ width: "50%" }}>
-              <Text style={styles.metaLabel}>Kunde signatur:</Text>
-              <Image
-                src={report.signatureUrl}
-                style={{ width: 120, height: 60, objectFit: "contain" }}
-              />
+              <Text style={styles.metaLabel}>Utført av:</Text>
+              <Text style={styles.metaValue}>{report.author.name}</Text>
             </View>
-          )}
+            {report.signatureUrl && (
+              <View style={{ width: "50%" }}>
+                <Text style={styles.metaLabel}>Kunde signatur:</Text>
+                <Image
+                  src={report.signatureUrl}
+                  style={{ width: 120, height: 60, objectFit: "contain" }}
+                />
+              </View>
+            )}
+          </View>
         </View>
       </Page>
     </Document>
