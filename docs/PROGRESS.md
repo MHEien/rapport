@@ -4,6 +4,41 @@ A chronological log of development progress on the Field Service PWA.
 
 ---
 
+## 2026-01-19: PDF Inventory Parsing Improvements (WIP)
+
+**Objective:** Fix "Vareoverførings.kladd" PDF parsing to correctly extract Varenr, Beskrivelse, Antall, and Enhetskode.
+
+### Completed
+
+1. **PDF-Parse v2 Integration**
+   - Fixed API mismatch (v1 function → v2 class-based `PDFParse`)
+   - Resolved "Setting up fake worker failed" by explicitly setting worker path
+
+2. **Tab-Separated Format Support**
+   - Rewrote parser to detect lines starting with date (`DD.MM.YY`)
+   - Handles two formats: combined `varenr beskrivelse` and separate `varenr [TAB] beskrivelse`
+   - Extracts Antall and Enhetskode from later segments
+
+3. **Garbage Filtering**
+   - Added skip patterns for: short lines, standalone dates, month names, SERVICE, BIL, timestamps, page markers
+   - Removed loose Strategy 3, 4, 5 that matched non-data lines
+
+### Files Modified
+| File | Change |
+|------|--------|
+| `inventory-actions.ts` | Rewrote `parsePdfText` for Vareoverføring format |
+
+### Remaining (Pinned)
+- Some items still show date in artikkelnr (multi-line description issue)
+- Need to handle wrapped descriptions spanning multiple PDF lines
+
+### Session Log
+| Start | End | Duration | Work Done |
+|-------|-----|----------|-----------|
+| 12:22 | 16:36 | 4h 15m | PDF parsing improvements, debugging, worker config |
+
+---
+
 ## 2026-01-18: Logout, User Admin & PDF Polish
 
 **Objective:** Fix authentication issues (logout, invite links), verify user administration, and polish PDF visuals.
@@ -344,3 +379,32 @@ Key features:
   - Added `wrap: false` to individual `tableRow` style to keep each row together
   - Replaced fixed spacers with `marginTop` on section headers
 - **Status:** Resolved. PDF now generates cleanly with proper page breaks.
+
+---
+
+## Hours Estimate
+
+Based on the logged development work, here is an estimated breakdown:
+
+| Date | Work Done | Est. Hours |
+|------|-----------|------------|
+| 2026-01-15 | Focus Mode Checklist, Infrastructure, Offline support | 8 |
+| 2026-01-15 | Premium App Shell, Dashboard, Create Report Flow | 6 |
+| 2026-01-16 | PDF Layout Redesign, Checklist UI, LiveDataVisualizer | 6 |
+| 2026-01-17 | Copy Invitation Link Feature | 1 |
+| 2026-01-17 | Phase 4 Team Features (Assignment, Admin Dashboard) | 5 |
+| 2026-01-17 | Service Point Ordering, Drag-and-Drop, Full Display | 4 |
+| 2026-01-18 | Service Report Workflow (Customer, Equipment, Van Inventory, Parts) | 10 |
+| 2026-01-18 | Logout, User Admin, PDF Polish | 4 |
+| 2026-01-19 | PDF Inventory Parsing Improvements (WIP) | 3 |
+
+### Summary
+
+| Metric | Value |
+|--------|-------|
+| **Total Estimated Hours** | **~47 hours** |
+| Development Days | 5 days (Jan 15-19) |
+| Average per Day | ~9.4 hours |
+
+> [!NOTE]
+> These are rough estimates based on scope of work completed. Actual time may vary.

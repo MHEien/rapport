@@ -42,9 +42,29 @@ export async function parseAndSaveInventoryPdf(formData: FormData) {
 
     // Dynamic import of pdf-parse (server-side only)
     const pdfParseModule = await import("pdf-parse");
-    // biome-ignore lint/suspicious/noExplicitAny: type definition mismatch for dynamic import
-    const pdfParse = (pdfParseModule as any).default ?? pdfParseModule;
-    const pdfData = await pdfParse(buffer);
+    const { PDFParse } = pdfParseModule;
+
+    // Fix for Next.js server-side worker issue
+    // pdfjs-dist tries to import the worker relative to itself, which fails in the bundle.
+    // We explicitly point it to the worker file in node_modules.
+    if (typeof process !== "undefined") {
+      const path = await import("node:path");
+      const { pathToFileURL } = await import("node:url");
+      const workerPath = path.join(
+        process.cwd(),
+        "node_modules",
+        "pdf-parse",
+        "dist",
+        "worker",
+        "pdf.worker.mjs",
+      );
+      PDFParse.setWorker(pathToFileURL(workerPath).href);
+    }
+
+    // Parse using v2 API
+    const parser = new PDFParse({ data: buffer });
+    const pdfData = await parser.getText();
+    await parser.destroy();
 
     // Parse the PDF text into parts
     const parts = parsePdfText(pdfData.text);
@@ -83,7 +103,7 @@ export async function parseAndSaveInventoryPdf(formData: FormData) {
     console.error("PDF parsing error:", error);
     return {
       success: false,
-      error: "Feil ved parsing av PDF. Prøv igjen eller sjekk filformatet.",
+      error: `Feil ved parsing av PDF: ${error instanceof Error ? error.message : "Ukjent feil"}`,
     };
   }
 }
@@ -106,13 +126,31 @@ function parsePdfText(text: string): ParsedPart[] {
 
   // Try different parsing strategies
   for (const line of lines) {
-    // Skip header-like lines
+    // Skip header-like lines and known garbage patterns
+    const lowerLine = line.toLowerCase();
     if (
-      line.toLowerCase().includes("part number") ||
-      line.toLowerCase().includes("description") ||
-      line.toLowerCase().includes("quantity") ||
-      line.toLowerCase().includes("artikkel") ||
-      line.toLowerCase().includes("antall")
+      line.length < 5 || // Skip very short lines
+      /^\d{2}\.\d{2}\.\d{2}$/.test(line) || // Skip standalone dates
+      /^\d{2}\.\d{2}\.\d{2}\s+\d{6}/.test(line) && !line.includes("\t") || // Skip "date varenr" without tabs
+      /^(o|ve|p|st|ty|e)$/i.test(line) || // Skip split words from PDF extraction
+      /^\d{1,2}\.\s*(januar|februar|mars|april|mai|juni|juli|august|september|oktober|november|desember)/i.test(line) || // Skip date strings like "19. januar"
+      lowerLine.includes("januar") || // Skip month names
+      lowerLine.includes("februar") ||
+      lowerLine.includes("part number") ||
+      lowerLine.includes("description") ||
+      lowerLine.includes("quantity") ||
+      lowerLine.includes("artikkel") ||
+      lowerLine.includes("antall") ||
+      lowerLine.includes("bokføring") ||
+      lowerLine.includes("varenr") ||
+      lowerLine.includes("kladde") ||
+      lowerLine.includes("lagerflytting") ||
+      lowerLine.includes("sterner") ||
+      lowerLine.includes("side") ||
+      lowerLine.startsWith("service") ||
+      /^bil\s/i.test(line) ||
+      /^\d{1,2}:\d{2}:\d{2}/.test(line) || // Skip timestamps
+      /^--\s*\d+\s+of\s+\d+\s*--$/.test(line) // Skip page markers
     ) {
       continue;
     }
@@ -134,9 +172,60 @@ function parsePdfText(text: string): ParsedPart[] {
       }
     }
 
-    // Strategy 2: Tab-separated
+    // Strategy 2: Tab-separated Vareoverføring format
+    // Handles TWO formats:
+    // Format A: "16.01.26 [TAB] VARENR BESKRIVELSE [TAB] ..." (varenr + beskrivelse combined)
+    // Format B: "16.01.26 [TAB] VARENR [TAB] BESKRIVELSE [TAB] ..." (varenr and beskrivelse separate)
     if (line.includes("\t")) {
       const segments = line.split("\t").map((s) => s.trim());
+
+      // Check if this looks like a Vareoverføring data line (starts with date pattern like DD.MM.YY)
+      if (segments.length >= 2 && /^\d{2}\.\d{2}\.\d{2}$/.test(segments[0])) {
+        let varenr = "";
+        let beskrivelse = "";
+
+        // Format A: segments[1] contains "VARENR BESKRIVELSE" combined
+        const combinedMatch = segments[1].match(/^(\d{6,})\s+(.+)$/);
+        if (combinedMatch) {
+          varenr = combinedMatch[1];
+          beskrivelse = combinedMatch[2].trim();
+        }
+        // Format B: segments[1] is only VARENR, segments[2] is BESKRIVELSE
+        else if (/^\d{6,}$/.test(segments[1]) && segments.length >= 3) {
+          varenr = segments[1];
+          // Description might be in segments[2], but skip if it looks like a location code
+          if (segments[2] && !segments[2].startsWith("SERVICE") && !/^[A-Z]{2,5}$/.test(segments[2])) {
+            beskrivelse = segments[2];
+          }
+        }
+
+        if (varenr && beskrivelse) {
+          // Find the segment containing "ANTALL ENHETSKODE" (number followed by unit like STK)
+          let antall = 0;
+          let enhetskode = "STK";
+
+          for (let i = segments.length - 1; i >= 2; i--) {
+            const antallMatch = segments[i].match(/^(\d+)\s+(\S+)$/);
+            if (antallMatch) {
+              antall = extractNumber(antallMatch[1]);
+              enhetskode = antallMatch[2];
+              break;
+            }
+          }
+
+          if (antall > 0) {
+            parts.push({
+              partNumber: varenr,
+              description: beskrivelse,
+              quantity: antall,
+              unit: enhetskode,
+            });
+            continue;
+          }
+        }
+      }
+
+      // Fallback for generic tab-separated (not Vareoverføring)
       if (segments.length >= 3) {
         const qty =
           extractNumber(segments[2]) ||
@@ -153,36 +242,8 @@ function parsePdfText(text: string): ParsedPart[] {
       }
     }
 
-    // Strategy 3: Pattern matching for common formats
-    // Match: "ABC123 Some description 10 stk" or "ABC-123-456 Description here 5"
-    const patternMatch = line.match(
-      /^([A-Z0-9][-A-Z0-9.]+)\s+(.+?)\s+(\d+(?:[.,]\d+)?)\s*(stk|pcs|ea|liter|l|kg|m)?$/i,
-    );
-    if (patternMatch) {
-      parts.push({
-        partNumber: patternMatch[1],
-        description: patternMatch[2].trim(),
-        quantity: extractNumber(patternMatch[3]),
-        unit: patternMatch[4] || "stk",
-      });
-      continue;
-    }
-
-    // Strategy 4: Looser pattern - number at end
-    const looseMatch = line.match(
-      /^(.+?)\s+(\d+(?:[.,]\d+)?)\s*(stk|pcs|ea|liter|l|kg|m)?$/i,
-    );
-    if (looseMatch) {
-      const descParts = looseMatch[1].trim().split(/\s+/);
-      if (descParts.length >= 2) {
-        parts.push({
-          partNumber: descParts[0],
-          description: descParts.slice(1).join(" "),
-          quantity: extractNumber(looseMatch[2]),
-          unit: looseMatch[3] || "stk",
-        });
-      }
-    }
+    // Note: Strategy 3, 4, 5 removed - they were matching garbage lines from Vareoverføring PDFs
+    // Only Strategy 1 (pipe-separated) and Strategy 2 (tab-separated Vareoverføring) are active
   }
 
   return parts;
