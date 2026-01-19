@@ -137,7 +137,7 @@ export function ChecklistWizard({
       setAnswers((prev) =>
         new Map(prev).set(key, {
           status: input.status,
-          comment: input.comment,
+          comment: input.comment ?? undefined,
         }),
       );
     },
@@ -148,7 +148,7 @@ export function ChecklistWizard({
         new Map(prev).set(key, {
           status: input.status,
           resultId: data.result.id,
-          comment: input.comment,
+          comment: input.comment ?? undefined,
         }),
       );
     },
