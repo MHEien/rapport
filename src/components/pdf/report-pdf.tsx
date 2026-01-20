@@ -469,7 +469,9 @@ export const ReportPDF = ({ report }: { report: ReportPDFData }) => {
             <Text style={styles.noteTitle}>
               Konklusjon/Notater (Felles for alle enheter):
             </Text>
-            <Text style={styles.noteText}>See comments in table above.</Text>
+            <Text style={styles.noteText}>
+              {report.overallComment || "Ingen kommentarer."}
+            </Text>
           </View>
 
           <View
