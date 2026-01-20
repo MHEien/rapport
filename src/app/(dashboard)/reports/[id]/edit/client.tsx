@@ -10,7 +10,7 @@ import {
   PenTool,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import type {
   ChecklistResult,
   Report,
@@ -259,12 +259,16 @@ interface ChecklistStepProps {
   equipment: EquipmentWithChecklists[];
   organizationId: string;
   onComplete: () => void;
+  localResults: Record<string, ChecklistResult>;
+  onResultUpdate: (result: ChecklistResult) => void;
 }
 
 function ChecklistStep({
   equipment,
   organizationId,
   onComplete,
+  localResults,
+  onResultUpdate,
 }: ChecklistStepProps) {
   return (
     <div className="flex-1 flex flex-col">
@@ -272,6 +276,8 @@ function ChecklistStep({
         equipment={equipment}
         organizationId={organizationId}
         onComplete={onComplete}
+        localResults={localResults}
+        onResultUpdate={onResultUpdate}
       />
     </div>
   );
@@ -518,6 +524,18 @@ export function ReportEditClient({
   const equipment =
     report.equipment?.length > 0 ? report.equipment : existingResults;
 
+  // Lifted state for checklist results to prevent data loss on navigation
+  const [localResults, setLocalResults] = useState<
+    Record<string, ChecklistResult>
+  >({});
+
+  const handleResultUpdate = useCallback((result: ChecklistResult) => {
+    setLocalResults((prev) => ({
+      ...prev,
+      [`${result.equipmentId}:${result.category}:${result.question}`]: result,
+    }));
+  }, []);
+
   const handleComplete = () => {
     // Navigate to completed report view
     router.push(`/reports/${report.id}`);
@@ -554,6 +572,8 @@ export function ReportEditClient({
           equipment={equipment}
           organizationId={report.organizationId}
           onComplete={() => setStep("summary")}
+          localResults={localResults}
+          onResultUpdate={handleResultUpdate}
         />
       )}
 
