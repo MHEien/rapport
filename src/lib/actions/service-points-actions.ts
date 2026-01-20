@@ -153,6 +153,7 @@ export async function bulkCreateServicePoints(
       // Default to 0 for bulk import; user can reorder later
       categorySortOrder: 0,
     })),
+    skipDuplicates: true,
   });
   revalidatePath("/data-editor");
   return { success: true, count: count.count };

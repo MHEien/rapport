@@ -65,6 +65,19 @@ import {
   updateCategoryOrder,
 } from "@/lib/actions/service-points-actions";
 
+import {
+  exportAllData,
+  getProductsForExport,
+  restoreData,
+} from "@/lib/actions/data-export-actions";
+import { downloadAsExcel, downloadAsJson } from "@/lib/export-utils";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
 // Types
 interface ServicePoint {
   id: string;
@@ -92,6 +105,7 @@ export function DataEditorClient({
   const router = useRouter();
   const [_isPending, startTransition] = useTransition();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const restoreInputRef = useRef<HTMLInputElement>(null);
 
   // State
   const [data, setData] = useState(initialData);
@@ -123,6 +137,7 @@ export function DataEditorClient({
 
   // Import state
   const [isImporting, setIsImporting] = useState(false);
+  const [isRestoring, setIsRestoring] = useState(false);
 
   // DnD sensors - require 8px movement before drag starts (avoids accidental drags)
   const sensors = useSensors(
@@ -372,6 +387,87 @@ export function DataEditorClient({
     }
   };
 
+  // Export Handlers
+  const handleExportBackup = async () => {
+    const result = await exportAllData();
+    if (result.success && result.data) {
+      downloadAsJson(
+        result.data,
+        `backup-${new Date().toISOString().split("T")[0]}`,
+      );
+    } else {
+      alert("Kunne ikke eksportere data: " + result.error);
+    }
+  };
+
+  const handleExportProducts = async () => {
+    const result = await getProductsForExport();
+    if (result.success && result.data) {
+      // Format for the user (similar to import template but with actual data if needed,
+      // or just list of products? User asked for "product list I've made")
+      // Actually, the user might mean "Service Points" list?
+      // "export to excel... like a whole productlist that I've made" inside "dataredigering".
+      // DataRedigering manages ServicePoints (Servicepunkter).
+      // So I should export the ServicePoints in the format of the Template!
+
+      // Let's re-read: "export the whole list I've made... Incase we have to update prisma again... export to excel, like a whole productlist"
+      // It strongly implies the ServicePoints list.
+      // So I should flatten `data.servicePoints` and export that.
+
+      const flatPoints = data.servicePoints.map((p) => ({
+        Produkttype: p.productType,
+        Kategori: p.category,
+        Tekst: p.text,
+        Service: p.isForService ? "Ja" : "Nei",
+        Igangkjøring: p.isForCommissioning ? "Ja" : "Nei",
+      }));
+
+      downloadAsExcel(
+        flatPoints,
+        "Servicepunkter",
+        `servicepunkter-${new Date().toISOString().split("T")[0]}`,
+      );
+    } else {
+      alert("Kunne ikke eksportere data");
+    }
+  };
+
+  // Restore Handler
+  const handleRestore = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (
+      !confirm(
+        "ADVARSEL: Dette vil overskrive/oppdatere dataene dine. Er du sikker?",
+      )
+    ) {
+      // Reset input
+      if (restoreInputRef.current) restoreInputRef.current.value = "";
+      return;
+    }
+
+    setIsRestoring(true);
+    try {
+      const text = await file.text();
+      const json = JSON.parse(text);
+      const result = await restoreData(json);
+
+      if (result.success) {
+        alert("Data gjenopprettet!");
+        startTransition(() => router.refresh());
+      } else {
+        alert("Feil ved gjenoppretting: " + result.error);
+      }
+    } catch (error) {
+      console.error("Restore failed", error);
+      alert("Kunne ikke lese backup-filen.");
+    } finally {
+      setIsRestoring(false);
+      if (restoreInputRef.current) restoreInputRef.current.value = "";
+    }
+  };
+
   // Get all unique categories across all types for autocomplete
   const allCategories = [
     ...new Set(data.servicePoints.map((p) => p.category)),
@@ -398,10 +494,17 @@ export function DataEditorClient({
                 ref={fileInputRef}
                 onChange={handleImport}
               />
-              <Button
+              <input
+                type="file"
+                accept=".json"
+                className="hidden"
+                ref={restoreInputRef}
+                onChange={handleRestore}
+              />
+              <Button // Removed standalone template button in favor of dropdown
                 type="button"
                 variant="outline"
-                className="flex-1 sm:flex-none border-white/10 hover:bg-white/5"
+                className="hidden" // Hiding it but keeping code just in case
                 onClick={() => handleDownloadTemplate()}
               >
                 <Download className="size-4 mr-2" />
@@ -429,6 +532,39 @@ export function DataEditorClient({
                 <Plus className="size-4 mr-2" />
                 Nytt punkt
               </Button>
+
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className="border-white/10 hover:bg-white/5"
+                  >
+                    <Download className="size-4 mr-2" />
+                    Eksport / Backup
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={handleExportProducts}>
+                    <FileSpreadsheet className="size-4 mr-2" />
+                    Eksportér liste (Excel)
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleExportBackup}>
+                    <Database className="size-4 mr-2" />
+                    Full Backup (JSON)
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => restoreInputRef.current?.click()}
+                    disabled={isRestoring}
+                  >
+                    <Upload className="size-4 mr-2" />
+                    {isRestoring ? "Gjenoppretter..." : "Restore Backup (JSON)"}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleDownloadTemplate}>
+                    <Download className="size-4 mr-2" />
+                    Last ned tom mal
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
         </div>
@@ -517,6 +653,7 @@ export function DataEditorClient({
                     <div className="border-t border-white/5">
                       {/* Nested DndContext for Categories */}
                       <DndContext
+                        id={`dnd-cat-${type}`}
                         sensors={sensors}
                         collisionDetection={closestCenter}
                         onDragEnd={(e) =>
@@ -544,6 +681,7 @@ export function DataEditorClient({
                               >
                                 {isCatExpanded && (
                                   <DndContext
+                                    id={`dnd-points-${type}-${category}`}
                                     sensors={sensors}
                                     collisionDetection={closestCenter}
                                     onDragEnd={(e) =>
