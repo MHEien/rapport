@@ -114,14 +114,13 @@ const statusFilters: { value: ReportStatus | "ALL"; label: string }[] = [
   { value: "ARCHIVED", label: "Arkivert" },
 ];
 
-
 export function ReportsClient({
   initialReports,
   initialPagination,
 }: ReportsClientProps) {
   const router = useRouter();
   const [_isPending, startTransition] = useTransition();
-  
+
   // State
   const [reports, setReports] = useState(initialReports);
   const [pagination, setPagination] = useState(initialPagination);
@@ -129,11 +128,13 @@ export function ReportsClient({
   const [statusFilter, setStatusFilter] = useState<ReportStatus | "ALL">("ALL");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [reportToDelete, setReportToDelete] = useState<string | null>(null);
-  
+
   // Assignment State
   const [assignmentDialogOpen, setAssignmentDialogOpen] = useState(false);
   const [reportToAssign, setReportToAssign] = useState<string | null>(null);
-  const [currentAssigneeId, setCurrentAssigneeId] = useState<string | null>(null);
+  const [currentAssigneeId, setCurrentAssigneeId] = useState<string | null>(
+    null,
+  );
 
   // Handlers
   const handleSearch = (value: string) => {
@@ -240,9 +241,9 @@ export function ReportsClient({
       <main className="px-4 lg:px-6 py-6">
         {reports.length === 0 ? (
           // ... existing empty state ...
-           <div className="rounded-2xl border border-white/5 bg-white/[0.02] p-12 text-center">
+          <div className="rounded-2xl border border-white/5 bg-white/[0.02] p-12 text-center">
             {/* ... same content ... */}
-             <FileText className="size-16 text-slate-600 mx-auto mb-4" />
+            <FileText className="size-16 text-slate-600 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-white mb-2">
               {search || statusFilter !== "ALL"
                 ? "Ingen resultater"
@@ -261,7 +262,7 @@ export function ReportsClient({
                 </Link>
               </Button>
             )}
-           </div>
+          </div>
         ) : (
           <div className="rounded-2xl border border-white/5 overflow-hidden bg-white/[0.02]">
             {/* Table header - hidden on mobile */}
@@ -333,15 +334,17 @@ export function ReportsClient({
                         <StatusIcon className="size-3" />
                         {config.label}
                       </Badge>
-                       {/* Show assignee if exists */}
-                       {report.assignedTo && (
+                      {/* Show assignee if exists */}
+                      {report.assignedTo && (
                         <div className="mt-1 flex items-center gap-1 text-xs text-slate-500">
-                            <span className="size-4 rounded-full bg-blue-500/20 text-blue-300 flex items-center justify-center text-[10px]">
-                                {report.assignedTo.name?.substring(0, 1) || "?"}
-                            </span>
-                            <span className="truncate max-w-[80px]">{report.assignedTo.name?.split(" ")[0]}</span>
+                          <span className="size-4 rounded-full bg-blue-500/20 text-blue-300 flex items-center justify-center text-[10px]">
+                            {report.assignedTo.name?.substring(0, 1) || "?"}
+                          </span>
+                          <span className="truncate max-w-[80px]">
+                            {report.assignedTo.name?.split(" ")[0]}
+                          </span>
                         </div>
-                       )}
+                      )}
                     </div>
                     <div>
                       <ReportActions
@@ -349,10 +352,12 @@ export function ReportsClient({
                         onEdit={() => router.push(`/reports/${report.id}/edit`)}
                         onDuplicate={() => handleDuplicate(report.id)}
                         onDelete={() => {
-                            setReportToDelete(report.id);
-                            setDeleteDialogOpen(true);
+                          setReportToDelete(report.id);
+                          setDeleteDialogOpen(true);
                         }}
-                        onAssign={() => handleAssign(report.id, report.assignedTo?.id)}
+                        onAssign={() =>
+                          handleAssign(report.id, report.assignedTo?.id)
+                        }
                       />
                     </div>
                   </div>
@@ -366,7 +371,7 @@ export function ReportsClient({
                     }
                     className="flex lg:hidden items-center gap-4 px-4 py-4 hover:bg-white/5 transition-colors cursor-pointer"
                   >
-                   {/* ... existing mobile row content ... */}
+                    {/* ... existing mobile row content ... */}
                     <div className="size-12 rounded-xl bg-gradient-to-br from-blue-500/20 to-indigo-500/10 flex items-center justify-center shrink-0">
                       <FileText className="size-6 text-blue-400" />
                     </div>
@@ -387,11 +392,11 @@ export function ReportsClient({
                           <StatusIcon className="size-2.5" />
                           {config.label}
                         </Badge>
-                         {/* Show assignee mobile */}
+                        {/* Show assignee mobile */}
                         {report.assignedTo && (
-                           <span className="text-xs text-slate-500 flex items-center gap-1">
-                              • {report.assignedTo.name?.split(" ")[0]}
-                           </span>
+                          <span className="text-xs text-slate-500 flex items-center gap-1">
+                            • {report.assignedTo.name?.split(" ")[0]}
+                          </span>
                         )}
                         <span className="text-xs text-slate-500">
                           {formatDistanceToNow(new Date(report.updatedAt), {
@@ -454,8 +459,8 @@ export function ReportsClient({
       </main>
 
       {/* Assignment Dialog */}
-      <AssignmentDialog 
-        open={assignmentDialogOpen} 
+      <AssignmentDialog
+        open={assignmentDialogOpen}
         onOpenChange={setAssignmentDialogOpen}
         reportId={reportToAssign}
         currentAssigneeId={currentAssigneeId}

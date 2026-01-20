@@ -75,7 +75,9 @@ export function AcceptInvitationClient({
       fetchOptions: {
         onSuccess: () => {
           // Redirect to signin with callback to this invitation page
-          router.push(`/auth/signin?callbackUrl=/accept-invitation/${invitation.id}`);
+          router.push(
+            `/auth/signin?callbackUrl=/accept-invitation/${invitation.id}`,
+          );
         },
       },
     });

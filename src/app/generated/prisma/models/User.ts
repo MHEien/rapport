@@ -208,6 +208,7 @@ export type UserWhereInput = {
   assignedReports?: Prisma.ReportListRelationFilter;
   members?: Prisma.MemberListRelationFilter;
   invitations?: Prisma.InvitationListRelationFilter;
+  technicianAssignments?: Prisma.ServiceAssignmentListRelationFilter;
 };
 
 export type UserOrderByWithRelationInput = {
@@ -225,6 +226,7 @@ export type UserOrderByWithRelationInput = {
   assignedReports?: Prisma.ReportOrderByRelationAggregateInput;
   members?: Prisma.MemberOrderByRelationAggregateInput;
   invitations?: Prisma.InvitationOrderByRelationAggregateInput;
+  technicianAssignments?: Prisma.ServiceAssignmentOrderByRelationAggregateInput;
 };
 
 export type UserWhereUniqueInput = Prisma.AtLeast<
@@ -246,6 +248,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<
     assignedReports?: Prisma.ReportListRelationFilter;
     members?: Prisma.MemberListRelationFilter;
     invitations?: Prisma.InvitationListRelationFilter;
+    technicianAssignments?: Prisma.ServiceAssignmentListRelationFilter;
   },
   "id" | "email"
 >;
@@ -295,6 +298,7 @@ export type UserCreateInput = {
   assignedReports?: Prisma.ReportCreateNestedManyWithoutAssignedToInput;
   members?: Prisma.MemberCreateNestedManyWithoutUserInput;
   invitations?: Prisma.InvitationCreateNestedManyWithoutInviterInput;
+  technicianAssignments?: Prisma.ServiceAssignmentCreateNestedManyWithoutTechnicianInput;
 };
 
 export type UserUncheckedCreateInput = {
@@ -312,6 +316,7 @@ export type UserUncheckedCreateInput = {
   assignedReports?: Prisma.ReportUncheckedCreateNestedManyWithoutAssignedToInput;
   members?: Prisma.MemberUncheckedCreateNestedManyWithoutUserInput;
   invitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutInviterInput;
+  technicianAssignments?: Prisma.ServiceAssignmentUncheckedCreateNestedManyWithoutTechnicianInput;
 };
 
 export type UserUpdateInput = {
@@ -329,6 +334,7 @@ export type UserUpdateInput = {
   assignedReports?: Prisma.ReportUpdateManyWithoutAssignedToNestedInput;
   members?: Prisma.MemberUpdateManyWithoutUserNestedInput;
   invitations?: Prisma.InvitationUpdateManyWithoutInviterNestedInput;
+  technicianAssignments?: Prisma.ServiceAssignmentUpdateManyWithoutTechnicianNestedInput;
 };
 
 export type UserUncheckedUpdateInput = {
@@ -346,6 +352,7 @@ export type UserUncheckedUpdateInput = {
   assignedReports?: Prisma.ReportUncheckedUpdateManyWithoutAssignedToNestedInput;
   members?: Prisma.MemberUncheckedUpdateManyWithoutUserNestedInput;
   invitations?: Prisma.InvitationUncheckedUpdateManyWithoutInviterNestedInput;
+  technicianAssignments?: Prisma.ServiceAssignmentUncheckedUpdateManyWithoutTechnicianNestedInput;
 };
 
 export type UserCreateManyInput = {
@@ -566,6 +573,32 @@ export type UserUpdateOneRequiredWithoutPostsNestedInput = {
   >;
 };
 
+export type UserCreateNestedOneWithoutTechnicianAssignmentsInput = {
+  create?: Prisma.XOR<
+    Prisma.UserCreateWithoutTechnicianAssignmentsInput,
+    Prisma.UserUncheckedCreateWithoutTechnicianAssignmentsInput
+  >;
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutTechnicianAssignmentsInput;
+  connect?: Prisma.UserWhereUniqueInput;
+};
+
+export type UserUpdateOneRequiredWithoutTechnicianAssignmentsNestedInput = {
+  create?: Prisma.XOR<
+    Prisma.UserCreateWithoutTechnicianAssignmentsInput,
+    Prisma.UserUncheckedCreateWithoutTechnicianAssignmentsInput
+  >;
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutTechnicianAssignmentsInput;
+  upsert?: Prisma.UserUpsertWithoutTechnicianAssignmentsInput;
+  connect?: Prisma.UserWhereUniqueInput;
+  update?: Prisma.XOR<
+    Prisma.XOR<
+      Prisma.UserUpdateToOneWithWhereWithoutTechnicianAssignmentsInput,
+      Prisma.UserUpdateWithoutTechnicianAssignmentsInput
+    >,
+    Prisma.UserUncheckedUpdateWithoutTechnicianAssignmentsInput
+  >;
+};
+
 export type UserCreateNestedOneWithoutMembersInput = {
   create?: Prisma.XOR<
     Prisma.UserCreateWithoutMembersInput,
@@ -632,6 +665,7 @@ export type UserCreateWithoutSessionsInput = {
   assignedReports?: Prisma.ReportCreateNestedManyWithoutAssignedToInput;
   members?: Prisma.MemberCreateNestedManyWithoutUserInput;
   invitations?: Prisma.InvitationCreateNestedManyWithoutInviterInput;
+  technicianAssignments?: Prisma.ServiceAssignmentCreateNestedManyWithoutTechnicianInput;
 };
 
 export type UserUncheckedCreateWithoutSessionsInput = {
@@ -648,6 +682,7 @@ export type UserUncheckedCreateWithoutSessionsInput = {
   assignedReports?: Prisma.ReportUncheckedCreateNestedManyWithoutAssignedToInput;
   members?: Prisma.MemberUncheckedCreateNestedManyWithoutUserInput;
   invitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutInviterInput;
+  technicianAssignments?: Prisma.ServiceAssignmentUncheckedCreateNestedManyWithoutTechnicianInput;
 };
 
 export type UserCreateOrConnectWithoutSessionsInput = {
@@ -692,6 +727,7 @@ export type UserUpdateWithoutSessionsInput = {
   assignedReports?: Prisma.ReportUpdateManyWithoutAssignedToNestedInput;
   members?: Prisma.MemberUpdateManyWithoutUserNestedInput;
   invitations?: Prisma.InvitationUpdateManyWithoutInviterNestedInput;
+  technicianAssignments?: Prisma.ServiceAssignmentUpdateManyWithoutTechnicianNestedInput;
 };
 
 export type UserUncheckedUpdateWithoutSessionsInput = {
@@ -708,6 +744,7 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
   assignedReports?: Prisma.ReportUncheckedUpdateManyWithoutAssignedToNestedInput;
   members?: Prisma.MemberUncheckedUpdateManyWithoutUserNestedInput;
   invitations?: Prisma.InvitationUncheckedUpdateManyWithoutInviterNestedInput;
+  technicianAssignments?: Prisma.ServiceAssignmentUncheckedUpdateManyWithoutTechnicianNestedInput;
 };
 
 export type UserCreateWithoutAccountsInput = {
@@ -724,6 +761,7 @@ export type UserCreateWithoutAccountsInput = {
   assignedReports?: Prisma.ReportCreateNestedManyWithoutAssignedToInput;
   members?: Prisma.MemberCreateNestedManyWithoutUserInput;
   invitations?: Prisma.InvitationCreateNestedManyWithoutInviterInput;
+  technicianAssignments?: Prisma.ServiceAssignmentCreateNestedManyWithoutTechnicianInput;
 };
 
 export type UserUncheckedCreateWithoutAccountsInput = {
@@ -740,6 +778,7 @@ export type UserUncheckedCreateWithoutAccountsInput = {
   assignedReports?: Prisma.ReportUncheckedCreateNestedManyWithoutAssignedToInput;
   members?: Prisma.MemberUncheckedCreateNestedManyWithoutUserInput;
   invitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutInviterInput;
+  technicianAssignments?: Prisma.ServiceAssignmentUncheckedCreateNestedManyWithoutTechnicianInput;
 };
 
 export type UserCreateOrConnectWithoutAccountsInput = {
@@ -784,6 +823,7 @@ export type UserUpdateWithoutAccountsInput = {
   assignedReports?: Prisma.ReportUpdateManyWithoutAssignedToNestedInput;
   members?: Prisma.MemberUpdateManyWithoutUserNestedInput;
   invitations?: Prisma.InvitationUpdateManyWithoutInviterNestedInput;
+  technicianAssignments?: Prisma.ServiceAssignmentUpdateManyWithoutTechnicianNestedInput;
 };
 
 export type UserUncheckedUpdateWithoutAccountsInput = {
@@ -800,6 +840,7 @@ export type UserUncheckedUpdateWithoutAccountsInput = {
   assignedReports?: Prisma.ReportUncheckedUpdateManyWithoutAssignedToNestedInput;
   members?: Prisma.MemberUncheckedUpdateManyWithoutUserNestedInput;
   invitations?: Prisma.InvitationUncheckedUpdateManyWithoutInviterNestedInput;
+  technicianAssignments?: Prisma.ServiceAssignmentUncheckedUpdateManyWithoutTechnicianNestedInput;
 };
 
 export type UserCreateWithoutAuthoredReportsInput = {
@@ -816,6 +857,7 @@ export type UserCreateWithoutAuthoredReportsInput = {
   assignedReports?: Prisma.ReportCreateNestedManyWithoutAssignedToInput;
   members?: Prisma.MemberCreateNestedManyWithoutUserInput;
   invitations?: Prisma.InvitationCreateNestedManyWithoutInviterInput;
+  technicianAssignments?: Prisma.ServiceAssignmentCreateNestedManyWithoutTechnicianInput;
 };
 
 export type UserUncheckedCreateWithoutAuthoredReportsInput = {
@@ -832,6 +874,7 @@ export type UserUncheckedCreateWithoutAuthoredReportsInput = {
   assignedReports?: Prisma.ReportUncheckedCreateNestedManyWithoutAssignedToInput;
   members?: Prisma.MemberUncheckedCreateNestedManyWithoutUserInput;
   invitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutInviterInput;
+  technicianAssignments?: Prisma.ServiceAssignmentUncheckedCreateNestedManyWithoutTechnicianInput;
 };
 
 export type UserCreateOrConnectWithoutAuthoredReportsInput = {
@@ -856,6 +899,7 @@ export type UserCreateWithoutAssignedReportsInput = {
   authoredReports?: Prisma.ReportCreateNestedManyWithoutAuthorInput;
   members?: Prisma.MemberCreateNestedManyWithoutUserInput;
   invitations?: Prisma.InvitationCreateNestedManyWithoutInviterInput;
+  technicianAssignments?: Prisma.ServiceAssignmentCreateNestedManyWithoutTechnicianInput;
 };
 
 export type UserUncheckedCreateWithoutAssignedReportsInput = {
@@ -872,6 +916,7 @@ export type UserUncheckedCreateWithoutAssignedReportsInput = {
   authoredReports?: Prisma.ReportUncheckedCreateNestedManyWithoutAuthorInput;
   members?: Prisma.MemberUncheckedCreateNestedManyWithoutUserInput;
   invitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutInviterInput;
+  technicianAssignments?: Prisma.ServiceAssignmentUncheckedCreateNestedManyWithoutTechnicianInput;
 };
 
 export type UserCreateOrConnectWithoutAssignedReportsInput = {
@@ -916,6 +961,7 @@ export type UserUpdateWithoutAuthoredReportsInput = {
   assignedReports?: Prisma.ReportUpdateManyWithoutAssignedToNestedInput;
   members?: Prisma.MemberUpdateManyWithoutUserNestedInput;
   invitations?: Prisma.InvitationUpdateManyWithoutInviterNestedInput;
+  technicianAssignments?: Prisma.ServiceAssignmentUpdateManyWithoutTechnicianNestedInput;
 };
 
 export type UserUncheckedUpdateWithoutAuthoredReportsInput = {
@@ -932,6 +978,7 @@ export type UserUncheckedUpdateWithoutAuthoredReportsInput = {
   assignedReports?: Prisma.ReportUncheckedUpdateManyWithoutAssignedToNestedInput;
   members?: Prisma.MemberUncheckedUpdateManyWithoutUserNestedInput;
   invitations?: Prisma.InvitationUncheckedUpdateManyWithoutInviterNestedInput;
+  technicianAssignments?: Prisma.ServiceAssignmentUncheckedUpdateManyWithoutTechnicianNestedInput;
 };
 
 export type UserUpsertWithoutAssignedReportsInput = {
@@ -968,6 +1015,7 @@ export type UserUpdateWithoutAssignedReportsInput = {
   authoredReports?: Prisma.ReportUpdateManyWithoutAuthorNestedInput;
   members?: Prisma.MemberUpdateManyWithoutUserNestedInput;
   invitations?: Prisma.InvitationUpdateManyWithoutInviterNestedInput;
+  technicianAssignments?: Prisma.ServiceAssignmentUpdateManyWithoutTechnicianNestedInput;
 };
 
 export type UserUncheckedUpdateWithoutAssignedReportsInput = {
@@ -984,6 +1032,7 @@ export type UserUncheckedUpdateWithoutAssignedReportsInput = {
   authoredReports?: Prisma.ReportUncheckedUpdateManyWithoutAuthorNestedInput;
   members?: Prisma.MemberUncheckedUpdateManyWithoutUserNestedInput;
   invitations?: Prisma.InvitationUncheckedUpdateManyWithoutInviterNestedInput;
+  technicianAssignments?: Prisma.ServiceAssignmentUncheckedUpdateManyWithoutTechnicianNestedInput;
 };
 
 export type UserCreateWithoutPostsInput = {
@@ -1000,6 +1049,7 @@ export type UserCreateWithoutPostsInput = {
   assignedReports?: Prisma.ReportCreateNestedManyWithoutAssignedToInput;
   members?: Prisma.MemberCreateNestedManyWithoutUserInput;
   invitations?: Prisma.InvitationCreateNestedManyWithoutInviterInput;
+  technicianAssignments?: Prisma.ServiceAssignmentCreateNestedManyWithoutTechnicianInput;
 };
 
 export type UserUncheckedCreateWithoutPostsInput = {
@@ -1016,6 +1066,7 @@ export type UserUncheckedCreateWithoutPostsInput = {
   assignedReports?: Prisma.ReportUncheckedCreateNestedManyWithoutAssignedToInput;
   members?: Prisma.MemberUncheckedCreateNestedManyWithoutUserInput;
   invitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutInviterInput;
+  technicianAssignments?: Prisma.ServiceAssignmentUncheckedCreateNestedManyWithoutTechnicianInput;
 };
 
 export type UserCreateOrConnectWithoutPostsInput = {
@@ -1060,6 +1111,7 @@ export type UserUpdateWithoutPostsInput = {
   assignedReports?: Prisma.ReportUpdateManyWithoutAssignedToNestedInput;
   members?: Prisma.MemberUpdateManyWithoutUserNestedInput;
   invitations?: Prisma.InvitationUpdateManyWithoutInviterNestedInput;
+  technicianAssignments?: Prisma.ServiceAssignmentUpdateManyWithoutTechnicianNestedInput;
 };
 
 export type UserUncheckedUpdateWithoutPostsInput = {
@@ -1072,6 +1124,103 @@ export type UserUncheckedUpdateWithoutPostsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput;
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput;
+  authoredReports?: Prisma.ReportUncheckedUpdateManyWithoutAuthorNestedInput;
+  assignedReports?: Prisma.ReportUncheckedUpdateManyWithoutAssignedToNestedInput;
+  members?: Prisma.MemberUncheckedUpdateManyWithoutUserNestedInput;
+  invitations?: Prisma.InvitationUncheckedUpdateManyWithoutInviterNestedInput;
+  technicianAssignments?: Prisma.ServiceAssignmentUncheckedUpdateManyWithoutTechnicianNestedInput;
+};
+
+export type UserCreateWithoutTechnicianAssignmentsInput = {
+  id?: string;
+  email: string;
+  name?: string | null;
+  emailVerified?: boolean;
+  image?: string | null;
+  createdAt?: Date | string;
+  updatedAt?: Date | string;
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput;
+  accounts?: Prisma.AccountCreateNestedManyWithoutUserInput;
+  posts?: Prisma.PostCreateNestedManyWithoutAuthorInput;
+  authoredReports?: Prisma.ReportCreateNestedManyWithoutAuthorInput;
+  assignedReports?: Prisma.ReportCreateNestedManyWithoutAssignedToInput;
+  members?: Prisma.MemberCreateNestedManyWithoutUserInput;
+  invitations?: Prisma.InvitationCreateNestedManyWithoutInviterInput;
+};
+
+export type UserUncheckedCreateWithoutTechnicianAssignmentsInput = {
+  id?: string;
+  email: string;
+  name?: string | null;
+  emailVerified?: boolean;
+  image?: string | null;
+  createdAt?: Date | string;
+  updatedAt?: Date | string;
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput;
+  accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput;
+  posts?: Prisma.PostUncheckedCreateNestedManyWithoutAuthorInput;
+  authoredReports?: Prisma.ReportUncheckedCreateNestedManyWithoutAuthorInput;
+  assignedReports?: Prisma.ReportUncheckedCreateNestedManyWithoutAssignedToInput;
+  members?: Prisma.MemberUncheckedCreateNestedManyWithoutUserInput;
+  invitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutInviterInput;
+};
+
+export type UserCreateOrConnectWithoutTechnicianAssignmentsInput = {
+  where: Prisma.UserWhereUniqueInput;
+  create: Prisma.XOR<
+    Prisma.UserCreateWithoutTechnicianAssignmentsInput,
+    Prisma.UserUncheckedCreateWithoutTechnicianAssignmentsInput
+  >;
+};
+
+export type UserUpsertWithoutTechnicianAssignmentsInput = {
+  update: Prisma.XOR<
+    Prisma.UserUpdateWithoutTechnicianAssignmentsInput,
+    Prisma.UserUncheckedUpdateWithoutTechnicianAssignmentsInput
+  >;
+  create: Prisma.XOR<
+    Prisma.UserCreateWithoutTechnicianAssignmentsInput,
+    Prisma.UserUncheckedCreateWithoutTechnicianAssignmentsInput
+  >;
+  where?: Prisma.UserWhereInput;
+};
+
+export type UserUpdateToOneWithWhereWithoutTechnicianAssignmentsInput = {
+  where?: Prisma.UserWhereInput;
+  data: Prisma.XOR<
+    Prisma.UserUpdateWithoutTechnicianAssignmentsInput,
+    Prisma.UserUncheckedUpdateWithoutTechnicianAssignmentsInput
+  >;
+};
+
+export type UserUpdateWithoutTechnicianAssignmentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string;
+  email?: Prisma.StringFieldUpdateOperationsInput | string;
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput;
+  accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput;
+  posts?: Prisma.PostUpdateManyWithoutAuthorNestedInput;
+  authoredReports?: Prisma.ReportUpdateManyWithoutAuthorNestedInput;
+  assignedReports?: Prisma.ReportUpdateManyWithoutAssignedToNestedInput;
+  members?: Prisma.MemberUpdateManyWithoutUserNestedInput;
+  invitations?: Prisma.InvitationUpdateManyWithoutInviterNestedInput;
+};
+
+export type UserUncheckedUpdateWithoutTechnicianAssignmentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string;
+  email?: Prisma.StringFieldUpdateOperationsInput | string;
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput;
+  accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput;
+  posts?: Prisma.PostUncheckedUpdateManyWithoutAuthorNestedInput;
   authoredReports?: Prisma.ReportUncheckedUpdateManyWithoutAuthorNestedInput;
   assignedReports?: Prisma.ReportUncheckedUpdateManyWithoutAssignedToNestedInput;
   members?: Prisma.MemberUncheckedUpdateManyWithoutUserNestedInput;
@@ -1092,6 +1241,7 @@ export type UserCreateWithoutMembersInput = {
   authoredReports?: Prisma.ReportCreateNestedManyWithoutAuthorInput;
   assignedReports?: Prisma.ReportCreateNestedManyWithoutAssignedToInput;
   invitations?: Prisma.InvitationCreateNestedManyWithoutInviterInput;
+  technicianAssignments?: Prisma.ServiceAssignmentCreateNestedManyWithoutTechnicianInput;
 };
 
 export type UserUncheckedCreateWithoutMembersInput = {
@@ -1108,6 +1258,7 @@ export type UserUncheckedCreateWithoutMembersInput = {
   authoredReports?: Prisma.ReportUncheckedCreateNestedManyWithoutAuthorInput;
   assignedReports?: Prisma.ReportUncheckedCreateNestedManyWithoutAssignedToInput;
   invitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutInviterInput;
+  technicianAssignments?: Prisma.ServiceAssignmentUncheckedCreateNestedManyWithoutTechnicianInput;
 };
 
 export type UserCreateOrConnectWithoutMembersInput = {
@@ -1152,6 +1303,7 @@ export type UserUpdateWithoutMembersInput = {
   authoredReports?: Prisma.ReportUpdateManyWithoutAuthorNestedInput;
   assignedReports?: Prisma.ReportUpdateManyWithoutAssignedToNestedInput;
   invitations?: Prisma.InvitationUpdateManyWithoutInviterNestedInput;
+  technicianAssignments?: Prisma.ServiceAssignmentUpdateManyWithoutTechnicianNestedInput;
 };
 
 export type UserUncheckedUpdateWithoutMembersInput = {
@@ -1168,6 +1320,7 @@ export type UserUncheckedUpdateWithoutMembersInput = {
   authoredReports?: Prisma.ReportUncheckedUpdateManyWithoutAuthorNestedInput;
   assignedReports?: Prisma.ReportUncheckedUpdateManyWithoutAssignedToNestedInput;
   invitations?: Prisma.InvitationUncheckedUpdateManyWithoutInviterNestedInput;
+  technicianAssignments?: Prisma.ServiceAssignmentUncheckedUpdateManyWithoutTechnicianNestedInput;
 };
 
 export type UserCreateWithoutInvitationsInput = {
@@ -1184,6 +1337,7 @@ export type UserCreateWithoutInvitationsInput = {
   authoredReports?: Prisma.ReportCreateNestedManyWithoutAuthorInput;
   assignedReports?: Prisma.ReportCreateNestedManyWithoutAssignedToInput;
   members?: Prisma.MemberCreateNestedManyWithoutUserInput;
+  technicianAssignments?: Prisma.ServiceAssignmentCreateNestedManyWithoutTechnicianInput;
 };
 
 export type UserUncheckedCreateWithoutInvitationsInput = {
@@ -1200,6 +1354,7 @@ export type UserUncheckedCreateWithoutInvitationsInput = {
   authoredReports?: Prisma.ReportUncheckedCreateNestedManyWithoutAuthorInput;
   assignedReports?: Prisma.ReportUncheckedCreateNestedManyWithoutAssignedToInput;
   members?: Prisma.MemberUncheckedCreateNestedManyWithoutUserInput;
+  technicianAssignments?: Prisma.ServiceAssignmentUncheckedCreateNestedManyWithoutTechnicianInput;
 };
 
 export type UserCreateOrConnectWithoutInvitationsInput = {
@@ -1244,6 +1399,7 @@ export type UserUpdateWithoutInvitationsInput = {
   authoredReports?: Prisma.ReportUpdateManyWithoutAuthorNestedInput;
   assignedReports?: Prisma.ReportUpdateManyWithoutAssignedToNestedInput;
   members?: Prisma.MemberUpdateManyWithoutUserNestedInput;
+  technicianAssignments?: Prisma.ServiceAssignmentUpdateManyWithoutTechnicianNestedInput;
 };
 
 export type UserUncheckedUpdateWithoutInvitationsInput = {
@@ -1260,6 +1416,7 @@ export type UserUncheckedUpdateWithoutInvitationsInput = {
   authoredReports?: Prisma.ReportUncheckedUpdateManyWithoutAuthorNestedInput;
   assignedReports?: Prisma.ReportUncheckedUpdateManyWithoutAssignedToNestedInput;
   members?: Prisma.MemberUncheckedUpdateManyWithoutUserNestedInput;
+  technicianAssignments?: Prisma.ServiceAssignmentUncheckedUpdateManyWithoutTechnicianNestedInput;
 };
 
 /**
@@ -1274,6 +1431,7 @@ export type UserCountOutputType = {
   assignedReports: number;
   members: number;
   invitations: number;
+  technicianAssignments: number;
 };
 
 export type UserCountOutputTypeSelect<
@@ -1287,6 +1445,9 @@ export type UserCountOutputTypeSelect<
   assignedReports?: boolean | UserCountOutputTypeCountAssignedReportsArgs;
   members?: boolean | UserCountOutputTypeCountMembersArgs;
   invitations?: boolean | UserCountOutputTypeCountInvitationsArgs;
+  technicianAssignments?:
+    | boolean
+    | UserCountOutputTypeCountTechnicianAssignmentsArgs;
 };
 
 /**
@@ -1372,6 +1533,16 @@ export type UserCountOutputTypeCountInvitationsArgs<
   where?: Prisma.InvitationWhereInput;
 };
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountTechnicianAssignmentsArgs<
+  ExtArgs extends
+    runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs,
+> = {
+  where?: Prisma.ServiceAssignmentWhereInput;
+};
+
 export type UserSelect<
   ExtArgs extends
     runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs,
@@ -1391,6 +1562,9 @@ export type UserSelect<
     assignedReports?: boolean | Prisma.User$assignedReportsArgs<ExtArgs>;
     members?: boolean | Prisma.User$membersArgs<ExtArgs>;
     invitations?: boolean | Prisma.User$invitationsArgs<ExtArgs>;
+    technicianAssignments?:
+      | boolean
+      | Prisma.User$technicianAssignmentsArgs<ExtArgs>;
     _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>;
   },
   ExtArgs["result"]["user"]
@@ -1462,6 +1636,9 @@ export type UserInclude<
   assignedReports?: boolean | Prisma.User$assignedReportsArgs<ExtArgs>;
   members?: boolean | Prisma.User$membersArgs<ExtArgs>;
   invitations?: boolean | Prisma.User$invitationsArgs<ExtArgs>;
+  technicianAssignments?:
+    | boolean
+    | Prisma.User$technicianAssignmentsArgs<ExtArgs>;
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>;
 };
 export type UserIncludeCreateManyAndReturn<
@@ -1486,6 +1663,7 @@ export type $UserPayload<
     assignedReports: Prisma.$ReportPayload<ExtArgs>[];
     members: Prisma.$MemberPayload<ExtArgs>[];
     invitations: Prisma.$InvitationPayload<ExtArgs>[];
+    technicianAssignments: Prisma.$ServiceAssignmentPayload<ExtArgs>[];
   };
   scalars: runtime.Types.Extensions.GetPayloadResult<
     {
@@ -2117,6 +2295,19 @@ export interface Prisma__UserClient<
   ): Prisma.PrismaPromise<
     | runtime.Types.Result.GetResult<
         Prisma.$InvitationPayload<ExtArgs>,
+        T,
+        "findMany",
+        GlobalOmitOptions
+      >
+    | Null
+  >;
+  technicianAssignments<
+    T extends Prisma.User$technicianAssignmentsArgs<ExtArgs> = {},
+  >(
+    args?: Prisma.Subset<T, Prisma.User$technicianAssignmentsArgs<ExtArgs>>,
+  ): Prisma.PrismaPromise<
+    | runtime.Types.Result.GetResult<
+        Prisma.$ServiceAssignmentPayload<ExtArgs>,
         T,
         "findMany",
         GlobalOmitOptions
@@ -2815,6 +3006,37 @@ export type User$invitationsArgs<
   distinct?:
     | Prisma.InvitationScalarFieldEnum
     | Prisma.InvitationScalarFieldEnum[];
+};
+
+/**
+ * User.technicianAssignments
+ */
+export type User$technicianAssignmentsArgs<
+  ExtArgs extends
+    runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs,
+> = {
+  /**
+   * Select specific fields to fetch from the ServiceAssignment
+   */
+  select?: Prisma.ServiceAssignmentSelect<ExtArgs> | null;
+  /**
+   * Omit specific fields from the ServiceAssignment
+   */
+  omit?: Prisma.ServiceAssignmentOmit<ExtArgs> | null;
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ServiceAssignmentInclude<ExtArgs> | null;
+  where?: Prisma.ServiceAssignmentWhereInput;
+  orderBy?:
+    | Prisma.ServiceAssignmentOrderByWithRelationInput
+    | Prisma.ServiceAssignmentOrderByWithRelationInput[];
+  cursor?: Prisma.ServiceAssignmentWhereUniqueInput;
+  take?: number;
+  skip?: number;
+  distinct?:
+    | Prisma.ServiceAssignmentScalarFieldEnum
+    | Prisma.ServiceAssignmentScalarFieldEnum[];
 };
 
 /**

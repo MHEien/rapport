@@ -21,6 +21,8 @@ export type * from "./models/Customer";
 export type * from "./models/CustomerEquipment";
 export type * from "./models/VanInventory";
 export type * from "./models/ReportPart";
+export type * from "./models/Project";
+export type * from "./models/ServiceAssignment";
 export type * from "./models/Organization";
 export type * from "./models/Member";
 export type * from "./models/Invitation";

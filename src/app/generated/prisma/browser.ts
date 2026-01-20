@@ -87,6 +87,16 @@ export type VanInventory = Prisma.VanInventoryModel;
  */
 export type ReportPart = Prisma.ReportPartModel;
 /**
+ * Model Project
+ *
+ */
+export type Project = Prisma.ProjectModel;
+/**
+ * Model ServiceAssignment
+ *
+ */
+export type ServiceAssignment = Prisma.ServiceAssignmentModel;
+/**
  * Model Organization
  *
  */

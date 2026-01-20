@@ -1,8 +1,10 @@
 "use client";
 
 import {
+  CalendarDays,
   Database,
   FileText,
+  FolderKanban,
   Home,
   LogOut,
   Menu,
@@ -21,9 +23,23 @@ import { authClient } from "@/lib/auth-client";
 import { Card } from "../ui/card";
 import { SyncIndicator } from "./sync-indicator";
 
-const navItems = [
+type NavItem = {
+  href: string;
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+  adminOnly?: boolean;
+};
+
+const navItems: NavItem[] = [
   { href: "/", label: "Hjem", icon: Home },
   { href: "/reports", label: "Rapporter", icon: FileText },
+  { href: "/schedule", label: "Timeplan", icon: CalendarDays },
+  {
+    href: "/projects",
+    label: "Prosjekter",
+    icon: FolderKanban,
+    adminOnly: true,
+  },
   { href: "/customers", label: "Kunder", icon: Users },
   { href: "/inventory", label: "Varebeholdning", icon: Package },
   { href: "/data-editor", label: "Dataredigering", icon: Database },
@@ -69,8 +85,13 @@ export function Sidebar({
     });
   };
 
-  const _isOwnerOrAdmin =
+  const isOwnerOrAdmin =
     membership?.role === "owner" || membership?.role === "admin";
+
+  // Filter nav items based on user role
+  const filteredNavItems = navItems.filter(
+    (item) => !item.adminOnly || isOwnerOrAdmin,
+  );
 
   return (
     <>
@@ -134,7 +155,7 @@ export function Sidebar({
 
         {/* Navigation */}
         <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
-          {navItems.map((item) => {
+          {filteredNavItems.map((item) => {
             const isActive = pathname === item.href;
             const Icon = item.icon;
 
@@ -203,13 +224,13 @@ export function Sidebar({
                 </div>
               )}
             </div>
-            
+
             <Button
-              variant="ghost" 
+              variant="ghost"
               onClick={handleSignOut}
               className={cn(
                 "w-full flex items-center gap-3 rounded-xl text-slate-400 hover:text-red-400 hover:bg-red-500/10",
-                collapsed ? "justify-center px-2" : "justify-start px-3"
+                collapsed ? "justify-center px-2" : "justify-start px-3",
               )}
             >
               <LogOut className="size-5 shrink-0" />

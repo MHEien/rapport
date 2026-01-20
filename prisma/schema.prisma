@@ -32,6 +32,9 @@ model User {
   members     Member[]
   invitations Invitation[]
 
+  // Scheduler Relations
+  technicianAssignments ServiceAssignment[] @relation("TechnicianAssignments")
+
   @@map("user")
 }
 
@@ -260,6 +263,7 @@ model Customer {
 
   equipment CustomerEquipment[]
   reports   Report[]
+  projects  Project[]
 
   @@unique([organizationId, name])
   @@index([organizationId])
@@ -344,6 +348,68 @@ enum ChecklistStatus {
   IKKE_AKTUELT // N/A
 }
 
+enum AssignmentStatus {
+  SCHEDULED
+  IN_PROGRESS
+  COMPLETE
+  CANCELLED
+}
+
+enum ReferenceType {
+  SERVICE_ORDER
+  PROJECT
+}
+
+// ---------------------------------------------------------
+// 7. TECHNICIAN SCHEDULER
+// ---------------------------------------------------------
+
+model Project {
+  id            String   @id @default(cuid())
+  projectNumber String
+  name          String
+  description   String?  @db.Text
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relations
+  customerId     String?
+  customer       Customer? @relation(fields: [customerId], references: [id])
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  assignments ServiceAssignment[]
+
+  @@unique([organizationId, projectNumber])
+  @@index([organizationId])
+}
+
+model ServiceAssignment {
+  id                 String           @id @default(cuid())
+  serviceOrderNumber String?          // Optional - used when referenceType is SERVICE_ORDER
+  referenceType      ReferenceType    @default(SERVICE_ORDER)
+  title              String           // Description of the job
+  startTime          DateTime
+  endTime            DateTime
+  status             AssignmentStatus @default(SCHEDULED)
+  notes              String?          @db.Text
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+
+  // Relations
+  technicianId   String
+  technician     User             @relation("TechnicianAssignments", fields: [technicianId], references: [id], onDelete: Cascade)
+  organizationId String
+  organization   Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  projectId      String?
+  project        Project?         @relation(fields: [projectId], references: [id])
+
+  @@index([technicianId])
+  @@index([organizationId])
+  @@index([projectId])
+  @@index([startTime, endTime])
+}
+
 // ---------------------------------------------------------
 // 4. MULTI-TENANCY (Better Auth Organization Plugin)
 // ---------------------------------------------------------
@@ -360,10 +426,12 @@ model Organization {
   invitations Invitation[]
 
   // App Relations
-  reports       Report[]
-  servicePoints ServicePoint[]
-  customers     Customer[]
-  vanInventory  VanInventory[]
+  reports            Report[]
+  servicePoints      ServicePoint[]
+  customers          Customer[]
+  vanInventory       VanInventory[]
+  serviceAssignments ServiceAssignment[]
+  projects           Project[]
 
   @@map("organization")
 }
