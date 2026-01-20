@@ -1,6 +1,6 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { nb } from "date-fns/locale";
 import { FolderKanban, Users } from "lucide-react";
@@ -26,8 +26,10 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
+import { DeleteProjectDialog } from "./delete-project-dialog";
 
 export function ProjectsList() {
+  const queryClient = useQueryClient();
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(
     null,
   );
@@ -83,9 +85,23 @@ export function ProjectsList() {
         {projects.map((project) => (
           <Card
             key={project.id}
-            className="cursor-pointer hover:border-primary/50 transition-colors"
+            className="cursor-pointer hover:border-primary/50 transition-colors relative group"
             onClick={() => setSelectedProjectId(project.id)}
           >
+            <div
+              className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity z-10"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <DeleteProjectDialog
+                projectId={project.id}
+                projectNumber={project.projectNumber}
+                projectName={project.name}
+                onDeleted={() =>
+                  queryClient.invalidateQueries({ queryKey: ["projects"] })
+                }
+              />
+            </div>
+
             <CardHeader className="pb-2">
               <div className="flex items-center justify-between">
                 <Badge variant="outline" className="font-mono">
@@ -95,9 +111,13 @@ export function ProjectsList() {
                   {project._count.assignments} oppdrag
                 </span>
               </div>
-              <CardTitle className="text-lg mt-2">{project.name}</CardTitle>
+              <CardTitle className="text-lg mt-2 truncate pr-6">
+                {project.name}
+              </CardTitle>
               {project.customer && (
-                <CardDescription>{project.customer.name}</CardDescription>
+                <CardDescription className="truncate">
+                  {project.customer.name}
+                </CardDescription>
               )}
             </CardHeader>
             <CardContent>
