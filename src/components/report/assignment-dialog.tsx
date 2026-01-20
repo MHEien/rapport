@@ -95,7 +95,7 @@ export function AssignmentDialog({
 
   const handleSelect = (userId: string) => {
     if (userId === currentAssigneeId) {
-      // If clicking current assignee, do nothing or unassign? 
+      // If clicking current assignee, do nothing or unassign?
       // Let's keep unassign as a separate action for clarity
       return;
     }
@@ -114,14 +114,14 @@ export function AssignmentDialog({
         <DialogHeader>
           <DialogTitle>Tildel rapport</DialogTitle>
           <DialogDescription className="text-slate-400">
-             Velg tekniker som skal utføre denne jobben.
+            Velg tekniker som skal utføre denne jobben.
           </DialogDescription>
         </DialogHeader>
 
         <div className="py-2">
           <Command className="bg-transparent border border-white/10 rounded-lg">
-            <CommandInput 
-              placeholder="Søk i teknikere..." 
+            <CommandInput
+              placeholder="Søk i teknikere..."
               className="placeholder:text-slate-500"
             />
             <CommandList>
@@ -140,8 +140,12 @@ export function AssignmentDialog({
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex-1 overflow-hidden">
-                      <p className="font-medium truncate">{tech.name || "Ukjent bruker"}</p>
-                      <p className="text-xs text-slate-400 truncate">{tech.email}</p>
+                      <p className="font-medium truncate">
+                        {tech.name || "Ukjent bruker"}
+                      </p>
+                      <p className="text-xs text-slate-400 truncate">
+                        {tech.email}
+                      </p>
                     </div>
                     {currentAssigneeId === tech.id && (
                       <Check className="size-4 text-blue-400" />
@@ -155,16 +159,16 @@ export function AssignmentDialog({
 
         {currentAssigneeId && (
           <div className="flex justify-between items-center pt-2 border-t border-white/10 mt-2">
-             <span className="text-xs text-slate-500">Nåværende: </span>
-             <Button 
-               variant="ghost" 
-               size="sm" 
-               onClick={handleUnassign}
-               className="text-red-400 hover:text-red-300 hover:bg-red-500/10 h-8"
-               disabled={unassignMutation.isPending}
-             >
-               Fjern tildeling
-             </Button>
+            <span className="text-xs text-slate-500">Nåværende: </span>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleUnassign}
+              className="text-red-400 hover:text-red-300 hover:bg-red-500/10 h-8"
+              disabled={unassignMutation.isPending}
+            >
+              Fjern tildeling
+            </Button>
           </div>
         )}
       </DialogContent>

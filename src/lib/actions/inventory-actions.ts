@@ -131,9 +131,11 @@ function parsePdfText(text: string): ParsedPart[] {
     if (
       line.length < 5 || // Skip very short lines
       /^\d{2}\.\d{2}\.\d{2}$/.test(line) || // Skip standalone dates
-      /^\d{2}\.\d{2}\.\d{2}\s+\d{6}/.test(line) && !line.includes("\t") || // Skip "date varenr" without tabs
+      (/^\d{2}\.\d{2}\.\d{2}\s+\d{6}/.test(line) && !line.includes("\t")) || // Skip "date varenr" without tabs
       /^(o|ve|p|st|ty|e)$/i.test(line) || // Skip split words from PDF extraction
-      /^\d{1,2}\.\s*(januar|februar|mars|april|mai|juni|juli|august|september|oktober|november|desember)/i.test(line) || // Skip date strings like "19. januar"
+      /^\d{1,2}\.\s*(januar|februar|mars|april|mai|juni|juli|august|september|oktober|november|desember)/i.test(
+        line,
+      ) || // Skip date strings like "19. januar"
       lowerLine.includes("januar") || // Skip month names
       lowerLine.includes("februar") ||
       lowerLine.includes("part number") ||
@@ -194,7 +196,11 @@ function parsePdfText(text: string): ParsedPart[] {
         else if (/^\d{6,}$/.test(segments[1]) && segments.length >= 3) {
           varenr = segments[1];
           // Description might be in segments[2], but skip if it looks like a location code
-          if (segments[2] && !segments[2].startsWith("SERVICE") && !/^[A-Z]{2,5}$/.test(segments[2])) {
+          if (
+            segments[2] &&
+            !segments[2].startsWith("SERVICE") &&
+            !/^[A-Z]{2,5}$/.test(segments[2])
+          ) {
             beskrivelse = segments[2];
           }
         }

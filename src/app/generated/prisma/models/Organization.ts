@@ -201,6 +201,8 @@ export type OrganizationWhereInput = {
   servicePoints?: Prisma.ServicePointListRelationFilter;
   customers?: Prisma.CustomerListRelationFilter;
   vanInventory?: Prisma.VanInventoryListRelationFilter;
+  serviceAssignments?: Prisma.ServiceAssignmentListRelationFilter;
+  projects?: Prisma.ProjectListRelationFilter;
 };
 
 export type OrganizationOrderByWithRelationInput = {
@@ -216,6 +218,8 @@ export type OrganizationOrderByWithRelationInput = {
   servicePoints?: Prisma.ServicePointOrderByRelationAggregateInput;
   customers?: Prisma.CustomerOrderByRelationAggregateInput;
   vanInventory?: Prisma.VanInventoryOrderByRelationAggregateInput;
+  serviceAssignments?: Prisma.ServiceAssignmentOrderByRelationAggregateInput;
+  projects?: Prisma.ProjectOrderByRelationAggregateInput;
 };
 
 export type OrganizationWhereUniqueInput = Prisma.AtLeast<
@@ -235,6 +239,8 @@ export type OrganizationWhereUniqueInput = Prisma.AtLeast<
     servicePoints?: Prisma.ServicePointListRelationFilter;
     customers?: Prisma.CustomerListRelationFilter;
     vanInventory?: Prisma.VanInventoryListRelationFilter;
+    serviceAssignments?: Prisma.ServiceAssignmentListRelationFilter;
+    projects?: Prisma.ProjectListRelationFilter;
   },
   "id" | "slug"
 >;
@@ -292,6 +298,8 @@ export type OrganizationCreateInput = {
   servicePoints?: Prisma.ServicePointCreateNestedManyWithoutOrganizationInput;
   customers?: Prisma.CustomerCreateNestedManyWithoutOrganizationInput;
   vanInventory?: Prisma.VanInventoryCreateNestedManyWithoutOrganizationInput;
+  serviceAssignments?: Prisma.ServiceAssignmentCreateNestedManyWithoutOrganizationInput;
+  projects?: Prisma.ProjectCreateNestedManyWithoutOrganizationInput;
 };
 
 export type OrganizationUncheckedCreateInput = {
@@ -307,6 +315,8 @@ export type OrganizationUncheckedCreateInput = {
   servicePoints?: Prisma.ServicePointUncheckedCreateNestedManyWithoutOrganizationInput;
   customers?: Prisma.CustomerUncheckedCreateNestedManyWithoutOrganizationInput;
   vanInventory?: Prisma.VanInventoryUncheckedCreateNestedManyWithoutOrganizationInput;
+  serviceAssignments?: Prisma.ServiceAssignmentUncheckedCreateNestedManyWithoutOrganizationInput;
+  projects?: Prisma.ProjectUncheckedCreateNestedManyWithoutOrganizationInput;
 };
 
 export type OrganizationUpdateInput = {
@@ -322,6 +332,8 @@ export type OrganizationUpdateInput = {
   servicePoints?: Prisma.ServicePointUpdateManyWithoutOrganizationNestedInput;
   customers?: Prisma.CustomerUpdateManyWithoutOrganizationNestedInput;
   vanInventory?: Prisma.VanInventoryUpdateManyWithoutOrganizationNestedInput;
+  serviceAssignments?: Prisma.ServiceAssignmentUpdateManyWithoutOrganizationNestedInput;
+  projects?: Prisma.ProjectUpdateManyWithoutOrganizationNestedInput;
 };
 
 export type OrganizationUncheckedUpdateInput = {
@@ -337,6 +349,8 @@ export type OrganizationUncheckedUpdateInput = {
   servicePoints?: Prisma.ServicePointUncheckedUpdateManyWithoutOrganizationNestedInput;
   customers?: Prisma.CustomerUncheckedUpdateManyWithoutOrganizationNestedInput;
   vanInventory?: Prisma.VanInventoryUncheckedUpdateManyWithoutOrganizationNestedInput;
+  serviceAssignments?: Prisma.ServiceAssignmentUncheckedUpdateManyWithoutOrganizationNestedInput;
+  projects?: Prisma.ProjectUncheckedUpdateManyWithoutOrganizationNestedInput;
 };
 
 export type OrganizationCreateManyInput = {
@@ -502,6 +516,59 @@ export type OrganizationUpdateOneRequiredWithoutVanInventoryNestedInput = {
   >;
 };
 
+export type OrganizationCreateNestedOneWithoutProjectsInput = {
+  create?: Prisma.XOR<
+    Prisma.OrganizationCreateWithoutProjectsInput,
+    Prisma.OrganizationUncheckedCreateWithoutProjectsInput
+  >;
+  connectOrCreate?: Prisma.OrganizationCreateOrConnectWithoutProjectsInput;
+  connect?: Prisma.OrganizationWhereUniqueInput;
+};
+
+export type OrganizationUpdateOneRequiredWithoutProjectsNestedInput = {
+  create?: Prisma.XOR<
+    Prisma.OrganizationCreateWithoutProjectsInput,
+    Prisma.OrganizationUncheckedCreateWithoutProjectsInput
+  >;
+  connectOrCreate?: Prisma.OrganizationCreateOrConnectWithoutProjectsInput;
+  upsert?: Prisma.OrganizationUpsertWithoutProjectsInput;
+  connect?: Prisma.OrganizationWhereUniqueInput;
+  update?: Prisma.XOR<
+    Prisma.XOR<
+      Prisma.OrganizationUpdateToOneWithWhereWithoutProjectsInput,
+      Prisma.OrganizationUpdateWithoutProjectsInput
+    >,
+    Prisma.OrganizationUncheckedUpdateWithoutProjectsInput
+  >;
+};
+
+export type OrganizationCreateNestedOneWithoutServiceAssignmentsInput = {
+  create?: Prisma.XOR<
+    Prisma.OrganizationCreateWithoutServiceAssignmentsInput,
+    Prisma.OrganizationUncheckedCreateWithoutServiceAssignmentsInput
+  >;
+  connectOrCreate?: Prisma.OrganizationCreateOrConnectWithoutServiceAssignmentsInput;
+  connect?: Prisma.OrganizationWhereUniqueInput;
+};
+
+export type OrganizationUpdateOneRequiredWithoutServiceAssignmentsNestedInput =
+  {
+    create?: Prisma.XOR<
+      Prisma.OrganizationCreateWithoutServiceAssignmentsInput,
+      Prisma.OrganizationUncheckedCreateWithoutServiceAssignmentsInput
+    >;
+    connectOrCreate?: Prisma.OrganizationCreateOrConnectWithoutServiceAssignmentsInput;
+    upsert?: Prisma.OrganizationUpsertWithoutServiceAssignmentsInput;
+    connect?: Prisma.OrganizationWhereUniqueInput;
+    update?: Prisma.XOR<
+      Prisma.XOR<
+        Prisma.OrganizationUpdateToOneWithWhereWithoutServiceAssignmentsInput,
+        Prisma.OrganizationUpdateWithoutServiceAssignmentsInput
+      >,
+      Prisma.OrganizationUncheckedUpdateWithoutServiceAssignmentsInput
+    >;
+  };
+
 export type OrganizationCreateNestedOneWithoutMembersInput = {
   create?: Prisma.XOR<
     Prisma.OrganizationCreateWithoutMembersInput,
@@ -566,6 +633,8 @@ export type OrganizationCreateWithoutReportsInput = {
   servicePoints?: Prisma.ServicePointCreateNestedManyWithoutOrganizationInput;
   customers?: Prisma.CustomerCreateNestedManyWithoutOrganizationInput;
   vanInventory?: Prisma.VanInventoryCreateNestedManyWithoutOrganizationInput;
+  serviceAssignments?: Prisma.ServiceAssignmentCreateNestedManyWithoutOrganizationInput;
+  projects?: Prisma.ProjectCreateNestedManyWithoutOrganizationInput;
 };
 
 export type OrganizationUncheckedCreateWithoutReportsInput = {
@@ -580,6 +649,8 @@ export type OrganizationUncheckedCreateWithoutReportsInput = {
   servicePoints?: Prisma.ServicePointUncheckedCreateNestedManyWithoutOrganizationInput;
   customers?: Prisma.CustomerUncheckedCreateNestedManyWithoutOrganizationInput;
   vanInventory?: Prisma.VanInventoryUncheckedCreateNestedManyWithoutOrganizationInput;
+  serviceAssignments?: Prisma.ServiceAssignmentUncheckedCreateNestedManyWithoutOrganizationInput;
+  projects?: Prisma.ProjectUncheckedCreateNestedManyWithoutOrganizationInput;
 };
 
 export type OrganizationCreateOrConnectWithoutReportsInput = {
@@ -622,6 +693,8 @@ export type OrganizationUpdateWithoutReportsInput = {
   servicePoints?: Prisma.ServicePointUpdateManyWithoutOrganizationNestedInput;
   customers?: Prisma.CustomerUpdateManyWithoutOrganizationNestedInput;
   vanInventory?: Prisma.VanInventoryUpdateManyWithoutOrganizationNestedInput;
+  serviceAssignments?: Prisma.ServiceAssignmentUpdateManyWithoutOrganizationNestedInput;
+  projects?: Prisma.ProjectUpdateManyWithoutOrganizationNestedInput;
 };
 
 export type OrganizationUncheckedUpdateWithoutReportsInput = {
@@ -636,6 +709,8 @@ export type OrganizationUncheckedUpdateWithoutReportsInput = {
   servicePoints?: Prisma.ServicePointUncheckedUpdateManyWithoutOrganizationNestedInput;
   customers?: Prisma.CustomerUncheckedUpdateManyWithoutOrganizationNestedInput;
   vanInventory?: Prisma.VanInventoryUncheckedUpdateManyWithoutOrganizationNestedInput;
+  serviceAssignments?: Prisma.ServiceAssignmentUncheckedUpdateManyWithoutOrganizationNestedInput;
+  projects?: Prisma.ProjectUncheckedUpdateManyWithoutOrganizationNestedInput;
 };
 
 export type OrganizationCreateWithoutServicePointsInput = {
@@ -650,6 +725,8 @@ export type OrganizationCreateWithoutServicePointsInput = {
   reports?: Prisma.ReportCreateNestedManyWithoutOrganizationInput;
   customers?: Prisma.CustomerCreateNestedManyWithoutOrganizationInput;
   vanInventory?: Prisma.VanInventoryCreateNestedManyWithoutOrganizationInput;
+  serviceAssignments?: Prisma.ServiceAssignmentCreateNestedManyWithoutOrganizationInput;
+  projects?: Prisma.ProjectCreateNestedManyWithoutOrganizationInput;
 };
 
 export type OrganizationUncheckedCreateWithoutServicePointsInput = {
@@ -664,6 +741,8 @@ export type OrganizationUncheckedCreateWithoutServicePointsInput = {
   reports?: Prisma.ReportUncheckedCreateNestedManyWithoutOrganizationInput;
   customers?: Prisma.CustomerUncheckedCreateNestedManyWithoutOrganizationInput;
   vanInventory?: Prisma.VanInventoryUncheckedCreateNestedManyWithoutOrganizationInput;
+  serviceAssignments?: Prisma.ServiceAssignmentUncheckedCreateNestedManyWithoutOrganizationInput;
+  projects?: Prisma.ProjectUncheckedCreateNestedManyWithoutOrganizationInput;
 };
 
 export type OrganizationCreateOrConnectWithoutServicePointsInput = {
@@ -706,6 +785,8 @@ export type OrganizationUpdateWithoutServicePointsInput = {
   reports?: Prisma.ReportUpdateManyWithoutOrganizationNestedInput;
   customers?: Prisma.CustomerUpdateManyWithoutOrganizationNestedInput;
   vanInventory?: Prisma.VanInventoryUpdateManyWithoutOrganizationNestedInput;
+  serviceAssignments?: Prisma.ServiceAssignmentUpdateManyWithoutOrganizationNestedInput;
+  projects?: Prisma.ProjectUpdateManyWithoutOrganizationNestedInput;
 };
 
 export type OrganizationUncheckedUpdateWithoutServicePointsInput = {
@@ -720,6 +801,8 @@ export type OrganizationUncheckedUpdateWithoutServicePointsInput = {
   reports?: Prisma.ReportUncheckedUpdateManyWithoutOrganizationNestedInput;
   customers?: Prisma.CustomerUncheckedUpdateManyWithoutOrganizationNestedInput;
   vanInventory?: Prisma.VanInventoryUncheckedUpdateManyWithoutOrganizationNestedInput;
+  serviceAssignments?: Prisma.ServiceAssignmentUncheckedUpdateManyWithoutOrganizationNestedInput;
+  projects?: Prisma.ProjectUncheckedUpdateManyWithoutOrganizationNestedInput;
 };
 
 export type OrganizationCreateWithoutCustomersInput = {
@@ -734,6 +817,8 @@ export type OrganizationCreateWithoutCustomersInput = {
   reports?: Prisma.ReportCreateNestedManyWithoutOrganizationInput;
   servicePoints?: Prisma.ServicePointCreateNestedManyWithoutOrganizationInput;
   vanInventory?: Prisma.VanInventoryCreateNestedManyWithoutOrganizationInput;
+  serviceAssignments?: Prisma.ServiceAssignmentCreateNestedManyWithoutOrganizationInput;
+  projects?: Prisma.ProjectCreateNestedManyWithoutOrganizationInput;
 };
 
 export type OrganizationUncheckedCreateWithoutCustomersInput = {
@@ -748,6 +833,8 @@ export type OrganizationUncheckedCreateWithoutCustomersInput = {
   reports?: Prisma.ReportUncheckedCreateNestedManyWithoutOrganizationInput;
   servicePoints?: Prisma.ServicePointUncheckedCreateNestedManyWithoutOrganizationInput;
   vanInventory?: Prisma.VanInventoryUncheckedCreateNestedManyWithoutOrganizationInput;
+  serviceAssignments?: Prisma.ServiceAssignmentUncheckedCreateNestedManyWithoutOrganizationInput;
+  projects?: Prisma.ProjectUncheckedCreateNestedManyWithoutOrganizationInput;
 };
 
 export type OrganizationCreateOrConnectWithoutCustomersInput = {
@@ -790,6 +877,8 @@ export type OrganizationUpdateWithoutCustomersInput = {
   reports?: Prisma.ReportUpdateManyWithoutOrganizationNestedInput;
   servicePoints?: Prisma.ServicePointUpdateManyWithoutOrganizationNestedInput;
   vanInventory?: Prisma.VanInventoryUpdateManyWithoutOrganizationNestedInput;
+  serviceAssignments?: Prisma.ServiceAssignmentUpdateManyWithoutOrganizationNestedInput;
+  projects?: Prisma.ProjectUpdateManyWithoutOrganizationNestedInput;
 };
 
 export type OrganizationUncheckedUpdateWithoutCustomersInput = {
@@ -804,6 +893,8 @@ export type OrganizationUncheckedUpdateWithoutCustomersInput = {
   reports?: Prisma.ReportUncheckedUpdateManyWithoutOrganizationNestedInput;
   servicePoints?: Prisma.ServicePointUncheckedUpdateManyWithoutOrganizationNestedInput;
   vanInventory?: Prisma.VanInventoryUncheckedUpdateManyWithoutOrganizationNestedInput;
+  serviceAssignments?: Prisma.ServiceAssignmentUncheckedUpdateManyWithoutOrganizationNestedInput;
+  projects?: Prisma.ProjectUncheckedUpdateManyWithoutOrganizationNestedInput;
 };
 
 export type OrganizationCreateWithoutVanInventoryInput = {
@@ -818,6 +909,8 @@ export type OrganizationCreateWithoutVanInventoryInput = {
   reports?: Prisma.ReportCreateNestedManyWithoutOrganizationInput;
   servicePoints?: Prisma.ServicePointCreateNestedManyWithoutOrganizationInput;
   customers?: Prisma.CustomerCreateNestedManyWithoutOrganizationInput;
+  serviceAssignments?: Prisma.ServiceAssignmentCreateNestedManyWithoutOrganizationInput;
+  projects?: Prisma.ProjectCreateNestedManyWithoutOrganizationInput;
 };
 
 export type OrganizationUncheckedCreateWithoutVanInventoryInput = {
@@ -832,6 +925,8 @@ export type OrganizationUncheckedCreateWithoutVanInventoryInput = {
   reports?: Prisma.ReportUncheckedCreateNestedManyWithoutOrganizationInput;
   servicePoints?: Prisma.ServicePointUncheckedCreateNestedManyWithoutOrganizationInput;
   customers?: Prisma.CustomerUncheckedCreateNestedManyWithoutOrganizationInput;
+  serviceAssignments?: Prisma.ServiceAssignmentUncheckedCreateNestedManyWithoutOrganizationInput;
+  projects?: Prisma.ProjectUncheckedCreateNestedManyWithoutOrganizationInput;
 };
 
 export type OrganizationCreateOrConnectWithoutVanInventoryInput = {
@@ -874,6 +969,8 @@ export type OrganizationUpdateWithoutVanInventoryInput = {
   reports?: Prisma.ReportUpdateManyWithoutOrganizationNestedInput;
   servicePoints?: Prisma.ServicePointUpdateManyWithoutOrganizationNestedInput;
   customers?: Prisma.CustomerUpdateManyWithoutOrganizationNestedInput;
+  serviceAssignments?: Prisma.ServiceAssignmentUpdateManyWithoutOrganizationNestedInput;
+  projects?: Prisma.ProjectUpdateManyWithoutOrganizationNestedInput;
 };
 
 export type OrganizationUncheckedUpdateWithoutVanInventoryInput = {
@@ -888,6 +985,192 @@ export type OrganizationUncheckedUpdateWithoutVanInventoryInput = {
   reports?: Prisma.ReportUncheckedUpdateManyWithoutOrganizationNestedInput;
   servicePoints?: Prisma.ServicePointUncheckedUpdateManyWithoutOrganizationNestedInput;
   customers?: Prisma.CustomerUncheckedUpdateManyWithoutOrganizationNestedInput;
+  serviceAssignments?: Prisma.ServiceAssignmentUncheckedUpdateManyWithoutOrganizationNestedInput;
+  projects?: Prisma.ProjectUncheckedUpdateManyWithoutOrganizationNestedInput;
+};
+
+export type OrganizationCreateWithoutProjectsInput = {
+  id?: string;
+  name: string;
+  slug?: string | null;
+  logo?: string | null;
+  metadata?: string | null;
+  createdAt?: Date | string;
+  members?: Prisma.MemberCreateNestedManyWithoutOrganizationInput;
+  invitations?: Prisma.InvitationCreateNestedManyWithoutOrganizationInput;
+  reports?: Prisma.ReportCreateNestedManyWithoutOrganizationInput;
+  servicePoints?: Prisma.ServicePointCreateNestedManyWithoutOrganizationInput;
+  customers?: Prisma.CustomerCreateNestedManyWithoutOrganizationInput;
+  vanInventory?: Prisma.VanInventoryCreateNestedManyWithoutOrganizationInput;
+  serviceAssignments?: Prisma.ServiceAssignmentCreateNestedManyWithoutOrganizationInput;
+};
+
+export type OrganizationUncheckedCreateWithoutProjectsInput = {
+  id?: string;
+  name: string;
+  slug?: string | null;
+  logo?: string | null;
+  metadata?: string | null;
+  createdAt?: Date | string;
+  members?: Prisma.MemberUncheckedCreateNestedManyWithoutOrganizationInput;
+  invitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutOrganizationInput;
+  reports?: Prisma.ReportUncheckedCreateNestedManyWithoutOrganizationInput;
+  servicePoints?: Prisma.ServicePointUncheckedCreateNestedManyWithoutOrganizationInput;
+  customers?: Prisma.CustomerUncheckedCreateNestedManyWithoutOrganizationInput;
+  vanInventory?: Prisma.VanInventoryUncheckedCreateNestedManyWithoutOrganizationInput;
+  serviceAssignments?: Prisma.ServiceAssignmentUncheckedCreateNestedManyWithoutOrganizationInput;
+};
+
+export type OrganizationCreateOrConnectWithoutProjectsInput = {
+  where: Prisma.OrganizationWhereUniqueInput;
+  create: Prisma.XOR<
+    Prisma.OrganizationCreateWithoutProjectsInput,
+    Prisma.OrganizationUncheckedCreateWithoutProjectsInput
+  >;
+};
+
+export type OrganizationUpsertWithoutProjectsInput = {
+  update: Prisma.XOR<
+    Prisma.OrganizationUpdateWithoutProjectsInput,
+    Prisma.OrganizationUncheckedUpdateWithoutProjectsInput
+  >;
+  create: Prisma.XOR<
+    Prisma.OrganizationCreateWithoutProjectsInput,
+    Prisma.OrganizationUncheckedCreateWithoutProjectsInput
+  >;
+  where?: Prisma.OrganizationWhereInput;
+};
+
+export type OrganizationUpdateToOneWithWhereWithoutProjectsInput = {
+  where?: Prisma.OrganizationWhereInput;
+  data: Prisma.XOR<
+    Prisma.OrganizationUpdateWithoutProjectsInput,
+    Prisma.OrganizationUncheckedUpdateWithoutProjectsInput
+  >;
+};
+
+export type OrganizationUpdateWithoutProjectsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string;
+  name?: Prisma.StringFieldUpdateOperationsInput | string;
+  slug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+  logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+  metadata?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+  members?: Prisma.MemberUpdateManyWithoutOrganizationNestedInput;
+  invitations?: Prisma.InvitationUpdateManyWithoutOrganizationNestedInput;
+  reports?: Prisma.ReportUpdateManyWithoutOrganizationNestedInput;
+  servicePoints?: Prisma.ServicePointUpdateManyWithoutOrganizationNestedInput;
+  customers?: Prisma.CustomerUpdateManyWithoutOrganizationNestedInput;
+  vanInventory?: Prisma.VanInventoryUpdateManyWithoutOrganizationNestedInput;
+  serviceAssignments?: Prisma.ServiceAssignmentUpdateManyWithoutOrganizationNestedInput;
+};
+
+export type OrganizationUncheckedUpdateWithoutProjectsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string;
+  name?: Prisma.StringFieldUpdateOperationsInput | string;
+  slug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+  logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+  metadata?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+  members?: Prisma.MemberUncheckedUpdateManyWithoutOrganizationNestedInput;
+  invitations?: Prisma.InvitationUncheckedUpdateManyWithoutOrganizationNestedInput;
+  reports?: Prisma.ReportUncheckedUpdateManyWithoutOrganizationNestedInput;
+  servicePoints?: Prisma.ServicePointUncheckedUpdateManyWithoutOrganizationNestedInput;
+  customers?: Prisma.CustomerUncheckedUpdateManyWithoutOrganizationNestedInput;
+  vanInventory?: Prisma.VanInventoryUncheckedUpdateManyWithoutOrganizationNestedInput;
+  serviceAssignments?: Prisma.ServiceAssignmentUncheckedUpdateManyWithoutOrganizationNestedInput;
+};
+
+export type OrganizationCreateWithoutServiceAssignmentsInput = {
+  id?: string;
+  name: string;
+  slug?: string | null;
+  logo?: string | null;
+  metadata?: string | null;
+  createdAt?: Date | string;
+  members?: Prisma.MemberCreateNestedManyWithoutOrganizationInput;
+  invitations?: Prisma.InvitationCreateNestedManyWithoutOrganizationInput;
+  reports?: Prisma.ReportCreateNestedManyWithoutOrganizationInput;
+  servicePoints?: Prisma.ServicePointCreateNestedManyWithoutOrganizationInput;
+  customers?: Prisma.CustomerCreateNestedManyWithoutOrganizationInput;
+  vanInventory?: Prisma.VanInventoryCreateNestedManyWithoutOrganizationInput;
+  projects?: Prisma.ProjectCreateNestedManyWithoutOrganizationInput;
+};
+
+export type OrganizationUncheckedCreateWithoutServiceAssignmentsInput = {
+  id?: string;
+  name: string;
+  slug?: string | null;
+  logo?: string | null;
+  metadata?: string | null;
+  createdAt?: Date | string;
+  members?: Prisma.MemberUncheckedCreateNestedManyWithoutOrganizationInput;
+  invitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutOrganizationInput;
+  reports?: Prisma.ReportUncheckedCreateNestedManyWithoutOrganizationInput;
+  servicePoints?: Prisma.ServicePointUncheckedCreateNestedManyWithoutOrganizationInput;
+  customers?: Prisma.CustomerUncheckedCreateNestedManyWithoutOrganizationInput;
+  vanInventory?: Prisma.VanInventoryUncheckedCreateNestedManyWithoutOrganizationInput;
+  projects?: Prisma.ProjectUncheckedCreateNestedManyWithoutOrganizationInput;
+};
+
+export type OrganizationCreateOrConnectWithoutServiceAssignmentsInput = {
+  where: Prisma.OrganizationWhereUniqueInput;
+  create: Prisma.XOR<
+    Prisma.OrganizationCreateWithoutServiceAssignmentsInput,
+    Prisma.OrganizationUncheckedCreateWithoutServiceAssignmentsInput
+  >;
+};
+
+export type OrganizationUpsertWithoutServiceAssignmentsInput = {
+  update: Prisma.XOR<
+    Prisma.OrganizationUpdateWithoutServiceAssignmentsInput,
+    Prisma.OrganizationUncheckedUpdateWithoutServiceAssignmentsInput
+  >;
+  create: Prisma.XOR<
+    Prisma.OrganizationCreateWithoutServiceAssignmentsInput,
+    Prisma.OrganizationUncheckedCreateWithoutServiceAssignmentsInput
+  >;
+  where?: Prisma.OrganizationWhereInput;
+};
+
+export type OrganizationUpdateToOneWithWhereWithoutServiceAssignmentsInput = {
+  where?: Prisma.OrganizationWhereInput;
+  data: Prisma.XOR<
+    Prisma.OrganizationUpdateWithoutServiceAssignmentsInput,
+    Prisma.OrganizationUncheckedUpdateWithoutServiceAssignmentsInput
+  >;
+};
+
+export type OrganizationUpdateWithoutServiceAssignmentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string;
+  name?: Prisma.StringFieldUpdateOperationsInput | string;
+  slug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+  logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+  metadata?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+  members?: Prisma.MemberUpdateManyWithoutOrganizationNestedInput;
+  invitations?: Prisma.InvitationUpdateManyWithoutOrganizationNestedInput;
+  reports?: Prisma.ReportUpdateManyWithoutOrganizationNestedInput;
+  servicePoints?: Prisma.ServicePointUpdateManyWithoutOrganizationNestedInput;
+  customers?: Prisma.CustomerUpdateManyWithoutOrganizationNestedInput;
+  vanInventory?: Prisma.VanInventoryUpdateManyWithoutOrganizationNestedInput;
+  projects?: Prisma.ProjectUpdateManyWithoutOrganizationNestedInput;
+};
+
+export type OrganizationUncheckedUpdateWithoutServiceAssignmentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string;
+  name?: Prisma.StringFieldUpdateOperationsInput | string;
+  slug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+  logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+  metadata?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+  members?: Prisma.MemberUncheckedUpdateManyWithoutOrganizationNestedInput;
+  invitations?: Prisma.InvitationUncheckedUpdateManyWithoutOrganizationNestedInput;
+  reports?: Prisma.ReportUncheckedUpdateManyWithoutOrganizationNestedInput;
+  servicePoints?: Prisma.ServicePointUncheckedUpdateManyWithoutOrganizationNestedInput;
+  customers?: Prisma.CustomerUncheckedUpdateManyWithoutOrganizationNestedInput;
+  vanInventory?: Prisma.VanInventoryUncheckedUpdateManyWithoutOrganizationNestedInput;
+  projects?: Prisma.ProjectUncheckedUpdateManyWithoutOrganizationNestedInput;
 };
 
 export type OrganizationCreateWithoutMembersInput = {
@@ -902,6 +1185,8 @@ export type OrganizationCreateWithoutMembersInput = {
   servicePoints?: Prisma.ServicePointCreateNestedManyWithoutOrganizationInput;
   customers?: Prisma.CustomerCreateNestedManyWithoutOrganizationInput;
   vanInventory?: Prisma.VanInventoryCreateNestedManyWithoutOrganizationInput;
+  serviceAssignments?: Prisma.ServiceAssignmentCreateNestedManyWithoutOrganizationInput;
+  projects?: Prisma.ProjectCreateNestedManyWithoutOrganizationInput;
 };
 
 export type OrganizationUncheckedCreateWithoutMembersInput = {
@@ -916,6 +1201,8 @@ export type OrganizationUncheckedCreateWithoutMembersInput = {
   servicePoints?: Prisma.ServicePointUncheckedCreateNestedManyWithoutOrganizationInput;
   customers?: Prisma.CustomerUncheckedCreateNestedManyWithoutOrganizationInput;
   vanInventory?: Prisma.VanInventoryUncheckedCreateNestedManyWithoutOrganizationInput;
+  serviceAssignments?: Prisma.ServiceAssignmentUncheckedCreateNestedManyWithoutOrganizationInput;
+  projects?: Prisma.ProjectUncheckedCreateNestedManyWithoutOrganizationInput;
 };
 
 export type OrganizationCreateOrConnectWithoutMembersInput = {
@@ -958,6 +1245,8 @@ export type OrganizationUpdateWithoutMembersInput = {
   servicePoints?: Prisma.ServicePointUpdateManyWithoutOrganizationNestedInput;
   customers?: Prisma.CustomerUpdateManyWithoutOrganizationNestedInput;
   vanInventory?: Prisma.VanInventoryUpdateManyWithoutOrganizationNestedInput;
+  serviceAssignments?: Prisma.ServiceAssignmentUpdateManyWithoutOrganizationNestedInput;
+  projects?: Prisma.ProjectUpdateManyWithoutOrganizationNestedInput;
 };
 
 export type OrganizationUncheckedUpdateWithoutMembersInput = {
@@ -972,6 +1261,8 @@ export type OrganizationUncheckedUpdateWithoutMembersInput = {
   servicePoints?: Prisma.ServicePointUncheckedUpdateManyWithoutOrganizationNestedInput;
   customers?: Prisma.CustomerUncheckedUpdateManyWithoutOrganizationNestedInput;
   vanInventory?: Prisma.VanInventoryUncheckedUpdateManyWithoutOrganizationNestedInput;
+  serviceAssignments?: Prisma.ServiceAssignmentUncheckedUpdateManyWithoutOrganizationNestedInput;
+  projects?: Prisma.ProjectUncheckedUpdateManyWithoutOrganizationNestedInput;
 };
 
 export type OrganizationCreateWithoutInvitationsInput = {
@@ -986,6 +1277,8 @@ export type OrganizationCreateWithoutInvitationsInput = {
   servicePoints?: Prisma.ServicePointCreateNestedManyWithoutOrganizationInput;
   customers?: Prisma.CustomerCreateNestedManyWithoutOrganizationInput;
   vanInventory?: Prisma.VanInventoryCreateNestedManyWithoutOrganizationInput;
+  serviceAssignments?: Prisma.ServiceAssignmentCreateNestedManyWithoutOrganizationInput;
+  projects?: Prisma.ProjectCreateNestedManyWithoutOrganizationInput;
 };
 
 export type OrganizationUncheckedCreateWithoutInvitationsInput = {
@@ -1000,6 +1293,8 @@ export type OrganizationUncheckedCreateWithoutInvitationsInput = {
   servicePoints?: Prisma.ServicePointUncheckedCreateNestedManyWithoutOrganizationInput;
   customers?: Prisma.CustomerUncheckedCreateNestedManyWithoutOrganizationInput;
   vanInventory?: Prisma.VanInventoryUncheckedCreateNestedManyWithoutOrganizationInput;
+  serviceAssignments?: Prisma.ServiceAssignmentUncheckedCreateNestedManyWithoutOrganizationInput;
+  projects?: Prisma.ProjectUncheckedCreateNestedManyWithoutOrganizationInput;
 };
 
 export type OrganizationCreateOrConnectWithoutInvitationsInput = {
@@ -1042,6 +1337,8 @@ export type OrganizationUpdateWithoutInvitationsInput = {
   servicePoints?: Prisma.ServicePointUpdateManyWithoutOrganizationNestedInput;
   customers?: Prisma.CustomerUpdateManyWithoutOrganizationNestedInput;
   vanInventory?: Prisma.VanInventoryUpdateManyWithoutOrganizationNestedInput;
+  serviceAssignments?: Prisma.ServiceAssignmentUpdateManyWithoutOrganizationNestedInput;
+  projects?: Prisma.ProjectUpdateManyWithoutOrganizationNestedInput;
 };
 
 export type OrganizationUncheckedUpdateWithoutInvitationsInput = {
@@ -1056,6 +1353,8 @@ export type OrganizationUncheckedUpdateWithoutInvitationsInput = {
   servicePoints?: Prisma.ServicePointUncheckedUpdateManyWithoutOrganizationNestedInput;
   customers?: Prisma.CustomerUncheckedUpdateManyWithoutOrganizationNestedInput;
   vanInventory?: Prisma.VanInventoryUncheckedUpdateManyWithoutOrganizationNestedInput;
+  serviceAssignments?: Prisma.ServiceAssignmentUncheckedUpdateManyWithoutOrganizationNestedInput;
+  projects?: Prisma.ProjectUncheckedUpdateManyWithoutOrganizationNestedInput;
 };
 
 /**
@@ -1069,6 +1368,8 @@ export type OrganizationCountOutputType = {
   servicePoints: number;
   customers: number;
   vanInventory: number;
+  serviceAssignments: number;
+  projects: number;
 };
 
 export type OrganizationCountOutputTypeSelect<
@@ -1081,6 +1382,10 @@ export type OrganizationCountOutputTypeSelect<
   servicePoints?: boolean | OrganizationCountOutputTypeCountServicePointsArgs;
   customers?: boolean | OrganizationCountOutputTypeCountCustomersArgs;
   vanInventory?: boolean | OrganizationCountOutputTypeCountVanInventoryArgs;
+  serviceAssignments?:
+    | boolean
+    | OrganizationCountOutputTypeCountServiceAssignmentsArgs;
+  projects?: boolean | OrganizationCountOutputTypeCountProjectsArgs;
 };
 
 /**
@@ -1156,6 +1461,26 @@ export type OrganizationCountOutputTypeCountVanInventoryArgs<
   where?: Prisma.VanInventoryWhereInput;
 };
 
+/**
+ * OrganizationCountOutputType without action
+ */
+export type OrganizationCountOutputTypeCountServiceAssignmentsArgs<
+  ExtArgs extends
+    runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs,
+> = {
+  where?: Prisma.ServiceAssignmentWhereInput;
+};
+
+/**
+ * OrganizationCountOutputType without action
+ */
+export type OrganizationCountOutputTypeCountProjectsArgs<
+  ExtArgs extends
+    runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs,
+> = {
+  where?: Prisma.ProjectWhereInput;
+};
+
 export type OrganizationSelect<
   ExtArgs extends
     runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs,
@@ -1173,6 +1498,10 @@ export type OrganizationSelect<
     servicePoints?: boolean | Prisma.Organization$servicePointsArgs<ExtArgs>;
     customers?: boolean | Prisma.Organization$customersArgs<ExtArgs>;
     vanInventory?: boolean | Prisma.Organization$vanInventoryArgs<ExtArgs>;
+    serviceAssignments?:
+      | boolean
+      | Prisma.Organization$serviceAssignmentsArgs<ExtArgs>;
+    projects?: boolean | Prisma.Organization$projectsArgs<ExtArgs>;
     _count?: boolean | Prisma.OrganizationCountOutputTypeDefaultArgs<ExtArgs>;
   },
   ExtArgs["result"]["organization"]
@@ -1234,6 +1563,10 @@ export type OrganizationInclude<
   servicePoints?: boolean | Prisma.Organization$servicePointsArgs<ExtArgs>;
   customers?: boolean | Prisma.Organization$customersArgs<ExtArgs>;
   vanInventory?: boolean | Prisma.Organization$vanInventoryArgs<ExtArgs>;
+  serviceAssignments?:
+    | boolean
+    | Prisma.Organization$serviceAssignmentsArgs<ExtArgs>;
+  projects?: boolean | Prisma.Organization$projectsArgs<ExtArgs>;
   _count?: boolean | Prisma.OrganizationCountOutputTypeDefaultArgs<ExtArgs>;
 };
 export type OrganizationIncludeCreateManyAndReturn<
@@ -1257,6 +1590,8 @@ export type $OrganizationPayload<
     servicePoints: Prisma.$ServicePointPayload<ExtArgs>[];
     customers: Prisma.$CustomerPayload<ExtArgs>[];
     vanInventory: Prisma.$VanInventoryPayload<ExtArgs>[];
+    serviceAssignments: Prisma.$ServiceAssignmentPayload<ExtArgs>[];
+    projects: Prisma.$ProjectPayload<ExtArgs>[];
   };
   scalars: runtime.Types.Extensions.GetPayloadResult<
     {
@@ -1882,6 +2217,33 @@ export interface Prisma__OrganizationClient<
   ): Prisma.PrismaPromise<
     | runtime.Types.Result.GetResult<
         Prisma.$VanInventoryPayload<ExtArgs>,
+        T,
+        "findMany",
+        GlobalOmitOptions
+      >
+    | Null
+  >;
+  serviceAssignments<
+    T extends Prisma.Organization$serviceAssignmentsArgs<ExtArgs> = {},
+  >(
+    args?: Prisma.Subset<
+      T,
+      Prisma.Organization$serviceAssignmentsArgs<ExtArgs>
+    >,
+  ): Prisma.PrismaPromise<
+    | runtime.Types.Result.GetResult<
+        Prisma.$ServiceAssignmentPayload<ExtArgs>,
+        T,
+        "findMany",
+        GlobalOmitOptions
+      >
+    | Null
+  >;
+  projects<T extends Prisma.Organization$projectsArgs<ExtArgs> = {}>(
+    args?: Prisma.Subset<T, Prisma.Organization$projectsArgs<ExtArgs>>,
+  ): Prisma.PrismaPromise<
+    | runtime.Types.Result.GetResult<
+        Prisma.$ProjectPayload<ExtArgs>,
         T,
         "findMany",
         GlobalOmitOptions
@@ -2576,6 +2938,66 @@ export type Organization$vanInventoryArgs<
   distinct?:
     | Prisma.VanInventoryScalarFieldEnum
     | Prisma.VanInventoryScalarFieldEnum[];
+};
+
+/**
+ * Organization.serviceAssignments
+ */
+export type Organization$serviceAssignmentsArgs<
+  ExtArgs extends
+    runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs,
+> = {
+  /**
+   * Select specific fields to fetch from the ServiceAssignment
+   */
+  select?: Prisma.ServiceAssignmentSelect<ExtArgs> | null;
+  /**
+   * Omit specific fields from the ServiceAssignment
+   */
+  omit?: Prisma.ServiceAssignmentOmit<ExtArgs> | null;
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ServiceAssignmentInclude<ExtArgs> | null;
+  where?: Prisma.ServiceAssignmentWhereInput;
+  orderBy?:
+    | Prisma.ServiceAssignmentOrderByWithRelationInput
+    | Prisma.ServiceAssignmentOrderByWithRelationInput[];
+  cursor?: Prisma.ServiceAssignmentWhereUniqueInput;
+  take?: number;
+  skip?: number;
+  distinct?:
+    | Prisma.ServiceAssignmentScalarFieldEnum
+    | Prisma.ServiceAssignmentScalarFieldEnum[];
+};
+
+/**
+ * Organization.projects
+ */
+export type Organization$projectsArgs<
+  ExtArgs extends
+    runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs,
+> = {
+  /**
+   * Select specific fields to fetch from the Project
+   */
+  select?: Prisma.ProjectSelect<ExtArgs> | null;
+  /**
+   * Omit specific fields from the Project
+   */
+  omit?: Prisma.ProjectOmit<ExtArgs> | null;
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProjectInclude<ExtArgs> | null;
+  where?: Prisma.ProjectWhereInput;
+  orderBy?:
+    | Prisma.ProjectOrderByWithRelationInput
+    | Prisma.ProjectOrderByWithRelationInput[];
+  cursor?: Prisma.ProjectWhereUniqueInput;
+  take?: number;
+  skip?: number;
+  distinct?: Prisma.ProjectScalarFieldEnum | Prisma.ProjectScalarFieldEnum[];
 };
 
 /**

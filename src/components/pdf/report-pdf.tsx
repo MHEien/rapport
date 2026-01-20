@@ -181,22 +181,24 @@ const styles = StyleSheet.create({
   // Footer Styles - Critical for positioning
   footer: {
     position: "absolute",
-    bottom: 20,
+    bottom: 15,
     left: 30,
     right: 30,
+    height: 50,
     borderTopWidth: 1,
-    borderColor: "#002E5D",
-    paddingTop: 10,
+    borderTopColor: "#002E5D",
+    paddingTop: 8,
     flexDirection: "row",
     justifyContent: "space-between",
+    alignItems: "flex-start",
     fontSize: 7,
     color: "#666",
-    gap: 10,
-    zIndex: 10, // Ensure footer sits ON TOP of any content backgrounds
+    backgroundColor: "#ffffff",
   },
   footerCol: {
     flexDirection: "column",
-    flex: 1, // Distribute space
+    flex: 1,
+    maxWidth: 85,
   },
 });
 
@@ -204,27 +206,16 @@ export const ReportPDF = ({ report }: { report: ReportPDFData }) => {
   return (
     <Document>
       <Page size="A4" style={styles.page} wrap>
-        {/* CRITICAL ORDERING:
-          1. Fixed Header
-          2. Fixed Footer (Must be at top + zIndex to appear on all pages and above content)
+        {/* 
+          CRITICAL: In @react-pdf/renderer, fixed elements must be declared
+          BEFORE flowing content to appear on ALL pages. The order in JSX matters!
+          
+          1. Fixed Footer (MUST BE FIRST for multi-page support)
+          2. Fixed Header 
           3. Flowing Content
         */}
 
-        {/* --- Fixed Header --- */}
-        <View style={styles.headerContainer} fixed>
-          <View style={styles.logoPlaceholder}>
-            {/* eslint-disable-next-line jsx-a11y/alt-text */}
-            <Image
-              src="/sterner-logo.png"
-              style={{ width: "100%", height: "100%", objectFit: "contain" }}
-            />
-          </View>
-          <View>
-            <Text style={styles.headerTitle}>KONSOLIDERT SERVICERAPPORT</Text>
-          </View>
-        </View>
-
-        {/* --- Fixed Footer --- */}
+        {/* --- Fixed Footer (MUST come first for all pages) --- */}
         <View style={styles.footer} fixed>
           <View style={styles.footerCol}>
             <Text style={{ fontWeight: "bold", color: "#002E5D" }}>
@@ -247,27 +238,48 @@ export const ReportPDF = ({ report }: { report: ReportPDFData }) => {
             <Text>3917 Porsgrunn</Text>
           </View>
           <View style={styles.footerCol}>
-            <Text style={{ fontWeight: "bold", color: "#002E5D" }}>Lofoten</Text>
+            <Text style={{ fontWeight: "bold", color: "#002E5D" }}>
+              Lofoten
+            </Text>
             <Text>Lufthavnveien 16</Text>
             <Text>8370 Leknes</Text>
           </View>
           <View style={styles.footerCol}>
-            <Text style={{ fontWeight: "bold", color: "#002E5D" }}>Kontakt</Text>
+            <Text style={{ fontWeight: "bold", color: "#002E5D" }}>
+              Kontakt
+            </Text>
             <Text>Tlf: 64 85 94 20</Text>
             <Text>post@sterneras.no</Text>
             <Text>www.sterneras.no</Text>
           </View>
-          <View
-            style={[
-              styles.footerCol,
-              { alignItems: "flex-end", justifyContent: "flex-end" },
-            ]}
-          >
-            <Text
-              render={({ pageNumber, totalPages }) =>
-                `Side ${pageNumber} av ${totalPages}`
-              }
+        </View>
+
+        {/* Page Number */}
+        <Text
+          fixed
+          render={({ pageNumber, totalPages }) =>
+            `Side ${pageNumber} av ${totalPages}`
+          }
+          style={{
+            position: "absolute",
+            fontSize: 8,
+            bottom: 20,
+            right: 30,
+            color: "#666",
+          }}
+        />
+
+        {/* --- Fixed Header --- */}
+        <View style={styles.headerContainer} fixed>
+          <View style={styles.logoPlaceholder}>
+            {/* eslint-disable-next-line jsx-a11y/alt-text */}
+            <Image
+              src="/sterner-logo.png"
+              style={{ width: "100%", height: "100%", objectFit: "contain" }}
             />
+          </View>
+          <View>
+            <Text style={styles.headerTitle}>KONSOLIDERT SERVICERAPPORT</Text>
           </View>
         </View>
 
@@ -419,18 +431,12 @@ export const ReportPDF = ({ report }: { report: ReportPDFData }) => {
                 Beskrivelse
               </Text>
               <Text
-                style={[
-                  { width: "15%", textAlign: "center" },
-                  styles.boldText,
-                ]}
+                style={[{ width: "15%", textAlign: "center" }, styles.boldText]}
               >
                 Antall
               </Text>
               <Text
-                style={[
-                  { width: "15%", textAlign: "center" },
-                  styles.boldText,
-                ]}
+                style={[{ width: "15%", textAlign: "center" }, styles.boldText]}
               >
                 Enhet
               </Text>

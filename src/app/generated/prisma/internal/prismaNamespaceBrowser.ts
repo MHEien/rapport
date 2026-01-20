@@ -68,6 +68,8 @@ export const ModelName = {
   CustomerEquipment: "CustomerEquipment",
   VanInventory: "VanInventory",
   ReportPart: "ReportPart",
+  Project: "Project",
+  ServiceAssignment: "ServiceAssignment",
   Organization: "Organization",
   Member: "Member",
   Invitation: "Invitation",
@@ -301,6 +303,39 @@ export const ReportPartScalarFieldEnum = {
 
 export type ReportPartScalarFieldEnum =
   (typeof ReportPartScalarFieldEnum)[keyof typeof ReportPartScalarFieldEnum];
+
+export const ProjectScalarFieldEnum = {
+  id: "id",
+  projectNumber: "projectNumber",
+  name: "name",
+  description: "description",
+  createdAt: "createdAt",
+  updatedAt: "updatedAt",
+  customerId: "customerId",
+  organizationId: "organizationId",
+} as const;
+
+export type ProjectScalarFieldEnum =
+  (typeof ProjectScalarFieldEnum)[keyof typeof ProjectScalarFieldEnum];
+
+export const ServiceAssignmentScalarFieldEnum = {
+  id: "id",
+  serviceOrderNumber: "serviceOrderNumber",
+  referenceType: "referenceType",
+  title: "title",
+  startTime: "startTime",
+  endTime: "endTime",
+  status: "status",
+  notes: "notes",
+  createdAt: "createdAt",
+  updatedAt: "updatedAt",
+  technicianId: "technicianId",
+  organizationId: "organizationId",
+  projectId: "projectId",
+} as const;
+
+export type ServiceAssignmentScalarFieldEnum =
+  (typeof ServiceAssignmentScalarFieldEnum)[keyof typeof ServiceAssignmentScalarFieldEnum];
 
 export const OrganizationScalarFieldEnum = {
   id: "id",

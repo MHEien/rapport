@@ -116,19 +116,19 @@ export function TeamSettingsClient({
         document.body.appendChild(textArea);
         textArea.focus();
         textArea.select();
-        
+
         try {
-          const successful = document.execCommand('copy');
+          const successful = document.execCommand("copy");
           if (successful) {
             toast.success("Invitasjonslenke kopiert!");
           } else {
-             // If legacy copy fails, show prompt
-             window.prompt("Kopier lenken manuelt:", link);
+            // If legacy copy fails, show prompt
+            window.prompt("Kopier lenken manuelt:", link);
           }
         } catch (_err) {
           window.prompt("Kopier lenken manuelt:", link);
         }
-        
+
         document.body.removeChild(textArea);
       }
     } catch (_error) {
@@ -409,57 +409,60 @@ export function TeamSettingsClient({
                         3. OR the target is NOT an owner (Admins can edit others, but not owners)
                      */}
                     {member.userId !== currentUserId &&
-                      (currentUserRole === "owner" || member.role !== "owner") && (
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="text-slate-400 hover:text-white"
+                      (currentUserRole === "owner" ||
+                        member.role !== "owner") && (
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="text-slate-400 hover:text-white"
+                            >
+                              <MoreVertical className="size-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent
+                            align="end"
+                            className="bg-slate-900 border-slate-800 text-white w-48"
                           >
-                            <MoreVertical className="size-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent
-                          align="end"
-                          className="bg-slate-900 border-slate-800 text-white w-48"
-                        >
-                          <DropdownMenuLabel>Handlinger</DropdownMenuLabel>
-                          <DropdownMenuSeparator className="bg-slate-800" />
+                            <DropdownMenuLabel>Handlinger</DropdownMenuLabel>
+                            <DropdownMenuSeparator className="bg-slate-800" />
 
-                          <DropdownMenuItem
-                            onClick={() =>
-                              handleUpdateRole(member.id, "technician")
-                            }
-                          >
-                            Sett til Tekniker
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => handleUpdateRole(member.id, "admin")}
-                          >
-                            Sett til Admin
-                          </DropdownMenuItem>
-                          {currentUserRole === "owner" && (
                             <DropdownMenuItem
                               onClick={() =>
-                                handleUpdateRole(member.id, "owner")
+                                handleUpdateRole(member.id, "technician")
                               }
                             >
-                              Sett til Eier
+                              Sett til Tekniker
                             </DropdownMenuItem>
-                          )}
+                            <DropdownMenuItem
+                              onClick={() =>
+                                handleUpdateRole(member.id, "admin")
+                              }
+                            >
+                              Sett til Admin
+                            </DropdownMenuItem>
+                            {currentUserRole === "owner" && (
+                              <DropdownMenuItem
+                                onClick={() =>
+                                  handleUpdateRole(member.id, "owner")
+                                }
+                              >
+                                Sett til Eier
+                              </DropdownMenuItem>
+                            )}
 
-                          <DropdownMenuSeparator className="bg-slate-800" />
-                          <DropdownMenuItem
-                            onClick={() => handleRemoveMember(member.id)}
-                            className="text-red-400 hover:text-red-300 hover:bg-red-900/20"
-                          >
-                            <Trash2 className="size-4 mr-2" />
-                            Fjern medlem
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    )}
+                            <DropdownMenuSeparator className="bg-slate-800" />
+                            <DropdownMenuItem
+                              onClick={() => handleRemoveMember(member.id)}
+                              className="text-red-400 hover:text-red-300 hover:bg-red-900/20"
+                            >
+                              <Trash2 className="size-4 mr-2" />
+                              Fjern medlem
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      )}
                   </div>
                 </div>
               ))}

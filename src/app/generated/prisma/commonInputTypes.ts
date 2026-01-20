@@ -321,6 +321,72 @@ export type EnumChecklistStatusWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedEnumChecklistStatusFilter<$PrismaModel>;
 };
 
+export type EnumReferenceTypeFilter<$PrismaModel = never> = {
+  equals?:
+    | $Enums.ReferenceType
+    | Prisma.EnumReferenceTypeFieldRefInput<$PrismaModel>;
+  in?:
+    | $Enums.ReferenceType[]
+    | Prisma.ListEnumReferenceTypeFieldRefInput<$PrismaModel>;
+  notIn?:
+    | $Enums.ReferenceType[]
+    | Prisma.ListEnumReferenceTypeFieldRefInput<$PrismaModel>;
+  not?:
+    | Prisma.NestedEnumReferenceTypeFilter<$PrismaModel>
+    | $Enums.ReferenceType;
+};
+
+export type EnumAssignmentStatusFilter<$PrismaModel = never> = {
+  equals?:
+    | $Enums.AssignmentStatus
+    | Prisma.EnumAssignmentStatusFieldRefInput<$PrismaModel>;
+  in?:
+    | $Enums.AssignmentStatus[]
+    | Prisma.ListEnumAssignmentStatusFieldRefInput<$PrismaModel>;
+  notIn?:
+    | $Enums.AssignmentStatus[]
+    | Prisma.ListEnumAssignmentStatusFieldRefInput<$PrismaModel>;
+  not?:
+    | Prisma.NestedEnumAssignmentStatusFilter<$PrismaModel>
+    | $Enums.AssignmentStatus;
+};
+
+export type EnumReferenceTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?:
+    | $Enums.ReferenceType
+    | Prisma.EnumReferenceTypeFieldRefInput<$PrismaModel>;
+  in?:
+    | $Enums.ReferenceType[]
+    | Prisma.ListEnumReferenceTypeFieldRefInput<$PrismaModel>;
+  notIn?:
+    | $Enums.ReferenceType[]
+    | Prisma.ListEnumReferenceTypeFieldRefInput<$PrismaModel>;
+  not?:
+    | Prisma.NestedEnumReferenceTypeWithAggregatesFilter<$PrismaModel>
+    | $Enums.ReferenceType;
+  _count?: Prisma.NestedIntFilter<$PrismaModel>;
+  _min?: Prisma.NestedEnumReferenceTypeFilter<$PrismaModel>;
+  _max?: Prisma.NestedEnumReferenceTypeFilter<$PrismaModel>;
+};
+
+export type EnumAssignmentStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?:
+    | $Enums.AssignmentStatus
+    | Prisma.EnumAssignmentStatusFieldRefInput<$PrismaModel>;
+  in?:
+    | $Enums.AssignmentStatus[]
+    | Prisma.ListEnumAssignmentStatusFieldRefInput<$PrismaModel>;
+  notIn?:
+    | $Enums.AssignmentStatus[]
+    | Prisma.ListEnumAssignmentStatusFieldRefInput<$PrismaModel>;
+  not?:
+    | Prisma.NestedEnumAssignmentStatusWithAggregatesFilter<$PrismaModel>
+    | $Enums.AssignmentStatus;
+  _count?: Prisma.NestedIntFilter<$PrismaModel>;
+  _min?: Prisma.NestedEnumAssignmentStatusFilter<$PrismaModel>;
+  _max?: Prisma.NestedEnumAssignmentStatusFilter<$PrismaModel>;
+};
+
 export type NestedStringFilter<$PrismaModel = never> = {
   equals?: string | Prisma.StringFieldRefInput<$PrismaModel>;
   in?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel>;
@@ -643,4 +709,73 @@ export type NestedEnumChecklistStatusWithAggregatesFilter<
   _count?: Prisma.NestedIntFilter<$PrismaModel>;
   _min?: Prisma.NestedEnumChecklistStatusFilter<$PrismaModel>;
   _max?: Prisma.NestedEnumChecklistStatusFilter<$PrismaModel>;
+};
+
+export type NestedEnumReferenceTypeFilter<$PrismaModel = never> = {
+  equals?:
+    | $Enums.ReferenceType
+    | Prisma.EnumReferenceTypeFieldRefInput<$PrismaModel>;
+  in?:
+    | $Enums.ReferenceType[]
+    | Prisma.ListEnumReferenceTypeFieldRefInput<$PrismaModel>;
+  notIn?:
+    | $Enums.ReferenceType[]
+    | Prisma.ListEnumReferenceTypeFieldRefInput<$PrismaModel>;
+  not?:
+    | Prisma.NestedEnumReferenceTypeFilter<$PrismaModel>
+    | $Enums.ReferenceType;
+};
+
+export type NestedEnumAssignmentStatusFilter<$PrismaModel = never> = {
+  equals?:
+    | $Enums.AssignmentStatus
+    | Prisma.EnumAssignmentStatusFieldRefInput<$PrismaModel>;
+  in?:
+    | $Enums.AssignmentStatus[]
+    | Prisma.ListEnumAssignmentStatusFieldRefInput<$PrismaModel>;
+  notIn?:
+    | $Enums.AssignmentStatus[]
+    | Prisma.ListEnumAssignmentStatusFieldRefInput<$PrismaModel>;
+  not?:
+    | Prisma.NestedEnumAssignmentStatusFilter<$PrismaModel>
+    | $Enums.AssignmentStatus;
+};
+
+export type NestedEnumReferenceTypeWithAggregatesFilter<$PrismaModel = never> =
+  {
+    equals?:
+      | $Enums.ReferenceType
+      | Prisma.EnumReferenceTypeFieldRefInput<$PrismaModel>;
+    in?:
+      | $Enums.ReferenceType[]
+      | Prisma.ListEnumReferenceTypeFieldRefInput<$PrismaModel>;
+    notIn?:
+      | $Enums.ReferenceType[]
+      | Prisma.ListEnumReferenceTypeFieldRefInput<$PrismaModel>;
+    not?:
+      | Prisma.NestedEnumReferenceTypeWithAggregatesFilter<$PrismaModel>
+      | $Enums.ReferenceType;
+    _count?: Prisma.NestedIntFilter<$PrismaModel>;
+    _min?: Prisma.NestedEnumReferenceTypeFilter<$PrismaModel>;
+    _max?: Prisma.NestedEnumReferenceTypeFilter<$PrismaModel>;
+  };
+
+export type NestedEnumAssignmentStatusWithAggregatesFilter<
+  $PrismaModel = never,
+> = {
+  equals?:
+    | $Enums.AssignmentStatus
+    | Prisma.EnumAssignmentStatusFieldRefInput<$PrismaModel>;
+  in?:
+    | $Enums.AssignmentStatus[]
+    | Prisma.ListEnumAssignmentStatusFieldRefInput<$PrismaModel>;
+  notIn?:
+    | $Enums.AssignmentStatus[]
+    | Prisma.ListEnumAssignmentStatusFieldRefInput<$PrismaModel>;
+  not?:
+    | Prisma.NestedEnumAssignmentStatusWithAggregatesFilter<$PrismaModel>
+    | $Enums.AssignmentStatus;
+  _count?: Prisma.NestedIntFilter<$PrismaModel>;
+  _min?: Prisma.NestedEnumAssignmentStatusFilter<$PrismaModel>;
+  _max?: Prisma.NestedEnumAssignmentStatusFilter<$PrismaModel>;
 };

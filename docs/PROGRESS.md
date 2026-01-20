@@ -4,6 +4,39 @@ A chronological log of development progress on the Field Service PWA.
 
 ---
 
+## 2026-01-19: Timeplan Page Technician Loading (WIP)
+
+**Objective:** Fix the Timeplan (Schedule) page not showing technicians, preventing work assignment.
+
+### Completed
+
+1. **Investigated Issue**
+   - Confirmed Team Settings shows 2 members (Test User owner, Test1 technician)
+   - Schedule page shows "Ingen teknikere i organisasjonen" despite members existing
+   - Browser console shows 500 errors on schedule page load
+
+2. **Applied Fixes to `schedule-actions.ts`**
+   - Added Date/string handling for `getAssignments` parameters (client-server serialization)
+   - Changed member `orderBy` from nested `user.name` to `createdAt` (null safety)
+   - Added try-catch with error logging
+
+### Remaining (Pinned)
+- 500 errors persist - need to check server logs for actual error
+- Likely issue in `getCurrentOrganization()` or session handling
+- May need to debug Prisma queries directly
+
+### Files Modified
+| File | Change |
+|------|--------|
+| `schedule-actions.ts` | Date param handling, orderBy fix, error logging |
+
+### Session Log
+| Start | End | Duration | Work Done |
+|-------|-----|----------|-----------|
+| 22:59 | 23:09 | 10m | Timeplan page debugging, applied 3 fixes (still broken) |
+
+---
+
 ## 2026-01-19: PDF Inventory Parsing Improvements (WIP)
 
 **Objective:** Fix "Vareoverførings.kladd" PDF parsing to correctly extract Varenr, Beskrivelse, Antall, and Enhetskode.

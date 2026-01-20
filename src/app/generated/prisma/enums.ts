@@ -33,3 +33,20 @@ export const ChecklistStatus = {
 
 export type ChecklistStatus =
   (typeof ChecklistStatus)[keyof typeof ChecklistStatus];
+
+export const AssignmentStatus = {
+  SCHEDULED: "SCHEDULED",
+  IN_PROGRESS: "IN_PROGRESS",
+  COMPLETE: "COMPLETE",
+  CANCELLED: "CANCELLED",
+} as const;
+
+export type AssignmentStatus =
+  (typeof AssignmentStatus)[keyof typeof AssignmentStatus];
+
+export const ReferenceType = {
+  SERVICE_ORDER: "SERVICE_ORDER",
+  PROJECT: "PROJECT",
+} as const;
+
+export type ReferenceType = (typeof ReferenceType)[keyof typeof ReferenceType];
