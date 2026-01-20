@@ -5,8 +5,10 @@ import {
   addDays,
   addWeeks,
   eachDayOfInterval,
+  endOfDay,
   format,
   isSameDay,
+  startOfDay,
   startOfWeek,
   subWeeks,
 } from "date-fns";
@@ -140,12 +142,18 @@ export function ScheduleCalendar({ organizationId }: ScheduleCalendarProps) {
 
   // Get assignments for a specific technician and day
   const getAssignmentsForSlot = (technicianId: string, date: Date) => {
-    return assignments.filter(
-      (a) =>
-        a.technicianId === technicianId &&
-        (isSameDay(new Date(a.startTime), date) ||
-          isSameDay(new Date(a.endTime), date)),
-    );
+    return assignments.filter((a) => {
+      if (a.technicianId !== technicianId) return false;
+
+      // Check if the current day falls within the start and end range of the assignment
+      // We normalize to start of day comparison to treat the date slot as a whole day bucket
+      const assignmentStart = startOfDay(new Date(a.startTime));
+      // Use endOfDay for the end date to ensure we include the last day regardless of time
+      const assignmentEnd = endOfDay(new Date(a.endTime));
+      const currentDay = startOfDay(date);
+
+      return currentDay >= assignmentStart && currentDay <= assignmentEnd;
+    });
   };
 
   // Check if user can edit a specific assignment
@@ -171,6 +179,29 @@ export function ScheduleCalendar({ organizationId }: ScheduleCalendarProps) {
 
   return (
     <div className="space-y-4">
+      {/* Navigation - Visible on all screens */}
+      <div className="flex items-center justify-between bg-background z-10 sticky top-0 py-2 md:static md:py-0">
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="icon" onClick={goToPreviousWeek}>
+            <ChevronLeft className="size-4" />
+          </Button>
+          <Button variant="outline" size="icon" onClick={goToNextWeek}>
+            <ChevronRight className="size-4" />
+          </Button>
+          <Button
+            variant="outline"
+            onClick={goToToday}
+            className="hidden sm:inline-flex"
+          >
+            I dag
+          </Button>
+        </div>
+        <h2 className="text-sm md:text-lg font-semibold">
+          {format(currentWeekStart, "d. MMM", { locale: nb })} -{" "}
+          {format(weekEnd, "d. MMM yyyy", { locale: nb })}
+        </h2>
+      </div>
+
       {/* Mobile View (Visible on small screens) */}
       <div className="md:hidden">
         <MobileAgendaView
@@ -186,25 +217,6 @@ export function ScheduleCalendar({ organizationId }: ScheduleCalendarProps) {
 
       {/* Desktop View (Hidden on small screens) */}
       <div className="hidden md:block space-y-4">
-        {/* Week Navigation */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Button variant="outline" size="icon" onClick={goToPreviousWeek}>
-              <ChevronLeft className="size-4" />
-            </Button>
-            <Button variant="outline" size="icon" onClick={goToNextWeek}>
-              <ChevronRight className="size-4" />
-            </Button>
-            <Button variant="outline" onClick={goToToday}>
-              I dag
-            </Button>
-          </div>
-          <h2 className="text-lg font-semibold">
-            {format(currentWeekStart, "d. MMMM", { locale: nb })} -{" "}
-            {format(weekEnd, "d. MMMM yyyy", { locale: nb })}
-          </h2>
-        </div>
-
         {/* Calendar Grid */}
         <Card className="overflow-hidden">
           <div className="overflow-x-auto">

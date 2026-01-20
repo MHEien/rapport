@@ -2,7 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { Camera, Cloud, CloudOff, WifiOff } from "lucide-react";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import type {
   ChecklistResult,
   ChecklistStatus,
@@ -31,12 +31,6 @@ import { cn } from "@/lib/utils";
 type EquipmentWithChecklists = ReportEquipment & {
   checklists: (ChecklistResult & { photos: { url: string }[] })[];
 };
-
-interface ChecklistTableProps {
-  equipment: EquipmentWithChecklists[];
-  organizationId: string;
-  onComplete?: () => void;
-}
 
 // ============================================================================
 // SYNC STATUS INDICATOR
@@ -144,6 +138,16 @@ function ChecklistRow({
   const [comment, setComment] = useState(existingResult?.comment ?? "");
   const [value, setValue] = useState(existingResult?.value ?? "");
   const [showComment, setShowComment] = useState(!!existingResult?.comment);
+
+  // Sync state with props when existingResult updates (e.g. from local update or re-mount)
+  useEffect(() => {
+    if (existingResult) {
+      setStatus(existingResult.status);
+      setComment(existingResult.comment ?? "");
+      setValue(existingResult.value ?? "");
+      if (existingResult.comment) setShowComment(true);
+    }
+  }, [existingResult]);
 
   const handleStatusSelect = (newStatus: ChecklistStatus) => {
     setStatus(newStatus);
@@ -320,11 +324,15 @@ function CategorySection({
 interface EquipmentTabContentProps {
   equipment: EquipmentWithChecklists;
   organizationId: string;
+  localResults: Record<string, ChecklistResult>;
+  onResultUpdate: (result: ChecklistResult) => void;
 }
 
 function EquipmentTabContent({
   equipment,
   organizationId,
+  localResults,
+  onResultUpdate,
 }: EquipmentTabContentProps) {
   // Fetch service points for this equipment's product type
   const reportType =
@@ -349,6 +357,14 @@ function EquipmentTabContent({
     saveChecklistResult,
     {
       actionName: "saveChecklistResult",
+      onSuccess: (data, payload) => {
+        // Create a synthetic ChecklistResult object to update local state
+        // Note: The payload contains the input, data contains the saved result
+        // Use the returned data to update local state
+        if (data.success && data.result) {
+          onResultUpdate(data.result);
+        }
+      },
     },
   );
 
@@ -373,6 +389,41 @@ function EquipmentTabContent({
     },
     [saveResult],
   );
+
+  // Merge server results with local overrides
+  const mergedResults = useMemo(() => {
+    const results = [...equipment.checklists]; // start with server data
+    // Override/append with localResults
+    // We assume localResults are keyed by unique combo
+    return results.map((r) => {
+      const key = `${r.equipmentId}:${r.category}:${r.question}`;
+      return localResults[key] || r;
+    });
+    // Note: This only updates *existing* results in the array.
+    // If local results include *new* items not in existing, we need to handle that?
+    // But `existingResults` passed to CategorySection is used for lookup.
+    // The lookup in CategorySection uses a Map. We can just pass a merged Map or Array.
+  }, [equipment.checklists, localResults]);
+
+  // Better approach: Let CategorySection do the lookup against a Map
+  // We can pass the `localResults` down or merge them here.
+  // CategorySection takes `existingResults: ChecklistResult[]`.
+  // Let's create a combined array.
+
+  const combinedResults = useMemo(() => {
+    // Start with server results
+    const map = new Map<string, ChecklistResult>();
+    equipment.checklists.forEach((r) => {
+      map.set(`${r.equipmentId}:${r.category}:${r.question}`, r);
+    });
+    // Apply local overrides
+    Object.values(localResults).forEach((r) => {
+      if (r.equipmentId === equipment.id) {
+        map.set(`${r.equipmentId}:${r.category}:${r.question}`, r);
+      }
+    });
+    return Array.from(map.values());
+  }, [equipment.checklists, localResults, equipment.id]);
 
   if (isLoading) {
     return (
@@ -415,7 +466,7 @@ function EquipmentTabContent({
           category={category}
           servicePoints={groupedPoints[category]}
           equipmentId={equipment.id}
-          existingResults={equipment.checklists}
+          existingResults={combinedResults}
           onSave={handleSave}
           isSaving={isSaving}
         />
@@ -428,15 +479,30 @@ function EquipmentTabContent({
 // MAIN CHECKLIST TABLE
 // ============================================================================
 
+// ============================================================================
+// MAIN CHECKLIST TABLE
+// ============================================================================
+
+export interface ChecklistTableProps {
+  equipment: EquipmentWithChecklists[];
+  organizationId: string;
+  onComplete: () => void;
+  localResults: Record<string, ChecklistResult>;
+  onResultUpdate: (result: ChecklistResult) => void;
+}
+
 export function ChecklistTable({
   equipment,
   organizationId,
   onComplete,
+  localResults,
+  onResultUpdate,
 }: ChecklistTableProps) {
   const [activeTab, setActiveTab] = useState(equipment[0]?.id ?? "");
-
-  // Track sync status across all equipment
   const [syncStatus] = useState<SyncStatus>("synced");
+
+  // State is now managed by parent (ReportEditClient)
+  // const [localResults, setLocalResults] = useState<Record<string, ChecklistResult>>({});
 
   if (equipment.length === 0) {
     return (
@@ -498,10 +564,22 @@ export function ChecklistTable({
             key={eq.id}
             value={eq.id}
             className="flex-1 mt-0 overflow-auto"
+            forceMount={true} // Keep mounted to preserve scroll position if possible, but state is handled
+            hidden={activeTab !== eq.id} // Manually hide if forceMount is true (Radix behavior varies, generally forceMount renders but doesn't hide automatically without CSS)
           >
+            {/* 
+               Note: forceMount + hidden prop is a pattern to keep DOM alive. 
+               However, strictly speaking, our lifted state `localResults` solves the data loss.
+               We'll use standard conditional rendering (no forceMount needed if state is safe) 
+               OR keep forceMount for better UX (no flicker). 
+               Let's rely on lifted state effectively. 
+               Radix TabsContent hidden handles display:none.
+            */}
             <EquipmentTabContent
               equipment={eq}
               organizationId={organizationId}
+              localResults={localResults}
+              onResultUpdate={onResultUpdate}
             />
           </TabsContent>
         ))}
