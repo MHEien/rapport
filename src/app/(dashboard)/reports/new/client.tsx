@@ -255,7 +255,7 @@ export function NewReportClient({ productTypes }: NewReportClientProps) {
                   Utstyrsliste
                 </h2>
                 <p className="text-sm text-slate-400">
-                  Legg til utstyr som skal serviceres
+                  Legg til utstyr som skal servises
                 </p>
               </div>
             </div>
@@ -264,9 +264,8 @@ export function NewReportClient({ productTypes }: NewReportClientProps) {
             {equipment.map((eq, index) => (
               <Card
                 key={eq.id}
-                className={`border-white/5 bg-white/[0.02] ${
-                  !eq.included ? "opacity-50" : ""
-                }`}
+                className={`border-white/5 bg-white/[0.02] ${!eq.included ? "opacity-50" : ""
+                  }`}
               >
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
@@ -333,17 +332,17 @@ export function NewReportClient({ productTypes }: NewReportClientProps) {
                       >
                         {productTypes.length > 0
                           ? productTypes.map((type) => (
+                            <option key={type} value={type}>
+                              {type}
+                            </option>
+                          ))
+                          : ["Generator", "UV-system", "Tørker", "Annet"].map(
+                            (type) => (
                               <option key={type} value={type}>
                                 {type}
                               </option>
-                            ))
-                          : ["Generator", "UV-system", "Tørker", "Annet"].map(
-                              (type) => (
-                                <option key={type} value={type}>
-                                  {type}
-                                </option>
-                              ),
-                            )}
+                            ),
+                          )}
                       </select>
                     </div>
                   </div>

@@ -1,31 +1,77 @@
 "use server";
 
+import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import type { ReportType } from "@/app/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
-import { getSession } from "@/lib/server";
-import { getCurrentOrganization } from "./org-actions";
+import {
+  requireOrg,
+  verifyReportAccess,
+  verifyEquipmentAccess,
+} from "./utils/auth";
+
+// ============================================================================
+// ZOD VALIDATION SCHEMAS
+// ============================================================================
+
+const createEquipmentSchema = z.object({
+  reportId: z.string().min(1),
+  productType: z.string().min(1),
+  productName: z.string().min(1),
+  model: z.string().optional(),
+  serialNumber: z.string().optional(),
+  runningHours: z.number().optional(),
+  jobType: z.enum(["SERVICE", "COMMISSIONING"]).optional().default("SERVICE"),
+  sortOrder: z.number().optional().default(0),
+});
+
+const bulkEquipmentItemSchema = z.object({
+  productType: z.string().min(1),
+  productName: z.string().min(1),
+  model: z.string().optional(),
+  serialNumber: z.string().optional(),
+  runningHours: z.number().optional(),
+  jobType: z.enum(["SERVICE", "COMMISSIONING"]).optional().default("SERVICE"),
+  included: z.boolean().optional().default(true),
+  customerEquipmentId: z.string().optional(),
+});
+
+const createReportWithEquipmentSchema = z.object({
+  customerName: z.string().min(1),
+  contactPerson: z.string().optional(),
+  customerId: z.string().optional(),
+  soNumber: z.string().optional(),
+  equipment: z.array(bulkEquipmentItemSchema),
+});
+
+const updateEquipmentSchema = z.object({
+  equipmentId: z.string().min(1),
+  productType: z.string().optional(),
+  productName: z.string().optional(),
+  model: z.string().optional(),
+  serialNumber: z.string().optional(),
+  runningHours: z.number().optional(),
+  jobType: z.enum(["SERVICE", "COMMISSIONING"]).optional(),
+  included: z.boolean().optional(),
+});
+
+const reorderEquipmentSchema = z.object({
+  reportId: z.string().min(1),
+  orderedIds: z.array(z.string().min(1)),
+});
 
 // ============================================================================
 // CREATE EQUIPMENT
 // ============================================================================
 
-export interface CreateEquipmentInput {
-  reportId: string;
-  productType: string;
-  productName: string;
-  model?: string;
-  serialNumber?: string;
-  runningHours?: number;
-  jobType?: ReportType;
-  sortOrder?: number;
-}
+export type CreateEquipmentInput = z.infer<typeof createEquipmentSchema>;
 
-export async function addEquipmentToReport(input: CreateEquipmentInput) {
-  const session = await getSession();
-  if (!session?.user) {
-    throw new Error("Ikke autentisert");
-  }
+export async function addEquipmentToReport(data: unknown) {
+  const { organization } = await requireOrg();
+  const input = createEquipmentSchema.parse(data);
+
+  // Verify report belongs to user's organization
+  await verifyReportAccess(input.reportId, organization.id);
 
   const equipment = await prisma.reportEquipment.create({
     data: {
@@ -35,8 +81,8 @@ export async function addEquipmentToReport(input: CreateEquipmentInput) {
       model: input.model,
       serialNumber: input.serialNumber,
       runningHours: input.runningHours,
-      jobType: input.jobType ?? "SERVICE",
-      sortOrder: input.sortOrder ?? 0,
+      jobType: input.jobType as ReportType,
+      sortOrder: input.sortOrder,
     },
   });
 
@@ -47,43 +93,21 @@ export async function addEquipmentToReport(input: CreateEquipmentInput) {
 // BULK CREATE EQUIPMENT (for new report creation)
 // ============================================================================
 
-export interface BulkEquipmentInput {
-  productType: string;
-  productName: string;
-  model?: string;
-  serialNumber?: string;
-  runningHours?: number;
-  jobType?: ReportType;
-  included?: boolean;
-  customerEquipmentId?: string; // Links to CustomerEquipment for persistence
-}
+export type BulkEquipmentInput = z.infer<typeof bulkEquipmentItemSchema>;
 
-export async function createReportWithEquipment(input: {
-  customerName: string;
-  contactPerson?: string;
-  customerId?: string; // Optional link to Customer record
-  soNumber?: string; // Service Order number
-  equipment: BulkEquipmentInput[];
-}) {
-  const session = await getSession();
-  if (!session?.user) {
-    throw new Error("Ikke autentisert");
-  }
-
-  const orgData = await getCurrentOrganization();
-  if (!orgData) {
-    throw new Error("Ingen organisasjon funnet");
-  }
+export async function createReportWithEquipment(data: unknown) {
+  const { organization, userId } = await requireOrg();
+  const input = createReportWithEquipmentSchema.parse(data);
 
   // Create report with equipment in a transaction
   const report = await prisma.report.create({
     data: {
-      authorId: session.user.id,
-      organizationId: orgData.organization.id,
+      authorId: userId,
+      organizationId: organization.id,
       customerName: input.customerName,
       contactPerson: input.contactPerson,
-      customerId: input.customerId, // Link to Customer if provided
-      soNumber: input.soNumber, // Service Order number
+      customerId: input.customerId,
+      soNumber: input.soNumber,
       status: "DRAFT",
       equipment: {
         create: input.equipment
@@ -94,9 +118,9 @@ export async function createReportWithEquipment(input: {
             model: eq.model,
             serialNumber: eq.serialNumber,
             runningHours: eq.runningHours,
-            jobType: eq.jobType ?? "SERVICE",
+            jobType: (eq.jobType ?? "SERVICE") as ReportType,
             sortOrder: index,
-            customerEquipmentId: eq.customerEquipmentId, // Link to CustomerEquipment if provided
+            customerEquipmentId: eq.customerEquipmentId,
           })),
       },
     },
@@ -112,34 +136,29 @@ export async function createReportWithEquipment(input: {
 // UPDATE EQUIPMENT
 // ============================================================================
 
-export interface UpdateEquipmentInput {
-  equipmentId: string;
-  productType?: string;
-  productName?: string;
-  model?: string;
-  serialNumber?: string;
-  runningHours?: number;
-  jobType?: ReportType;
-  included?: boolean;
-}
+export type UpdateEquipmentInput = z.infer<typeof updateEquipmentSchema>;
 
-export async function updateReportEquipment(input: UpdateEquipmentInput) {
-  const { equipmentId, ...data } = input;
+export async function updateReportEquipment(data: unknown) {
+  const { organization } = await requireOrg();
+  const input = updateEquipmentSchema.parse(data);
+
+  // Verify equipment belongs to user's organization
+  await verifyEquipmentAccess(input.equipmentId, organization.id);
 
   const equipment = await prisma.reportEquipment.update({
-    where: { id: equipmentId },
+    where: { id: input.equipmentId },
     data: {
-      ...(data.productType && { productType: data.productType }),
-      ...(data.productName && { productName: data.productName }),
-      ...(data.model !== undefined && { model: data.model }),
-      ...(data.serialNumber !== undefined && {
-        serialNumber: data.serialNumber,
+      ...(input.productType && { productType: input.productType }),
+      ...(input.productName && { productName: input.productName }),
+      ...(input.model !== undefined && { model: input.model }),
+      ...(input.serialNumber !== undefined && {
+        serialNumber: input.serialNumber,
       }),
-      ...(data.runningHours !== undefined && {
-        runningHours: data.runningHours,
+      ...(input.runningHours !== undefined && {
+        runningHours: input.runningHours,
       }),
-      ...(data.jobType && { jobType: data.jobType }),
-      ...(data.included !== undefined && { included: data.included }),
+      ...(input.jobType && { jobType: input.jobType as ReportType }),
+      ...(input.included !== undefined && { included: input.included }),
     },
   });
 
@@ -151,9 +170,15 @@ export async function updateReportEquipment(input: UpdateEquipmentInput) {
 // REMOVE EQUIPMENT
 // ============================================================================
 
-export async function removeReportEquipment(equipmentId: string) {
+export async function removeReportEquipment(equipmentId: unknown) {
+  const { organization } = await requireOrg();
+  const parsedId = z.string().min(1).parse(equipmentId);
+
+  // Verify equipment belongs to user's organization
+  await verifyEquipmentAccess(parsedId, organization.id);
+
   await prisma.reportEquipment.delete({
-    where: { id: equipmentId },
+    where: { id: parsedId },
   });
 
   return { success: true };
@@ -163,13 +188,32 @@ export async function removeReportEquipment(equipmentId: string) {
 // REORDER EQUIPMENT
 // ============================================================================
 
-export async function reorderReportEquipment(
-  _reportId: string,
-  orderedIds: string[],
-) {
+export async function reorderReportEquipment(data: unknown) {
+  const { organization } = await requireOrg();
+  const input = reorderEquipmentSchema.parse(data);
+
+  // Verify report belongs to user's organization
+  await verifyReportAccess(input.reportId, organization.id);
+
+  // Also verify each equipment ID belongs to this report
+  const existingEquipment = await prisma.reportEquipment.findMany({
+    where: {
+      reportId: input.reportId,
+      id: { in: input.orderedIds },
+    },
+    select: { id: true },
+  });
+
+  const existingIds = new Set(existingEquipment.map((e) => e.id));
+  for (const id of input.orderedIds) {
+    if (!existingIds.has(id)) {
+      throw new Error("Utstyr ikke funnet i rapporten");
+    }
+  }
+
   // Update sort order for each equipment item
   await prisma.$transaction(
-    orderedIds.map((id, index) =>
+    input.orderedIds.map((id, index) =>
       prisma.reportEquipment.update({
         where: { id },
         data: { sortOrder: index },
@@ -184,9 +228,15 @@ export async function reorderReportEquipment(
 // GET EQUIPMENT FOR REPORT
 // ============================================================================
 
-export async function getReportEquipment(reportId: string) {
+export async function getReportEquipment(reportId: unknown) {
+  const { organization } = await requireOrg();
+  const parsedId = z.string().min(1).parse(reportId);
+
+  // Verify report belongs to user's organization
+  await verifyReportAccess(parsedId, organization.id);
+
   const equipment = await prisma.reportEquipment.findMany({
-    where: { reportId },
+    where: { reportId: parsedId },
     orderBy: { sortOrder: "asc" },
     include: {
       checklists: {

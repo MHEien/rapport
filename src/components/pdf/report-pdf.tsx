@@ -279,7 +279,7 @@ export const ReportPDF = ({ report }: { report: ReportPDFData }) => {
             />
           </View>
           <View>
-            <Text style={styles.headerTitle}>KONSOLIDERT SERVICERAPPORT</Text>
+            <Text style={styles.headerTitle}>SERVICERAPPORT</Text>
           </View>
         </View>
 
@@ -483,7 +483,7 @@ export const ReportPDF = ({ report }: { report: ReportPDFData }) => {
             </View>
             {report.signatureUrl && (
               <View style={{ width: "50%" }}>
-                <Text style={styles.metaLabel}>Kunde signatur:</Text>
+                <Text style={styles.metaLabel}>Montør signatur:</Text>
                 <Image
                   src={report.signatureUrl}
                   style={{ width: 120, height: 60, objectFit: "contain" }}

@@ -1,47 +1,51 @@
 "use server";
 
+import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { getSession } from "@/lib/server";
+import { requireOrg, verifyReportAccess } from "./utils/auth";
 import { consumeFromInventory, restoreToInventory } from "./inventory-actions";
-import { getCurrentOrganization } from "./org-actions";
+
+// ============================================================================
+// ZOD VALIDATION SCHEMAS
+// ============================================================================
+
+const addPartSchema = z.object({
+  reportId: z.string().min(1),
+  partNumber: z.string().min(1),
+  description: z.string().min(1),
+  quantity: z.number().min(1),
+  unit: z.string().optional().default("stk"),
+  inventoryId: z.string().optional(),
+  inventorySessionId: z.string().optional(),
+});
+
+const updatePartQuantitySchema = z.object({
+  reportPartId: z.string().min(1),
+  newQuantity: z.number().min(1),
+});
+
+const addFromInventorySchema = z.object({
+  reportId: z.string().min(1),
+  inventoryItemId: z.string().min(1),
+  quantity: z.number().min(1),
+});
 
 // ============================================================================
 // REPORT PARTS MANAGEMENT
 // ============================================================================
 
-export interface AddPartInput {
-  reportId: string;
-  partNumber: string;
-  description: string;
-  quantity: number;
-  unit?: string;
-  inventoryId?: string; // If consuming from van inventory
-  inventorySessionId?: string;
-}
+export type AddPartInput = z.infer<typeof addPartSchema>;
 
 /**
  * Add a part to a report
  * If inventoryId is provided, also consume from inventory
  */
-export async function addPartToReport(input: AddPartInput) {
-  const session = await getSession();
-  if (!session?.user) {
-    return { success: false, error: "Ikke autentisert" };
-  }
-
-  const orgData = await getCurrentOrganization();
-  if (!orgData) {
-    return { success: false, error: "Ingen organisasjon funnet" };
-  }
+export async function addPartToReport(data: unknown) {
+  const { organization } = await requireOrg();
+  const input = addPartSchema.parse(data);
 
   // Verify report belongs to org
-  const report = await prisma.report.findFirst({
-    where: { id: input.reportId, organizationId: orgData.organization.id },
-  });
-
-  if (!report) {
-    return { success: false, error: "Rapport ikke funnet" };
-  }
+  await verifyReportAccess(input.reportId, organization.id);
 
   // If consuming from inventory, update inventory first
   if (input.inventoryId) {
@@ -61,7 +65,7 @@ export async function addPartToReport(input: AddPartInput) {
       partNumber: input.partNumber,
       description: input.description,
       quantity: input.quantity,
-      unit: input.unit || "stk",
+      unit: input.unit,
       inventorySessionId: input.inventorySessionId,
     },
   });
@@ -73,20 +77,16 @@ export async function addPartToReport(input: AddPartInput) {
  * Remove a part from a report
  * If part was from inventory, restore the quantity
  */
-export async function removePartFromReport(reportPartId: string) {
-  const session = await getSession();
-  if (!session?.user) {
-    return { success: false, error: "Ikke autentisert" };
-  }
-
-  const orgData = await getCurrentOrganization();
-  if (!orgData) {
-    return { success: false, error: "Ingen organisasjon funnet" };
-  }
+export async function removePartFromReport(reportPartId: unknown) {
+  const { organization } = await requireOrg();
+  const parsedId = z.string().min(1).parse(reportPartId);
 
   // Get the part with its report
-  const part = await prisma.reportPart.findUnique({
-    where: { id: reportPartId },
+  const part = await prisma.reportPart.findFirst({
+    where: {
+      id: parsedId,
+      report: { organizationId: organization.id },
+    },
     include: {
       report: {
         select: { organizationId: true },
@@ -94,7 +94,7 @@ export async function removePartFromReport(reportPartId: string) {
     },
   });
 
-  if (!part || part.report.organizationId !== orgData.organization.id) {
+  if (!part) {
     return { success: false, error: "Del ikke funnet" };
   }
 
@@ -115,7 +115,7 @@ export async function removePartFromReport(reportPartId: string) {
 
   // Delete the report part
   await prisma.reportPart.delete({
-    where: { id: reportPartId },
+    where: { id: parsedId },
   });
 
   return { success: true };
@@ -124,22 +124,15 @@ export async function removePartFromReport(reportPartId: string) {
 /**
  * Update quantity of a part in a report
  */
-export async function updateReportPartQuantity(
-  reportPartId: string,
-  newQuantity: number,
-) {
-  const session = await getSession();
-  if (!session?.user) {
-    return { success: false, error: "Ikke autentisert" };
-  }
+export async function updateReportPartQuantity(data: unknown) {
+  const { organization } = await requireOrg();
+  const input = updatePartQuantitySchema.parse(data);
 
-  const orgData = await getCurrentOrganization();
-  if (!orgData) {
-    return { success: false, error: "Ingen organisasjon funnet" };
-  }
-
-  const part = await prisma.reportPart.findUnique({
-    where: { id: reportPartId },
+  const part = await prisma.reportPart.findFirst({
+    where: {
+      id: input.reportPartId,
+      report: { organizationId: organization.id },
+    },
     include: {
       report: {
         select: { organizationId: true },
@@ -147,11 +140,11 @@ export async function updateReportPartQuantity(
     },
   });
 
-  if (!part || part.report.organizationId !== orgData.organization.id) {
+  if (!part) {
     return { success: false, error: "Del ikke funnet" };
   }
 
-  const quantityDiff = newQuantity - part.quantity;
+  const quantityDiff = input.newQuantity - part.quantity;
 
   // If from inventory, adjust inventory accordingly
   if (part.inventorySessionId && quantityDiff !== 0) {
@@ -180,8 +173,8 @@ export async function updateReportPartQuantity(
   }
 
   const updated = await prisma.reportPart.update({
-    where: { id: reportPartId },
-    data: { quantity: newQuantity },
+    where: { id: input.reportPartId },
+    data: { quantity: input.newQuantity },
   });
 
   return { success: true, part: updated };
@@ -190,9 +183,15 @@ export async function updateReportPartQuantity(
 /**
  * Get all parts for a report
  */
-export async function getReportParts(reportId: string) {
+export async function getReportParts(reportId: unknown) {
+  const { organization } = await requireOrg();
+  const parsedId = z.string().min(1).parse(reportId);
+
+  // Verify report belongs to org
+  await verifyReportAccess(parsedId, organization.id);
+
   const parts = await prisma.reportPart.findMany({
-    where: { reportId },
+    where: { reportId: parsedId },
     orderBy: { description: "asc" },
   });
 
@@ -202,9 +201,15 @@ export async function getReportParts(reportId: string) {
 /**
  * Get parts for PDF export (customer-facing, just the consumed parts)
  */
-export async function getReportPartsForPdf(reportId: string) {
+export async function getReportPartsForPdf(reportId: unknown) {
+  const { organization } = await requireOrg();
+  const parsedId = z.string().min(1).parse(reportId);
+
+  // Verify report belongs to org
+  await verifyReportAccess(parsedId, organization.id);
+
   const parts = await prisma.reportPart.findMany({
-    where: { reportId },
+    where: { reportId: parsedId },
     orderBy: { description: "asc" },
     select: {
       partNumber: true,
@@ -221,15 +226,16 @@ export async function getReportPartsForPdf(reportId: string) {
  * Get remaining inventory after a report's consumption
  * This is for the technician dashboard (internal only)
  */
-export async function getRemainingInventoryForReport(reportId: string) {
-  const session = await getSession();
-  if (!session?.user) {
-    return null;
-  }
+export async function getRemainingInventoryForReport(reportId: unknown) {
+  const { organization } = await requireOrg();
+  const parsedId = z.string().min(1).parse(reportId);
+
+  // Verify report belongs to org
+  await verifyReportAccess(parsedId, organization.id);
 
   // Get the report's parts to find which session was used
   const reportParts = await prisma.reportPart.findMany({
-    where: { reportId },
+    where: { reportId: parsedId },
     select: { inventorySessionId: true },
   });
 
@@ -276,14 +282,22 @@ export async function addPartFromInventory(
   inventoryItemId: string,
   quantity: number,
 ) {
-  const session = await getSession();
-  if (!session?.user) {
-    return { success: false, error: "Ikke autentisert" };
-  }
+  const { organization } = await requireOrg();
+
+  // Validate inputs
+  const parsedReportId = z.string().min(1).parse(reportId);
+  const parsedInventoryItemId = z.string().min(1).parse(inventoryItemId);
+  const parsedQuantity = z.number().min(1).parse(quantity);
+
+  // Verify report belongs to org
+  await verifyReportAccess(parsedReportId, organization.id);
 
   // Get the inventory item details
-  const inventoryItem = await prisma.vanInventory.findUnique({
-    where: { id: inventoryItemId },
+  const inventoryItem = await prisma.vanInventory.findFirst({
+    where: {
+      id: parsedInventoryItemId,
+      organizationId: organization.id,
+    },
   });
 
   if (!inventoryItem) {
@@ -292,12 +306,12 @@ export async function addPartFromInventory(
 
   // Use the full addPartToReport flow
   return addPartToReport({
-    reportId,
+    reportId: parsedReportId,
     partNumber: inventoryItem.partNumber,
     description: inventoryItem.description,
-    quantity,
+    quantity: parsedQuantity,
     unit: inventoryItem.unit || "stk",
-    inventoryId: inventoryItemId,
+    inventoryId: parsedInventoryItemId,
     inventorySessionId: inventoryItem.sessionId,
   });
 }
