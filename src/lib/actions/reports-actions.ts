@@ -1,13 +1,36 @@
 "use server";
 
+import { z } from "zod";
 import type { ReportStatus } from "@/app/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
-import { getCurrentOrganization } from "./org-actions";
+import { requireOrg, requireAdmin, verifyReportAccess } from "./utils/auth";
 
-export type ReportFilters = {
-  status?: ReportStatus;
-  search?: string;
-};
+// ============================================================================
+// ZOD VALIDATION SCHEMAS
+// ============================================================================
+
+const reportFiltersSchema = z.object({
+  status: z.enum(["DRAFT", "SYNCED", "COMPLETED", "ARCHIVED"]).optional(),
+  search: z.string().optional(),
+});
+
+const paginationSchema = z.object({
+  page: z.number().min(1).optional().default(1),
+  limit: z.number().min(1).max(100).optional().default(20),
+});
+
+const getReportsSchema = z.object({
+  filters: reportFiltersSchema.optional(),
+  page: z.number().min(1).optional().default(1),
+  limit: z.number().min(1).max(100).optional().default(20),
+});
+
+const assignReportSchema = z.object({
+  reportId: z.string().min(1),
+  userId: z.string().min(1),
+});
+
+export type ReportFilters = z.infer<typeof reportFiltersSchema>;
 
 /**
  * Get reports for the current user's organization
@@ -17,13 +40,12 @@ export async function getReports(
   page = 1,
   limit = 20,
 ) {
-  const orgData = await getCurrentOrganization();
-  if (!orgData) {
-    return {
-      reports: [],
-      pagination: { page, limit, total: 0, totalPages: 0 },
-    };
-  }
+  const { organization } = await requireOrg();
+
+  // Validate inputs
+  const parsedFilters = filters ? reportFiltersSchema.parse(filters) : undefined;
+  const parsedPage = z.number().min(1).parse(page);
+  const parsedLimit = z.number().min(1).max(100).parse(limit);
 
   const where: {
     organizationId: string;
@@ -32,18 +54,18 @@ export async function getReports(
       customerName?: { contains: string; mode: "insensitive" };
     }>;
   } = {
-    organizationId: orgData.organization.id,
+    organizationId: organization.id,
   };
 
-  if (filters?.status) {
-    where.status = filters.status;
+  if (parsedFilters?.status) {
+    where.status = parsedFilters.status;
   }
 
   // Note: productName and serialNumber are now on equipment relation
   // For now, only search by customerName - could add equipment-level search later
-  if (filters?.search?.trim()) {
+  if (parsedFilters?.search?.trim()) {
     where.OR = [
-      { customerName: { contains: filters.search, mode: "insensitive" } },
+      { customerName: { contains: parsedFilters.search, mode: "insensitive" } },
     ];
   }
 
@@ -51,8 +73,8 @@ export async function getReports(
     prisma.report.findMany({
       where,
       orderBy: { updatedAt: "desc" },
-      skip: (page - 1) * limit,
-      take: limit,
+      skip: (parsedPage - 1) * parsedLimit,
+      take: parsedLimit,
       select: {
         id: true,
         reportNumber: true,
@@ -86,10 +108,10 @@ export async function getReports(
   return {
     reports,
     pagination: {
-      page,
-      limit,
+      page: parsedPage,
+      limit: parsedLimit,
       total,
-      totalPages: Math.ceil(total / limit),
+      totalPages: Math.ceil(total / parsedLimit),
     },
   };
 }
@@ -97,23 +119,15 @@ export async function getReports(
 /**
  * Delete a report (must be in user's org)
  */
-export async function deleteReport(reportId: string) {
-  const orgData = await getCurrentOrganization();
-  if (!orgData) {
-    return { success: false, error: "Ikke autentisert" };
-  }
+export async function deleteReport(reportId: unknown) {
+  const { organization } = await requireOrg();
+  const parsedId = z.string().min(1).parse(reportId);
 
   // Verify report belongs to org
-  const report = await prisma.report.findFirst({
-    where: { id: reportId, organizationId: orgData.organization.id },
-  });
-
-  if (!report) {
-    return { success: false, error: "Rapport ikke funnet" };
-  }
+  await verifyReportAccess(parsedId, organization.id);
 
   await prisma.report.delete({
-    where: { id: reportId },
+    where: { id: parsedId },
   });
 
   return { success: true };
@@ -122,14 +136,12 @@ export async function deleteReport(reportId: string) {
 /**
  * Duplicate a report within the same organization
  */
-export async function duplicateReport(reportId: string) {
-  const orgData = await getCurrentOrganization();
-  if (!orgData) {
-    return { success: false, error: "Ikke autentisert" };
-  }
+export async function duplicateReport(reportId: unknown) {
+  const { organization, userId } = await requireOrg();
+  const parsedId = z.string().min(1).parse(reportId);
 
   const original = await prisma.report.findFirst({
-    where: { id: reportId, organizationId: orgData.organization.id },
+    where: { id: parsedId, organizationId: organization.id },
     include: {
       equipment: {
         include: { checklists: true },
@@ -141,17 +153,10 @@ export async function duplicateReport(reportId: string) {
     return { success: false, error: "Rapport ikke funnet" };
   }
 
-  // Get current session for authorId
-  const { getSession } = await import("@/lib/server");
-  const session = await getSession();
-  if (!session?.user) {
-    return { success: false, error: "Ikke autentisert" };
-  }
-
   const duplicate = await prisma.report.create({
     data: {
-      authorId: session.user.id,
-      organizationId: orgData.organization.id,
+      authorId: userId,
+      organizationId: organization.id,
       customerName: original.customerName,
       customerAddress: original.customerAddress,
       contactPerson: original.contactPerson,
@@ -177,34 +182,16 @@ export async function duplicateReport(reportId: string) {
  * Only org owners/admins can assign reports
  */
 export async function assignReport(reportId: string, userId: string) {
-  const orgData = await getCurrentOrganization();
-  if (!orgData) {
-    return { success: false, error: "Ikke autentisert" };
-  }
-
-  // Check if current user is owner/admin
-  if (
-    orgData.membership.role !== "owner" &&
-    orgData.membership.role !== "admin"
-  ) {
-    return {
-      success: false,
-      error: "Kun administratorer kan tildele rapporter",
-    };
-  }
+  const { organization } = await requireAdmin();
+  const parsedReportId = z.string().min(1).parse(reportId);
+  const parsedUserId = z.string().min(1).parse(userId);
 
   // Verify report belongs to org
-  const report = await prisma.report.findFirst({
-    where: { id: reportId, organizationId: orgData.organization.id },
-  });
-
-  if (!report) {
-    return { success: false, error: "Rapport ikke funnet" };
-  }
+  await verifyReportAccess(parsedReportId, organization.id);
 
   // Verify user is a member of the org
   const member = await prisma.member.findFirst({
-    where: { userId, organizationId: orgData.organization.id },
+    where: { userId: parsedUserId, organizationId: organization.id },
   });
 
   if (!member) {
@@ -212,8 +199,8 @@ export async function assignReport(reportId: string, userId: string) {
   }
 
   await prisma.report.update({
-    where: { id: reportId },
-    data: { assignedToId: userId },
+    where: { id: parsedReportId },
+    data: { assignedToId: parsedUserId },
   });
 
   return { success: true };
@@ -222,34 +209,15 @@ export async function assignReport(reportId: string, userId: string) {
 /**
  * Remove assignment from a report
  */
-export async function unassignReport(reportId: string) {
-  const orgData = await getCurrentOrganization();
-  if (!orgData) {
-    return { success: false, error: "Ikke autentisert" };
-  }
-
-  // Check if current user is owner/admin
-  if (
-    orgData.membership.role !== "owner" &&
-    orgData.membership.role !== "admin"
-  ) {
-    return {
-      success: false,
-      error: "Kun administratorer kan fjerne tildeling",
-    };
-  }
+export async function unassignReport(reportId: unknown): Promise<{ success: boolean; error?: string }> {
+  const { organization } = await requireAdmin();
+  const parsedId = z.string().min(1).parse(reportId);
 
   // Verify report belongs to org
-  const report = await prisma.report.findFirst({
-    where: { id: reportId, organizationId: orgData.organization.id },
-  });
-
-  if (!report) {
-    return { success: false, error: "Rapport ikke funnet" };
-  }
+  await verifyReportAccess(parsedId, organization.id);
 
   await prisma.report.update({
-    where: { id: reportId },
+    where: { id: parsedId },
     data: { assignedToId: null },
   });
 
@@ -260,13 +228,10 @@ export async function unassignReport(reportId: string) {
  * Get all technicians in the organization for assignment dropdown
  */
 export async function getOrganizationTechnicians() {
-  const orgData = await getCurrentOrganization();
-  if (!orgData) {
-    return [];
-  }
+  const { organization } = await requireOrg();
 
   const members = await prisma.member.findMany({
-    where: { organizationId: orgData.organization.id },
+    where: { organizationId: organization.id },
     select: {
       userId: true,
       role: true,

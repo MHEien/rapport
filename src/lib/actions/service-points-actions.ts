@@ -1,20 +1,58 @@
 "use server";
 
+import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
-import { getCurrentOrganization } from "./org-actions";
+import { requireOrg } from "./utils/auth";
+
+// ============================================================================
+// ZOD VALIDATION SCHEMAS
+// ============================================================================
+
+const createServicePointSchema = z.object({
+  productType: z.string().min(1),
+  category: z.string().min(1),
+  text: z.string().min(1),
+  isForService: z.boolean().optional().default(true),
+  isForCommissioning: z.boolean().optional().default(true),
+});
+
+const bulkCreateServicePointSchema = z.array(createServicePointSchema);
+
+const updateServicePointInputSchema = z.object({
+  text: z.string().optional(),
+  category: z.string().optional(),
+  isForService: z.boolean().optional(),
+  isForCommissioning: z.boolean().optional(),
+});
+
+const updateOrderSchema = z.array(
+  z.object({
+    id: z.string().min(1),
+    sortOrder: z.number(),
+  }),
+);
+
+const updateCategoryOrderSchema = z.array(
+  z.object({
+    productType: z.string().min(1),
+    category: z.string().min(1),
+    sortOrder: z.number(),
+  }),
+);
+
+// ============================================================================
+// SERVICE POINT ACTIONS
+// ============================================================================
 
 /**
  * Get all service points for the current organization
  */
 export async function getServicePoints() {
-  const orgData = await getCurrentOrganization();
-  if (!orgData) {
-    return { servicePoints: [], grouped: {} };
-  }
+  const { organization } = await requireOrg();
 
   const servicePoints = await prisma.servicePoint.findMany({
-    where: { organizationId: orgData.organization.id },
+    where: { organizationId: organization.id },
     orderBy: [
       { productType: "asc" },
       { categorySortOrder: "asc" },
@@ -45,13 +83,10 @@ export async function getServicePoints() {
  * Get distinct product types for the current organization
  */
 export async function getProductTypes() {
-  const orgData = await getCurrentOrganization();
-  if (!orgData) {
-    return [];
-  }
+  const { organization } = await requireOrg();
 
   const types = await prisma.servicePoint.findMany({
-    where: { organizationId: orgData.organization.id },
+    where: { organizationId: organization.id },
     distinct: ["productType"],
     select: { productType: true },
     orderBy: { productType: "asc" },
@@ -62,22 +97,14 @@ export async function getProductTypes() {
 /**
  * Create a new service point in the current organization
  */
-export async function createServicePoint(input: {
-  productType: string;
-  category: string;
-  text: string;
-  isForService?: boolean;
-  isForCommissioning?: boolean;
-}) {
-  const orgData = await getCurrentOrganization();
-  if (!orgData) {
-    return { success: false, error: "Ikke autentisert" };
-  }
+export async function createServicePoint(data: unknown) {
+  const { organization } = await requireOrg();
+  const input = createServicePointSchema.parse(data);
 
   // Get max sortOrder for this category to append new item at end
   const maxSort = await prisma.servicePoint.aggregate({
     where: {
-      organizationId: orgData.organization.id,
+      organizationId: organization.id,
       productType: input.productType,
       category: input.category,
     },
@@ -88,7 +115,7 @@ export async function createServicePoint(input: {
   // Get existing category order (if any) or default to 0
   const existingCategoryPoint = await prisma.servicePoint.findFirst({
     where: {
-      organizationId: orgData.organization.id,
+      organizationId: organization.id,
       productType: input.productType,
       category: input.category,
     },
@@ -101,7 +128,7 @@ export async function createServicePoint(input: {
     // New category, append to end
     const maxCatSort = await prisma.servicePoint.aggregate({
       where: {
-        organizationId: orgData.organization.id,
+        organizationId: organization.id,
         productType: input.productType,
       },
       _max: { categorySortOrder: true },
@@ -111,14 +138,14 @@ export async function createServicePoint(input: {
 
   const point = await prisma.servicePoint.create({
     data: {
-      organizationId: orgData.organization.id,
+      organizationId: organization.id,
       productType: input.productType,
       category: input.category,
       text: input.text,
       sortOrder: nextSortOrder,
       categorySortOrder,
-      isForService: input.isForService ?? true,
-      isForCommissioning: input.isForCommissioning ?? true,
+      isForService: input.isForService,
+      isForCommissioning: input.isForCommissioning,
     },
   });
   revalidatePath("/data-editor");
@@ -128,28 +155,18 @@ export async function createServicePoint(input: {
 /**
  * Bulk create service points in the current organization
  */
-export async function bulkCreateServicePoints(
-  inputs: Array<{
-    productType: string;
-    category: string;
-    text: string;
-    isForService?: boolean;
-    isForCommissioning?: boolean;
-  }>,
-) {
-  const orgData = await getCurrentOrganization();
-  if (!orgData) {
-    return { success: false, error: "Ikke autentisert" };
-  }
+export async function bulkCreateServicePoints(data: unknown) {
+  const { organization } = await requireOrg();
+  const inputs = bulkCreateServicePointSchema.parse(data);
 
   const count = await prisma.servicePoint.createMany({
     data: inputs.map((input) => ({
-      organizationId: orgData.organization.id,
+      organizationId: organization.id,
       productType: input.productType,
       category: input.category,
       text: input.text,
-      isForService: input.isForService ?? true,
-      isForCommissioning: input.isForCommissioning ?? true,
+      isForService: input.isForService,
+      isForCommissioning: input.isForCommissioning,
       // Default to 0 for bulk import; user can reorder later
       categorySortOrder: 0,
     })),
@@ -163,30 +180,29 @@ export async function bulkCreateServicePoints(
  * Update a service point (must be in user's org)
  */
 export async function updateServicePoint(
-  id: string,
-  input: {
-    text?: string;
-    category?: string;
-    isForService?: boolean;
-    isForCommissioning?: boolean;
-  },
+  servicePointId: string,
+  inputData: unknown,
 ) {
-  const orgData = await getCurrentOrganization();
-  if (!orgData) {
-    return { success: false, error: "Ikke autentisert" };
-  }
+  const { organization } = await requireOrg();
+  const parsedId = z.string().min(1).parse(servicePointId);
+  const input = updateServicePointInputSchema.parse(inputData);
 
   // Verify ownership
   const existing = await prisma.servicePoint.findFirst({
-    where: { id, organizationId: orgData.organization.id },
+    where: { id: parsedId, organizationId: organization.id },
   });
   if (!existing) {
     return { success: false, error: "Sjekkpunkt ikke funnet" };
   }
 
   const point = await prisma.servicePoint.update({
-    where: { id },
-    data: input,
+    where: { id: parsedId },
+    data: {
+      ...(input.text !== undefined && { text: input.text }),
+      ...(input.category !== undefined && { category: input.category }),
+      ...(input.isForService !== undefined && { isForService: input.isForService }),
+      ...(input.isForCommissioning !== undefined && { isForCommissioning: input.isForCommissioning }),
+    },
   });
   revalidatePath("/data-editor");
   return { success: true, point };
@@ -195,22 +211,20 @@ export async function updateServicePoint(
 /**
  * Delete a service point (must be in user's org)
  */
-export async function deleteServicePoint(id: string) {
-  const orgData = await getCurrentOrganization();
-  if (!orgData) {
-    return { success: false, error: "Ikke autentisert" };
-  }
+export async function deleteServicePoint(servicePointId: unknown) {
+  const { organization } = await requireOrg();
+  const parsedId = z.string().min(1).parse(servicePointId);
 
   // Verify ownership
   const existing = await prisma.servicePoint.findFirst({
-    where: { id, organizationId: orgData.organization.id },
+    where: { id: parsedId, organizationId: organization.id },
   });
   if (!existing) {
     return { success: false, error: "Sjekkpunkt ikke funnet" };
   }
 
   await prisma.servicePoint.delete({
-    where: { id },
+    where: { id: parsedId },
   });
   revalidatePath("/data-editor");
   return { success: true };
@@ -219,20 +233,18 @@ export async function deleteServicePoint(id: string) {
 /**
  * Create a product type (just returns success - types are inferred from service points)
  */
-export async function createProductType(name: string) {
-  return { success: true, productType: name };
+export async function createProductType(name: unknown) {
+  await requireOrg(); // Ensure authenticated
+  const parsedName = z.string().min(1).parse(name);
+  return { success: true, productType: parsedName };
 }
 
 /**
  * Update sort order for multiple service points (drag-and-drop reordering)
  */
-export async function updateServicePointOrder(
-  items: Array<{ id: string; sortOrder: number }>,
-) {
-  const orgData = await getCurrentOrganization();
-  if (!orgData) {
-    return { success: false, error: "Ikke autentisert" };
-  }
+export async function updateServicePointOrder(data: unknown) {
+  const { organization } = await requireOrg();
+  const items = updateOrderSchema.parse(data);
 
   // Update each item's sortOrder
   await prisma.$transaction(
@@ -240,7 +252,7 @@ export async function updateServicePointOrder(
       prisma.servicePoint.updateMany({
         where: {
           id: item.id,
-          organizationId: orgData.organization.id,
+          organizationId: organization.id,
         },
         data: { sortOrder: item.sortOrder },
       }),
@@ -254,17 +266,9 @@ export async function updateServicePointOrder(
 /**
  * Update sort order for categories (drag-and-drop reordering)
  */
-export async function updateCategoryOrder(
-  items: Array<{
-    productType: string;
-    category: string;
-    sortOrder: number;
-  }>,
-) {
-  const orgData = await getCurrentOrganization();
-  if (!orgData) {
-    return { success: false, error: "Ikke autentisert" };
-  }
+export async function updateCategoryOrder(data: unknown) {
+  const { organization } = await requireOrg();
+  const items = updateCategoryOrderSchema.parse(data);
 
   // Since categories aren't normalized, we have to update all service points
   // that belong to the productType + category combination.
@@ -272,7 +276,7 @@ export async function updateCategoryOrder(
     items.map((item) =>
       prisma.servicePoint.updateMany({
         where: {
-          organizationId: orgData.organization.id,
+          organizationId: organization.id,
           productType: item.productType,
           category: item.category,
         },

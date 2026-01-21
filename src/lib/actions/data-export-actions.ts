@@ -1,64 +1,69 @@
 "use server";
 
+import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { getCurrentOrganization } from "./org-actions";
+import { requireOrg, requireOwner, requireAdmin } from "./utils/auth";
 
-// Helper for authorization (Owner Only)
-async function requireOwner() {
-  const orgData = await getCurrentOrganization();
-  if (!orgData) {
-    return { error: "Ikke autentisert", orgData: null };
-  }
+// ============================================================================
+// ZOD VALIDATION SCHEMAS
+// ============================================================================
 
-  if (orgData.membership.role !== "owner") {
-    return {
-      error: "Kun eier har tilgang til full backup og gjenoppretting",
-      orgData: null,
-    };
-  }
+const customerDataSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  email: z.string().nullable().optional(),
+  phone: z.string().nullable().optional(),
+  address: z.string().nullable().optional(),
+});
 
-  return { error: null, orgData };
-}
+const servicePointDataSchema = z.object({
+  id: z.string(),
+  productType: z.string(),
+  category: z.string(),
+  text: z.string(),
+  sortOrder: z.number().optional().default(0),
+  categorySortOrder: z.number().optional().default(0),
+  isForService: z.boolean().optional().default(true),
+  isForCommissioning: z.boolean().optional().default(true),
+});
 
-// Helper for Admin or Owner
-async function requireAdminOrOwner() {
-  const orgData = await getCurrentOrganization();
-  if (!orgData) {
-    return { error: "Ikke autentisert", orgData: null };
-  }
+const projectDataSchema = z.object({
+  id: z.string(),
+  projectNumber: z.string(),
+  name: z.string(),
+  description: z.string().nullable().optional(),
+  customerId: z.string().nullable().optional(),
+  createdAt: z.string().optional(),
+});
 
-  if (
-    orgData.membership.role !== "owner" &&
-    orgData.membership.role !== "admin"
-  ) {
-    return {
-      error: "Ingen tilgang",
-      orgData: null,
-    };
-  }
+const restoreDataSchema = z.object({
+  timestamp: z.string().optional(),
+  organization: z.string().optional(),
+  customers: z.array(customerDataSchema).optional(),
+  servicePoints: z.array(servicePointDataSchema).optional(),
+  projects: z.array(projectDataSchema).optional(),
+});
 
-  return { error: null, orgData };
-}
+// ============================================================================
+// DATA EXPORT ACTIONS
+// ============================================================================
 
 /**
  * Fetch all data for backup (Owner only)
  */
 export async function exportAllData() {
-  const { error, orgData } = await requireOwner();
-  if (error || !orgData) {
-    return { success: false, error: error ?? "Ikke autentisert" };
-  }
+  const { organization } = await requireOwner();
 
   try {
     const [customers, servicePoints, projects] = await Promise.all([
       prisma.customer.findMany({
-        where: { organizationId: orgData.organization.id },
+        where: { organizationId: organization.id },
       }),
       prisma.servicePoint.findMany({
-        where: { organizationId: orgData.organization.id },
+        where: { organizationId: organization.id },
       }),
       prisma.project.findMany({
-        where: { organizationId: orgData.organization.id },
+        where: { organizationId: organization.id },
         include: { customer: true },
       }),
     ]);
@@ -67,7 +72,7 @@ export async function exportAllData() {
       success: true,
       data: {
         timestamp: new Date().toISOString(),
-        organization: orgData.organization.name,
+        organization: organization.name,
         customers,
         servicePoints,
         projects,
@@ -82,18 +87,18 @@ export async function exportAllData() {
 /**
  * Restore data from backup (Owner only)
  */
-export async function restoreData(data: any) {
-  const { error, orgData } = await requireOwner();
-  if (error || !orgData) {
-    return { success: false, error: error ?? "Ikke autentisert" };
-  }
+export async function restoreData(data: unknown) {
+  const { organization } = await requireOwner();
+
+  // Validate the backup data structure
+  const parsed = restoreDataSchema.parse(data);
 
   try {
-    const orgId = orgData.organization.id;
+    const orgId = organization.id;
 
     // 1. Restore Customers
-    if (Array.isArray(data.customers)) {
-      for (const c of data.customers) {
+    if (parsed.customers && Array.isArray(parsed.customers)) {
+      for (const c of parsed.customers) {
         await prisma.customer.upsert({
           where: { id: c.id },
           create: {
@@ -115,8 +120,8 @@ export async function restoreData(data: any) {
     }
 
     // 2. Restore Service Points
-    if (Array.isArray(data.servicePoints)) {
-      for (const sp of data.servicePoints) {
+    if (parsed.servicePoints && Array.isArray(parsed.servicePoints)) {
+      for (const sp of parsed.servicePoints) {
         await prisma.servicePoint.upsert({
           where: { id: sp.id },
           create: {
@@ -144,8 +149,8 @@ export async function restoreData(data: any) {
     }
 
     // 3. Restore Projects (Must be after customers)
-    if (Array.isArray(data.projects)) {
-      for (const p of data.projects) {
+    if (parsed.projects && Array.isArray(parsed.projects)) {
+      for (const p of parsed.projects) {
         // Ensure customer exists (if provided)
         if (p.customerId) {
           const customerExists = await prisma.customer.findUnique({
@@ -186,15 +191,12 @@ export async function restoreData(data: any) {
  * Fetch products for Excel export
  */
 export async function getProductsForExport() {
-  const { error, orgData } = await requireAdminOrOwner();
-  if (error || !orgData) {
-    return { success: false, error: error ?? "Ikke autentisert" };
-  }
+  const { organization } = await requireAdmin();
 
   try {
     const products = await prisma.servicePoint.findMany({
       // Assuming servicePoint is the intended "product" list based on recent context
-      where: { organizationId: orgData.organization.id },
+      where: { organizationId: organization.id },
       select: {
         id: true,
         productType: true,

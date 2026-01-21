@@ -1,34 +1,37 @@
 "use server";
 
+import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { getSession } from "@/lib/server";
-import { getCurrentOrganization } from "./org-actions";
+import { requireOrg } from "./utils/auth";
+
+// ============================================================================
+// ZOD VALIDATION SCHEMAS
+// ============================================================================
+
+const parsedPartSchema = z.object({
+  partNumber: z.string().min(1),
+  description: z.string().min(1),
+  quantity: z.number().min(1),
+  unit: z.string().optional(),
+});
+
+const consumeRestoreSchema = z.object({
+  inventoryId: z.string().min(1),
+  quantity: z.number().min(1),
+});
 
 // ============================================================================
 // VAN INVENTORY MANAGEMENT
 // ============================================================================
 
-export interface ParsedPart {
-  partNumber: string;
-  description: string;
-  quantity: number;
-  unit?: string;
-}
+export type ParsedPart = z.infer<typeof parsedPartSchema>;
 
 /**
  * Parse PDF and save inventory to database
  * The PDF parsing is flexible and can be tuned based on actual PDF format
  */
 export async function parseAndSaveInventoryPdf(formData: FormData) {
-  const session = await getSession();
-  if (!session?.user) {
-    return { success: false, error: "Ikke autentisert" };
-  }
-
-  const orgData = await getCurrentOrganization();
-  if (!orgData) {
-    return { success: false, error: "Ingen organisasjon funnet" };
-  }
+  const { organization, userId } = await requireOrg();
 
   const file = formData.get("file") as File;
   if (!file) {
@@ -88,8 +91,8 @@ export async function parseAndSaveInventoryPdf(formData: FormData) {
         quantity: part.quantity,
         remaining: part.quantity, // Initially, remaining = imported quantity
         unit: part.unit,
-        organizationId: orgData.organization.id,
-        userId: session.user.id,
+        organizationId: organization.id,
+        userId: userId,
       })),
     });
 
@@ -269,21 +272,13 @@ function extractNumber(str: string): number {
  * Get current inventory session for the user
  */
 export async function getCurrentSessionInventory() {
-  const session = await getSession();
-  if (!session?.user) {
-    return null;
-  }
-
-  const orgData = await getCurrentOrganization();
-  if (!orgData) {
-    return null;
-  }
+  const { organization, userId } = await requireOrg();
 
   // Get the most recent session for this user
   const latestItem = await prisma.vanInventory.findFirst({
     where: {
-      organizationId: orgData.organization.id,
-      userId: session.user.id,
+      organizationId: organization.id,
+      userId: userId,
     },
     orderBy: { createdAt: "desc" },
     select: { sessionId: true, createdAt: true },
@@ -312,22 +307,14 @@ export async function getCurrentSessionInventory() {
  * Get all inventory sessions for the user
  */
 export async function getInventorySessions() {
-  const session = await getSession();
-  if (!session?.user) {
-    return [];
-  }
-
-  const orgData = await getCurrentOrganization();
-  if (!orgData) {
-    return [];
-  }
+  const { organization, userId } = await requireOrg();
 
   // Get distinct sessions with their first item's createdAt
   const sessions = await prisma.vanInventory.groupBy({
     by: ["sessionId"],
     where: {
-      organizationId: orgData.organization.id,
-      userId: session.user.id,
+      organizationId: organization.id,
+      userId: userId,
     },
     _count: { id: true },
     _min: { createdAt: true },
@@ -344,23 +331,16 @@ export async function getInventorySessions() {
 /**
  * Clear an inventory session
  */
-export async function clearInventorySession(sessionId: string) {
-  const session = await getSession();
-  if (!session?.user) {
-    return { success: false, error: "Ikke autentisert" };
-  }
-
-  const orgData = await getCurrentOrganization();
-  if (!orgData) {
-    return { success: false, error: "Ingen organisasjon funnet" };
-  }
+export async function clearInventorySession(sessionId: unknown) {
+  const { organization, userId } = await requireOrg();
+  const parsedId = z.string().min(1).parse(sessionId);
 
   // Verify this session belongs to the user
   const item = await prisma.vanInventory.findFirst({
     where: {
-      sessionId,
-      organizationId: orgData.organization.id,
-      userId: session.user.id,
+      sessionId: parsedId,
+      organizationId: organization.id,
+      userId: userId,
     },
   });
 
@@ -369,7 +349,7 @@ export async function clearInventorySession(sessionId: string) {
   }
 
   await prisma.vanInventory.deleteMany({
-    where: { sessionId },
+    where: { sessionId: parsedId },
   });
 
   return { success: true };
@@ -379,23 +359,25 @@ export async function clearInventorySession(sessionId: string) {
  * Consume parts from inventory (reduce remaining count)
  */
 export async function consumeFromInventory(
-  inventoryId: string,
-  quantityUsed: number,
+  inventoryId: unknown,
+  quantityUsed: unknown,
 ) {
-  const session = await getSession();
-  if (!session?.user) {
-    return { success: false, error: "Ikke autentisert" };
-  }
+  const { organization } = await requireOrg();
+  const parsedId = z.string().min(1).parse(inventoryId);
+  const parsedQty = z.number().min(1).parse(quantityUsed);
 
-  const item = await prisma.vanInventory.findUnique({
-    where: { id: inventoryId },
+  const item = await prisma.vanInventory.findFirst({
+    where: {
+      id: parsedId,
+      organizationId: organization.id,
+    },
   });
 
   if (!item) {
     return { success: false, error: "Del ikke funnet i inventar" };
   }
 
-  if (item.remaining < quantityUsed) {
+  if (item.remaining < parsedQty) {
     return {
       success: false,
       error: `Ikke nok på lager. Tilgjengelig: ${item.remaining}`,
@@ -403,8 +385,8 @@ export async function consumeFromInventory(
   }
 
   const updated = await prisma.vanInventory.update({
-    where: { id: inventoryId },
-    data: { remaining: item.remaining - quantityUsed },
+    where: { id: parsedId },
+    data: { remaining: item.remaining - parsedQty },
   });
 
   return { success: true, item: updated };
@@ -414,11 +396,18 @@ export async function consumeFromInventory(
  * Restore parts to inventory (e.g., if removing from report)
  */
 export async function restoreToInventory(
-  inventoryId: string,
-  quantityToRestore: number,
+  inventoryId: unknown,
+  quantityToRestore: unknown,
 ) {
-  const item = await prisma.vanInventory.findUnique({
-    where: { id: inventoryId },
+  const { organization } = await requireOrg();
+  const parsedId = z.string().min(1).parse(inventoryId);
+  const parsedQty = z.number().min(1).parse(quantityToRestore);
+
+  const item = await prisma.vanInventory.findFirst({
+    where: {
+      id: parsedId,
+      organizationId: organization.id,
+    },
   });
 
   if (!item) {
@@ -426,12 +415,12 @@ export async function restoreToInventory(
   }
 
   const newRemaining = Math.min(
-    item.remaining + quantityToRestore,
+    item.remaining + parsedQty,
     item.quantity, // Can't exceed original quantity
   );
 
   const updated = await prisma.vanInventory.update({
-    where: { id: inventoryId },
+    where: { id: parsedId },
     data: { remaining: newRemaining },
   });
 
@@ -441,16 +430,14 @@ export async function restoreToInventory(
 /**
  * Manually add a single item to current inventory
  */
-export async function addInventoryItem(input: ParsedPart) {
-  const session = await getSession();
-  if (!session?.user) {
-    return { success: false, error: "Ikke autentisert" };
-  }
+export async function addInventoryItem(data: unknown) {
+  const { organization, userId } = await requireOrg();
 
-  const orgData = await getCurrentOrganization();
-  if (!orgData) {
-    return { success: false, error: "Ingen organisasjon funnet" };
+  const parsed = parsedPartSchema.safeParse(data);
+  if (!parsed.success) {
+    return { success: false as const, error: parsed.error.issues[0]?.message ?? "Ugyldig data" };
   }
+  const input = parsed.data;
 
   // Get current session or create new one
   const currentInventory = await getCurrentSessionInventory();
@@ -466,10 +453,10 @@ export async function addInventoryItem(input: ParsedPart) {
       quantity: input.quantity,
       remaining: input.quantity,
       unit: input.unit || "stk",
-      organizationId: orgData.organization.id,
-      userId: session.user.id,
+      organizationId: organization.id,
+      userId: userId,
     },
   });
 
-  return { success: true, item };
+  return { success: true as const, item };
 }

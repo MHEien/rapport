@@ -1,30 +1,30 @@
 "use server";
 
+import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { getCurrentOrganization } from "./org-actions";
+import { requireOrg, requireAdmin } from "./utils/auth";
 
 // ============================================================================
-// AUTHORIZATION HELPER
+// ZOD VALIDATION SCHEMAS
 // ============================================================================
 
-async function requireAdminOrOwner() {
-  const orgData = await getCurrentOrganization();
-  if (!orgData) {
-    return { error: "Ikke autentisert", orgData: null };
-  }
+const searchProjectsSchema = z.object({
+  query: z.string(),
+});
 
-  if (
-    orgData.membership.role !== "owner" &&
-    orgData.membership.role !== "admin"
-  ) {
-    return {
-      error: "Kun administratorer har tilgang til prosjekter",
-      orgData: null,
-    };
-  }
+const createProjectSchema = z.object({
+  projectNumber: z.string().min(1),
+  name: z.string().min(1),
+  description: z.string().optional(),
+  customerId: z.string().optional(),
+});
 
-  return { error: null, orgData };
-}
+const updateProjectSchema = z.object({
+  projectId: z.string().min(1),
+  name: z.string().optional(),
+  description: z.string().optional(),
+  customerId: z.string().nullable().optional(),
+});
 
 // ============================================================================
 // PROJECT ACTIONS
@@ -33,20 +33,18 @@ async function requireAdminOrOwner() {
 /**
  * Search for projects by number or name (Accessible to ALL members)
  */
-export async function searchProjects(query: string) {
-  const orgData = await getCurrentOrganization();
-  if (!orgData) {
-    return { success: false, error: "Ikke autentisert", projects: [] };
-  }
+export async function searchProjects(data: unknown) {
+  const { organization } = await requireOrg();
+  const input = searchProjectsSchema.parse(data);
 
   // No role check - technicians need to search projects to log hours
 
   const projects = await prisma.project.findMany({
     where: {
-      organizationId: orgData.organization.id,
+      organizationId: organization.id,
       OR: [
-        { projectNumber: { contains: query, mode: "insensitive" } },
-        { name: { contains: query, mode: "insensitive" } },
+        { projectNumber: { contains: input.query, mode: "insensitive" } },
+        { name: { contains: input.query, mode: "insensitive" } },
       ],
     },
     select: {
@@ -68,13 +66,10 @@ export async function searchProjects(query: string) {
  * Get all projects for the organization (admin only)
  */
 export async function getProjects() {
-  const { error, orgData } = await requireAdminOrOwner();
-  if (error || !orgData) {
-    return { success: false, error: error ?? "Ikke autentisert", projects: [] };
-  }
+  const { organization } = await requireAdmin();
 
   const projects = await prisma.project.findMany({
-    where: { organizationId: orgData.organization.id },
+    where: { organizationId: organization.id },
     include: {
       customer: {
         select: { id: true, name: true },
@@ -92,14 +87,12 @@ export async function getProjects() {
 /**
  * Get project with detailed stats (workers and days)
  */
-export async function getProjectWithStats(projectId: string) {
-  const { error, orgData } = await requireAdminOrOwner();
-  if (error || !orgData) {
-    return { success: false, error: error ?? "Ikke autentisert" };
-  }
+export async function getProjectWithStats(projectId: unknown) {
+  const { organization } = await requireAdmin();
+  const parsedId = z.string().min(1).parse(projectId);
 
   const project = await prisma.project.findFirst({
-    where: { id: projectId, organizationId: orgData.organization.id },
+    where: { id: parsedId, organizationId: organization.id },
     include: {
       customer: true,
       assignments: {
@@ -178,21 +171,14 @@ export async function getProjectWithStats(projectId: string) {
 /**
  * Create a new project
  */
-export async function createProject(input: {
-  projectNumber: string;
-  name: string;
-  description?: string;
-  customerId?: string;
-}) {
-  const { error, orgData } = await requireAdminOrOwner();
-  if (error || !orgData) {
-    return { success: false, error: error ?? "Ikke autentisert" };
-  }
+export async function createProject(data: unknown) {
+  const { organization } = await requireAdmin();
+  const input = createProjectSchema.parse(data);
 
   // Check for duplicate project number
   const existing = await prisma.project.findFirst({
     where: {
-      organizationId: orgData.organization.id,
+      organizationId: organization.id,
       projectNumber: input.projectNumber,
     },
   });
@@ -207,7 +193,7 @@ export async function createProject(input: {
       name: input.name,
       description: input.description,
       customerId: input.customerId || null,
-      organizationId: orgData.organization.id,
+      organizationId: organization.id,
     },
     include: {
       customer: true,
@@ -220,21 +206,12 @@ export async function createProject(input: {
 /**
  * Update a project
  */
-export async function updateProject(
-  projectId: string,
-  input: {
-    name?: string;
-    description?: string;
-    customerId?: string | null;
-  },
-) {
-  const { error, orgData } = await requireAdminOrOwner();
-  if (error || !orgData) {
-    return { success: false, error: error ?? "Ikke autentisert" };
-  }
+export async function updateProject(data: unknown) {
+  const { organization } = await requireAdmin();
+  const input = updateProjectSchema.parse(data);
 
   const existing = await prisma.project.findFirst({
-    where: { id: projectId, organizationId: orgData.organization.id },
+    where: { id: input.projectId, organizationId: organization.id },
   });
 
   if (!existing) {
@@ -242,11 +219,11 @@ export async function updateProject(
   }
 
   const project = await prisma.project.update({
-    where: { id: projectId },
+    where: { id: input.projectId },
     data: {
-      name: input.name,
-      description: input.description,
-      customerId: input.customerId,
+      ...(input.name !== undefined && { name: input.name }),
+      ...(input.description !== undefined && { description: input.description }),
+      ...(input.customerId !== undefined && { customerId: input.customerId }),
     },
     include: {
       customer: true,
@@ -259,14 +236,12 @@ export async function updateProject(
 /**
  * Delete a project (only if no assignments)
  */
-export async function deleteProject(projectId: string) {
-  const { error, orgData } = await requireAdminOrOwner();
-  if (error || !orgData) {
-    return { success: false, error: error ?? "Ikke autentisert" };
-  }
+export async function deleteProject(projectId: unknown) {
+  const { organization } = await requireAdmin();
+  const parsedId = z.string().min(1).parse(projectId);
 
   const existing = await prisma.project.findFirst({
-    where: { id: projectId, organizationId: orgData.organization.id },
+    where: { id: parsedId, organizationId: organization.id },
     include: { _count: { select: { assignments: true } } },
   });
 
@@ -281,7 +256,7 @@ export async function deleteProject(projectId: string) {
     };
   }
 
-  await prisma.project.delete({ where: { id: projectId } });
+  await prisma.project.delete({ where: { id: parsedId } });
 
   return { success: true };
 }
